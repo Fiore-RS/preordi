@@ -1,0 +1,107 @@
+@import 'tailwindcss';
+
+/* Tokens de Preordi — ver docs/preordi-especificacion.md, sección 10 */
+@theme {
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
+  --font-sans: 'DM Sans Variable', 'DM Sans', sans-serif;
+
+  --color-naranja-50: #FDF3E3;
+  --color-naranja-100: #FBE0B8;
+  --color-naranja-300: #F0AE4D;
+  --color-naranja-500: #E28C00;
+  --color-naranja-700: #A86600;
+  --color-naranja-900: #5C3800;
+
+  --color-amarillo-50: #FEFAE0;
+  --color-amarillo-100: #FBF1B0;
+  --color-amarillo-500: #ECCD00;
+  --color-amarillo-700: #A88F00;
+  --color-amarillo-900: #4D4100;
+
+  --color-celeste-50: #EEF6FB;
+  --color-celeste-100: #D3E8F5;
+  --color-celeste-300: #94C8E8;
+  --color-celeste-500: #62AEDC;
+  --color-celeste-700: #2F7FB0;
+
+  --color-marino-50: #E9EDF2;
+  --color-marino-100: #C9D2DE;
+  --color-marino-300: #94A8C2;
+  --color-marino-400: #4A5F7A;
+  --color-marino-500: #203856;
+  --color-marino-700: #16273D;
+  --color-marino-900: #0D1726;
+
+  --color-papel: #FFFDF8;
+}
+
+@layer base {
+  /*
+    Igual que en Sobres: el documento no hace scroll ni rebota (bounce) en móviles.
+    Todo el scroll ocurre dentro de los contenedores .no-scrollbar del marco
+    (ver components/organisms/MarcoApp.tsx).
+  */
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-marino-50 font-sans text-marino-500 antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+/* Oculta la barra de scroll nativa dentro de la app (el scroll sigue funcionando). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+  Entrada suave de cada pantalla al navegar (ver LayoutPrincipal.tsx).
+  A diferencia de Sobres, se anima margin-top en vez de transform: un transform
+  convierte al contenedor en referencia de los elementos absolute, y el botón +
+  saltaría de lugar durante la animación.
+*/
+@keyframes entrar {
+  from {
+    opacity: 0;
+    margin-top: 6px;
+  }
+  to {
+    opacity: 1;
+    margin-top: 0;
+  }
+}
+
+/* Quien prefiera menos movimiento (ajuste del sistema) no ve animaciones. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
