@@ -465,6 +465,17 @@ Al editar no se muestran los pasos 7–8. Los pagos se manejan desde el detalle.
 - **Zona peligrosa:** reiniciar todo
 - **Acerca de:** versión y link al repo
 
+### 8.10 Pantalla de carga
+Igual que en Sobres y Teleo:
+- Aparece al abrir la app, **encima de todo**, mientras la app ya se monta debajo.
+- Muestra el **ícono de la caja pulsando** (`animate-pulse`) sobre el fondo de marca.
+- Dura **2 s** y luego se desvanece en **250 ms**; después se quita por completo.
+- Usa **colores de marca fijos**, no los del tema, para verse igual en modo claro y oscuro.
+- Es el **mismo dibujo que las pantallas de arranque de iOS** (`apple-touch-startup-image` en `public/splash/`), así el paso de una a la otra no se nota.
+- `aria-hidden="true"`. Con "reducir movimiento" activado, el pulso se desactiva por la regla global de `index.css`.
+- Componente: `components/organisms/PantallaCarga.tsx`, montado en `App.tsx` fuera de las rutas.
+- Fondo propuesto: `marino-500`, el mismo del ícono. Se define junto con el ícono final.
+
 ---
 
 ## 9. Ejemplo de cálculo
@@ -587,7 +598,7 @@ Al editar no se muestran los pasos 7–8. Los pagos se manejan desde el detalle.
 - **Áreas táctiles** de al menos 44 px.
 
 ### 10.8 Ícono de la app
-Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo marino. Se usa en el ícono de instalación, el splash y los estados vacíos. Hay una versión provisional en `public/` (`favicon.svg` y los PNG).
+Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo marino. Se usa en el ícono de instalación, la pantalla de carga (8.10), los splash de iOS y los estados vacíos. Hay una versión provisional en `public/` (`favicon.svg` y los PNG).
 
 ---
 
@@ -599,10 +610,11 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 4. **Lógica:** tipos ✅, `calculos` ✅, `fechas` ✅, `estados` ✅ y persistencia ✅, verificados con el ejemplo de la sección 9
 5. **Pantallas MVP:** en el orden de la sección 8
 6. **Imágenes y respaldo:** compresión, IndexedDB y `.zip`
-7. **Pulido PWA:** íconos, splash, modo oscuro y prueba de instalación en el teléfono
+7. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro y prueba de instalación en el teléfono
 8. **Publicar:** agregar al hub `index`
 
 ---
 
 ## 12. Pendientes por decidir
 - Diseño final del ícono (caja)
+- Fondo de la pantalla de carga y de los splash de iOS (junto con el ícono final)
