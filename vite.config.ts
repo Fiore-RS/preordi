@@ -4,10 +4,11 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command, isPreview }) => ({
   // En GitHub Pages el sitio queda en fiore-rs.github.io/preordi/, así que en
-  // build usamos esa subruta como base; en desarrollo seguimos en la raíz.
-  base: command === 'build' ? '/preordi/' : '/',
+  // build (y en `npm run preview`, que sirve ese build) usamos esa subruta como
+  // base; en desarrollo seguimos en la raíz.
+  base: command === 'build' || isPreview ? '/preordi/' : '/',
   plugins: [
     react(),
     tailwindcss(),

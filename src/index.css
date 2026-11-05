@@ -105,3 +105,9 @@
     transition-duration: 1ms !important;
   }
 }
+
+/* Foco visible solo al navegar con teclado (como en Sobres). */
+:where(button, a, [role]):focus-visible {
+  outline: 2px solid var(--color-naranja-500);
+  outline-offset: 2px;
+}
