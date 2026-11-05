@@ -12,34 +12,16 @@ import {
   type CampoConError,
   type ErroresFormulario,
   type FormularioPreorden as Formulario,
-  type PrecisionFormulario,
 } from '../../lib/formulario';
 import { nuevoId } from '../../lib/ids';
-import type { Preorden, TipoPago } from '../../types';
+import type { Preorden } from '../../types';
 import { Boton } from '../atoms/Boton';
 import { Icono } from '../atoms/Icono';
 import { Campo, CLASE_ENTRADA } from '../molecules/Campo';
 import { CampoMonto } from '../molecules/CampoMonto';
 import { Segmentado } from '../molecules/Segmentado';
-
-const MESES = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre',
-];
-const TRIMESTRES = ['T1 · ene–mar', 'T2 · abr–jun', 'T3 · jul–set', 'T4 · oct–dic'];
-
-const TIPOS_PAGO: { valor: TipoPago; titulo: string; detalle: string }[] = [
-  { valor: 'deposito', titulo: 'Depósito + saldo', detalle: 'Pago una parte ahora y el resto al llegar' },
-  { valor: 'completo', titulo: 'Pago completo', detalle: 'Ya la pagué toda' },
-  { valor: 'al_envio', titulo: 'Pago al envío', detalle: 'Me cobran cuando la despachan' },
-];
-
-const PRECISIONES: { valor: PrecisionFormulario; texto: string }[] = [
-  { valor: 'dia', texto: 'Día' },
-  { valor: 'mes', texto: 'Mes' },
-  { valor: 'trimestre', texto: 'Trimestre' },
-  { valor: 'ninguna', texto: 'Sin fecha' },
-];
+import { SelectorFechaEstimada } from '../molecules/SelectorFechaEstimada';
+import { SelectorTipoPago } from '../molecules/SelectorTipoPago';
 
 interface Props {
   /** Preorden a editar. Sin ella, el formulario crea una nueva. */
@@ -121,10 +103,6 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
   const costo = costoDeFormulario(f);
   const pagado = original ? totalPagado(original) : 0;
   const haySobrepago = !!original && costo > 0 && pagado > costo;
-
-  const anioActual = Number(hoy.slice(0, 4));
-  const anios = Array.from({ length: 7 }, (_, i) => String(anioActual - 1 + i));
-  if (!anios.includes(f.anio)) anios.unshift(f.anio);
 
   const textoGuardar = original ? 'Guardar cambios' : f.estadoInicial === 'deseada' ? 'Guardar deseo' : 'Guardar preorden';
   const describe = (campo: CampoConError) => (errores[campo] ? `campo-${campo}-error` : undefined);
@@ -285,36 +263,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
         {apartando && (
           <>
             <Campo id="campo-tipoPago" etiqueta="Tipo de pago">
-              <div role="radiogroup" aria-label="Tipo de pago" className="flex flex-col gap-2">
-                {TIPOS_PAGO.map((t) => {
-                  const activo = t.valor === f.tipoPago;
-                  return (
-                    <button
-                      key={t.valor}
-                      type="button"
-                      role="radio"
-                      aria-checked={activo}
-                      onClick={() => cambiar({ tipoPago: t.valor }, 'deposito')}
-                      className={`flex items-start gap-3 rounded-[14px] px-3.5 py-3 text-left transition-colors ${
-                        activo ? 'border-[1.5px] border-naranja-500 bg-naranja-50' : 'border border-marino-100 bg-white'
-                      }`}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className={`mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 ${
-                          activo ? 'border-naranja-700' : 'border-marino-300'
-                        }`}
-                      >
-                        {activo && <span className="size-2 rounded-full bg-naranja-700" />}
-                      </span>
-                      <span className="flex flex-col gap-0.5">
-                        <span className="text-[15px] font-bold">{t.titulo}</span>
-                        <span className="text-[13px] text-marino-400">{t.detalle}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              <SelectorTipoPago valor={f.tipoPago} onCambio={(tipoPago) => cambiar({ tipoPago }, 'deposito')} />
             </Campo>
 
             <div className="grid grid-cols-2 gap-3">
@@ -353,71 +302,14 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
         )}
 
         <Campo id="campo-fechaEstimada" etiqueta="Llegada estimada" error={errores.fechaEstimada}>
-          <Segmentado
-            etiqueta="Precisión de la fecha"
-            valor={f.precision}
-            onCambio={(precision) => cambiar({ precision }, 'fechaEstimada')}
-            opciones={PRECISIONES}
+          <SelectorFechaEstimada
+            idBase="fecha-estimada"
+            hoy={hoy}
+            valores={f}
+            onCambio={(cambios) => cambiar(cambios, 'fechaEstimada')}
+            invalido={!!errores.fechaEstimada}
+            aria-describedby={describe('fechaEstimada')}
           />
-          {f.precision === 'dia' && (
-            <>
-              <label htmlFor="fecha-dia" className="sr-only">
-                Día estimado
-              </label>
-              <input
-                id="fecha-dia"
-                type="date"
-                value={f.fechaDia}
-                onChange={(e) => cambiar({ fechaDia: e.target.value }, 'fechaEstimada')}
-                aria-invalid={!!errores.fechaEstimada || undefined}
-                aria-describedby={describe('fechaEstimada')}
-                className={`${CLASE_ENTRADA} h-12`}
-              />
-            </>
-          )}
-          {(f.precision === 'mes' || f.precision === 'trimestre') && (
-            <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2">
-              {f.precision === 'mes' ? (
-                <select
-                  aria-label="Mes estimado"
-                  value={f.mes}
-                  onChange={(e) => cambiar({ mes: e.target.value }, 'fechaEstimada')}
-                  className={`${CLASE_ENTRADA} h-12`}
-                >
-                  {MESES.map((m, i) => (
-                    <option key={m} value={String(i + 1)}>
-                      {m}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <select
-                  aria-label="Trimestre estimado"
-                  value={f.trimestre}
-                  onChange={(e) => cambiar({ trimestre: e.target.value }, 'fechaEstimada')}
-                  className={`${CLASE_ENTRADA} h-12`}
-                >
-                  {TRIMESTRES.map((t, i) => (
-                    <option key={t} value={String(i + 1)}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-              )}
-              <select
-                aria-label="Año estimado"
-                value={f.anio}
-                onChange={(e) => cambiar({ anio: e.target.value }, 'fechaEstimada')}
-                className={`${CLASE_ENTRADA} h-12`}
-              >
-                {anios.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
           {original?.fechaEstimada && (
             <p className="text-[13px] text-marino-400">Si la cambiás, queda registrada como reprogramación.</p>
           )}

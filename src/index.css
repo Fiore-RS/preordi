@@ -111,3 +111,24 @@
   outline: 2px solid var(--color-naranja-500);
   outline-offset: 2px;
 }
+
+/* Hojas inferiores (ver components/organisms/HojaInferior.tsx). */
+@keyframes aparecer {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes subir {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

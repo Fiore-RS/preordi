@@ -52,6 +52,9 @@ export type CampoConError =
   | 'fechaEstimada'
   | 'costosExtra';
 
+/** La parte del formulario que describe la fecha estimada (también la usa la hoja Cambiar fecha). */
+export type ValoresFecha = Pick<FormularioPreorden, 'precision' | 'fechaDia' | 'mes' | 'trimestre' | 'anio'>;
+
 export type ErroresFormulario = Partial<Record<CampoConError, string>>;
 
 /** Orden de los campos en pantalla, para enfocar el primer error. */
@@ -94,9 +97,21 @@ export function formularioVacio(
 
 const conGrupos = (n: number) => new Intl.NumberFormat('es-CR').format(n);
 
+/** Valores del selector de fecha a partir de una fecha estimada (o los de hoy si no hay). */
+export function valoresFecha(fe: FechaEstimada | null, hoy: string): ValoresFecha {
+  const d = desdeISO(fe?.fecha ?? hoy);
+  return {
+    precision: fe ? fe.precision : 'ninguna',
+    fechaDia: fe?.precision === 'dia' ? fe.fecha : '',
+    mes: String(d.getMonth() + 1),
+    trimestre: String(Math.floor(d.getMonth() / 3) + 1),
+    anio: String(d.getFullYear()),
+  };
+}
+
 export function formularioDesdePreorden(p: Preorden, hoy: string): FormularioPreorden {
   const base = formularioVacio(hoy, p.categoriaId, p.estado === 'deseada' ? 'deseada' : 'apartada');
-  const f: FormularioPreorden = {
+  return {
     ...base,
     nombre: p.nombre,
     tiendaId: p.tiendaId,
@@ -107,23 +122,14 @@ export function formularioDesdePreorden(p: Preorden, hoy: string): FormularioPre
     costosExtra: p.costosExtra.map((c) => ({ id: c.id, concepto: c.concepto, monto: conGrupos(c.monto) })),
     link: p.link ?? '',
     notas: p.notas ?? '',
-  };
-  if (!p.fechaEstimada) return { ...f, precision: 'ninguna' };
-  const d = desdeISO(p.fechaEstimada.fecha);
-  return {
-    ...f,
-    precision: p.fechaEstimada.precision,
-    fechaDia: p.fechaEstimada.precision === 'dia' ? p.fechaEstimada.fecha : '',
-    mes: String(d.getMonth() + 1),
-    trimestre: String(Math.floor(d.getMonth() / 3) + 1),
-    anio: String(d.getFullYear()),
+    ...valoresFecha(p.fechaEstimada, hoy),
   };
 }
 
 const dos = (n: number) => String(n).padStart(2, '0');
 
 /** Convierte la parte de fecha estimada del formulario. `undefined` = incompleta o inválida. */
-export function fechaEstimadaDeFormulario(f: FormularioPreorden): FechaEstimada | null | undefined {
+export function fechaEstimadaDeFormulario(f: ValoresFecha): FechaEstimada | null | undefined {
   if (f.precision === 'ninguna') return null;
   if (f.precision === 'dia') {
     return /^\d{4}-\d{2}-\d{2}$/.test(f.fechaDia) ? { fecha: f.fechaDia, precision: 'dia' } : undefined;

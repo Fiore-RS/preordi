@@ -16,7 +16,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Boton({ variante = 'secundario', tamano = 'grande', className = '', type = 'button', ...resto }: Props) {
-  const medidas = tamano === 'grande' ? 'min-h-[50px] px-6 text-[15px] font-bold' : 'min-h-10 px-3.5 text-sm font-medium';
+  const medidas = tamano === 'grande' ? 'min-h-[50px] px-5 text-[15px] font-bold whitespace-nowrap' : 'min-h-10 px-3.5 text-sm font-medium';
   return (
     <button
       type={type}
