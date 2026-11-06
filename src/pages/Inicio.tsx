@@ -48,13 +48,13 @@ export function Inicio() {
 
       {datos.preordenes.length === 0 && (
         <section className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-naranja-100 text-naranja-700">
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-tono-naranja text-tono-naranja-texto">
             <Icono nombre="caja" tamano={32} grosor={1.6} />
           </span>
           <p className="font-display text-xl font-bold">Todavía no hay preórdenes</p>
           <Link
             to="/preordenes/nueva"
-            className="flex min-h-[50px] items-center rounded-full bg-marino-500 px-6 font-bold text-papel"
+            className="flex min-h-[50px] items-center rounded-full bg-principal px-6 font-bold text-principal-texto"
           >
             Agregar preorden
           </Link>

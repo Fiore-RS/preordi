@@ -21,8 +21,8 @@ export function EditarPreorden() {
         <Encabezado titulo="Editar preorden" volverA="/preordenes" />
         <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
           <p className="font-display text-xl font-bold">No encontramos esta preorden</p>
-          <p className="text-sm text-marino-400">Puede que la hayas eliminado.</p>
-          <Link to="/preordenes" className="font-bold text-naranja-700 underline underline-offset-4">
+          <p className="text-sm text-tinta-suave">Puede que la hayas eliminado.</p>
+          <Link to="/preordenes" className="font-bold text-acento-texto underline underline-offset-4">
             Ver mis preórdenes
           </Link>
         </div>

@@ -15,11 +15,11 @@ const conGrupos = (n: number) => new Intl.NumberFormat('es-CR').format(n);
 export function CampoMonto({ id, valor, onCambio, invalido, placeholder = '0', ...resto }: Props) {
   return (
     <div
-      className={`flex h-12 items-center gap-1.5 rounded-xl border bg-white px-3.5 focus-within:border-marino-500 ${
-        invalido ? 'border-naranja-700' : 'border-marino-100'
+      className={`flex h-12 items-center gap-1.5 rounded-xl border bg-superficie px-3.5 focus-within:border-tinta ${
+        invalido ? 'border-acento-texto' : 'border-borde'
       }`}
     >
-      <span className="font-display text-lg text-marino-400" aria-hidden="true">
+      <span className="font-display text-lg text-tinta-suave" aria-hidden="true">
         ₡
       </span>
       <input
@@ -35,7 +35,7 @@ export function CampoMonto({ id, valor, onCambio, invalido, placeholder = '0', .
           const monto = parsearMonto(valor);
           if (monto !== null) onCambio(conGrupos(monto));
         }}
-        className="h-full w-full min-w-0 bg-transparent text-base text-marino-500 tabular-nums placeholder:text-marino-300 focus:outline-none"
+        className="h-full w-full min-w-0 bg-transparent text-base text-tinta tabular-nums placeholder:text-tinta-tenue focus:outline-none"
       />
     </div>
   );

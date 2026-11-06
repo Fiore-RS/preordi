@@ -11,8 +11,8 @@ import type { ReactNode } from 'react';
  */
 export function MarcoApp({ children }: { children: ReactNode }) {
   return (
-    <div className="fixed inset-0 flex justify-center bg-marino-50 sm:py-6">
-      <div className="relative flex h-full w-full max-w-md flex-col overflow-hidden bg-papel sm:rounded-3xl">
+    <div className="fixed inset-0 flex justify-center bg-exterior sm:py-6">
+      <div className="relative flex h-full w-full max-w-md flex-col overflow-hidden bg-fondo sm:rounded-3xl">
         {children}
       </div>
     </div>

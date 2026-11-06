@@ -25,20 +25,20 @@ export function SelectorTipoPago({ valor, onCambio }: Props) {
             aria-checked={activo}
             onClick={() => onCambio(t.valor)}
             className={`flex items-start gap-3 rounded-[14px] px-3.5 py-3 text-left transition-colors ${
-              activo ? 'border-[1.5px] border-naranja-500 bg-naranja-50' : 'border border-marino-100 bg-white'
+              activo ? 'border-[1.5px] border-naranja-500 bg-acento-tenue' : 'border border-borde bg-superficie'
             }`}
           >
             <span
               aria-hidden="true"
               className={`mt-0.5 flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 ${
-                activo ? 'border-naranja-700' : 'border-marino-300'
+                activo ? 'border-acento-texto' : 'border-borde-fuerte'
               }`}
             >
               {activo && <span className="size-2 rounded-full bg-naranja-700" />}
             </span>
             <span className="flex flex-col gap-0.5">
               <span className="text-[15px] font-bold">{t.titulo}</span>
-              <span className="text-[13px] text-marino-400">{t.detalle}</span>
+              <span className="text-[13px] text-tinta-suave">{t.detalle}</span>
             </span>
           </button>
         );

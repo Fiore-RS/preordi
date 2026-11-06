@@ -10,13 +10,13 @@ interface Props<T extends string> {
   onCambio: (valor: T) => void;
 }
 
-/** Control segmentado: una sola opción activa (pastilla blanca sobre fondo marino-50). */
+/** Control segmentado: una sola opción activa (pastilla de superficie sobre superficie suave). */
 export function Segmentado<T extends string>({ etiqueta, opciones, valor, onCambio }: Props<T>) {
   return (
     <div
       role="radiogroup"
       aria-label={etiqueta}
-      className="grid gap-1 rounded-[14px] bg-marino-50 p-1"
+      className="grid gap-1 rounded-[14px] bg-superficie-suave p-1"
       style={{ gridTemplateColumns: `repeat(${opciones.length}, minmax(0, 1fr))` }}
     >
       {opciones.map((o) => {
@@ -29,7 +29,7 @@ export function Segmentado<T extends string>({ etiqueta, opciones, valor, onCamb
             aria-checked={activa}
             onClick={() => onCambio(o.valor)}
             className={`min-h-10 rounded-[10px] px-1 text-[13px] transition-colors ${
-              activa ? 'bg-white font-bold text-marino-500' : 'font-medium text-marino-400 hover:text-marino-500'
+              activa ? 'bg-superficie font-bold text-tinta' : 'font-medium text-tinta-suave hover:text-tinta'
             }`}
           >
             {o.texto}

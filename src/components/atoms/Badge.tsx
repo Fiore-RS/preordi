@@ -7,12 +7,12 @@ type Tono = 'amarillo' | 'naranja' | 'celeste' | 'marino' | 'gris' | 'alerta';
 
 // Colores de la especificación 10.2: relleno claro con el tono oscuro de la misma familia.
 const TONOS: Record<Tono, string> = {
-  amarillo: 'bg-amarillo-100 text-amarillo-900',
-  naranja: 'bg-naranja-100 text-naranja-900',
-  celeste: 'bg-celeste-100 text-marino-700',
-  marino: 'bg-marino-100 text-marino-700',
-  gris: 'bg-marino-50 text-marino-400',
-  alerta: 'bg-naranja-50 text-naranja-700 font-bold',
+  amarillo: 'bg-tono-amarillo text-tono-amarillo-texto',
+  naranja: 'bg-tono-naranja text-tono-naranja-texto',
+  celeste: 'bg-tono-celeste text-tono-celeste-texto',
+  marino: 'bg-tono-marino text-tono-marino-texto',
+  gris: 'bg-tono-gris text-tono-gris-texto',
+  alerta: 'bg-acento-tenue text-acento-texto font-bold',
 };
 
 export function Badge({ tono, children }: { tono: Tono; children: ReactNode }) {

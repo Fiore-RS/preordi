@@ -57,8 +57,8 @@ export function DetallePreorden() {
         <Encabezado titulo="Detalle" volverA="/preordenes" />
         <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">
           <p className="font-display text-xl font-bold">No encontramos esta preorden</p>
-          <p className="text-sm text-marino-400">Puede que la hayas eliminado.</p>
-          <Link to="/preordenes" className="font-bold text-naranja-700 underline underline-offset-4">
+          <p className="text-sm text-tinta-suave">Puede que la hayas eliminado.</p>
+          <Link to="/preordenes" className="font-bold text-acento-texto underline underline-offset-4">
             Ver mis preórdenes
           </Link>
         </div>
@@ -89,13 +89,13 @@ export function DetallePreorden() {
   return (
     <main className="flex flex-1 flex-col">
       {/* Imagen (fase 6): por ahora, un marcador con el color del estado */}
-      <div className="relative flex h-56 shrink-0 flex-col items-center justify-center gap-2 bg-naranja-100 text-naranja-700">
+      <div className="relative flex h-56 shrink-0 flex-col items-center justify-center gap-2 bg-tono-naranja text-tono-naranja-texto">
         <Icono nombre="imagen" tamano={44} grosor={1.4} />
         <div className="absolute inset-x-4 top-4 flex justify-between">
           <Link
             to={esDeseo ? '/deseos' : '/preordenes'}
             aria-label="Volver"
-            className="flex size-11 items-center justify-center rounded-full bg-papel text-marino-500"
+            className="flex size-11 items-center justify-center rounded-full bg-fondo text-tinta"
           >
             <Icono nombre="atras" tamano={22} grosor={2} />
           </Link>
@@ -103,7 +103,7 @@ export function DetallePreorden() {
             type="button"
             aria-label="Más acciones"
             onClick={() => setHoja({ tipo: 'acciones' })}
-            className="flex size-11 items-center justify-center rounded-full bg-papel text-marino-500"
+            className="flex size-11 items-center justify-center rounded-full bg-fondo text-tinta"
           >
             <Icono nombre="puntos" tamano={22} grosor={2} />
           </button>
@@ -120,18 +120,18 @@ export function DetallePreorden() {
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
             {tienda &&
               (tienda.link ? (
-                <a href={tienda.link} target="_blank" rel="noreferrer" className="text-marino-400 underline underline-offset-2">
+                <a href={tienda.link} target="_blank" rel="noreferrer" className="text-tinta-suave underline underline-offset-2">
                   {tienda.nombre}
                 </a>
               ) : (
-                <span className="text-marino-400">{tienda.nombre}</span>
+                <span className="text-tinta-suave">{tienda.nombre}</span>
               ))}
             {preorden.link && (
               <a
                 href={preorden.link}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-1 font-medium text-naranja-700"
+                className="flex items-center gap-1 font-medium text-acento-texto"
               >
                 <Icono nombre="enlace" tamano={16} grosor={2} />
                 Ver producto
@@ -141,43 +141,43 @@ export function DetallePreorden() {
         </div>
 
         {preorden.estado === 'cancelada' && preorden.fechaCancelada && (
-          <p className="rounded-xl bg-marino-50 px-3.5 py-3 text-sm text-marino-700">
+          <p className="rounded-xl bg-superficie-suave px-3.5 py-3 text-sm text-tinta">
             Cancelada el {formatearFecha(preorden.fechaCancelada)}.
             {totalPagado(preorden) > 0 && ` Quedan ${formatearMonto(totalPagado(preorden))} pagados sin reembolsar.`}
           </p>
         )}
         {recibidaConSaldo(preorden) && (
-          <p className="flex items-start gap-2 rounded-xl border border-naranja-300 bg-naranja-50 px-3.5 py-3 text-sm text-naranja-900">
-            <Icono nombre="alerta" tamano={18} grosor={2} className="mt-px shrink-0 text-naranja-700" />
+          <p className="flex items-start gap-2 rounded-xl border border-acento-borde bg-acento-tenue px-3.5 py-3 text-sm text-acento-tenue-texto">
+            <Icono nombre="alerta" tamano={18} grosor={2} className="mt-px shrink-0 text-acento-texto" />
             Ya la recibiste, pero todavía queda saldo por pagar.
           </p>
         )}
 
-        <section aria-label="Dinero" className="flex flex-col gap-3 rounded-[18px] border border-marino-50 bg-white p-4">
+        <section aria-label="Dinero" className="flex flex-col gap-3 rounded-[18px] border border-borde-suave bg-superficie p-4">
           {esDeseo ? (
             <div className="flex flex-col">
-              <span className="text-[13px] text-marino-400">Costo si la apartás</span>
+              <span className="text-[13px] text-tinta-suave">Costo si la apartás</span>
               <span className="font-display text-2xl font-bold tabular-nums">{formatearMonto(costoTotal(preorden))}</span>
             </div>
           ) : (
             <>
               <div className="flex items-end justify-between gap-3">
                 <div className="flex flex-col">
-                  <span className="text-[13px] text-marino-400">Pagado</span>
+                  <span className="text-[13px] text-tinta-suave">Pagado</span>
                   <span className="font-display text-2xl font-bold tabular-nums">
                     {formatearMonto(totalPagado(preorden))}
                   </span>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-[13px] text-marino-400">Saldo</span>
+                  <span className="text-[13px] text-tinta-suave">Saldo</span>
                   <span
-                    className={`font-display text-2xl font-bold tabular-nums ${saldo > 0 ? 'text-naranja-700' : ''}`}
+                    className={`font-display text-2xl font-bold tabular-nums ${saldo > 0 ? 'text-acento-texto' : ''}`}
                   >
                     {formatearMonto(saldo)}
                   </span>
                 </div>
               </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-marino-50">
+              <div className="h-2.5 overflow-hidden rounded-full bg-superficie-suave">
                 <div
                   className="h-2.5 rounded-full bg-naranja-500"
                   style={{ width: `${Math.round(progresoPago(preorden) * 100)}%` }}
@@ -188,14 +188,14 @@ export function DetallePreorden() {
               </div>
             </>
           )}
-          <dl className="flex flex-col gap-1.5 border-t border-marino-50 pt-3 text-sm">
+          <dl className="flex flex-col gap-1.5 border-t border-borde-suave pt-3 text-sm">
             <div className="flex justify-between">
-              <dt className="text-marino-400">Precio</dt>
+              <dt className="text-tinta-suave">Precio</dt>
               <dd className="tabular-nums">{formatearMonto(preorden.precio)}</dd>
             </div>
             {preorden.costosExtra.map((c) => (
               <div key={c.id} className="flex justify-between">
-                <dt className="text-marino-400">{c.concepto}</dt>
+                <dt className="text-tinta-suave">{c.concepto}</dt>
                 <dd className="tabular-nums">{formatearMonto(c.monto)}</dd>
               </div>
             ))}
@@ -205,17 +205,17 @@ export function DetallePreorden() {
             </div>
           </dl>
           {preorden.referenciaOriginal && (
-            <p className="text-[13px] text-marino-400">Precio original: {preorden.referenciaOriginal}</p>
+            <p className="text-[13px] text-tinta-suave">Precio original: {preorden.referenciaOriginal}</p>
           )}
         </section>
 
-        <section aria-label="Fecha estimada" className="flex flex-col gap-3 rounded-[18px] border border-marino-50 bg-white p-4">
+        <section aria-label="Fecha estimada" className="flex flex-col gap-3 rounded-[18px] border border-borde-suave bg-superficie p-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-celeste-50">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-superficie-suave">
               <Icono nombre="calendario" />
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
-              <span className="text-[13px] text-marino-400">Llegada estimada</span>
+              <span className="text-[13px] text-tinta-suave">Llegada estimada</span>
               <span className="text-[17px] font-bold">{formatearFechaEstimada(preorden.fechaEstimada)}</span>
             </span>
             <Boton tamano="chico" onClick={() => setHoja({ tipo: 'fecha' })}>
@@ -233,13 +233,13 @@ export function DetallePreorden() {
             </div>
           )}
           {preorden.historialFechas.length > 0 && (
-            <ul className="flex flex-col gap-2 rounded-xl bg-marino-50 px-3 py-2.5 text-[13px]">
+            <ul className="flex flex-col gap-2 rounded-xl bg-superficie-suave px-3 py-2.5 text-[13px]">
               {[...preorden.historialFechas].reverse().map((c) => (
                 <li key={c.id} className="flex flex-col">
                   <span className="font-medium">
                     {formatearFechaEstimada(c.anterior)} → {formatearFechaEstimada(c.nueva)}
                   </span>
-                  <span className="text-marino-400">
+                  <span className="text-tinta-suave">
                     Anotado el {formatearFecha(c.registradoEl)}
                     {c.nota && ` · ${c.nota}`}
                   </span>
@@ -266,13 +266,13 @@ export function DetallePreorden() {
                           <Icono nombre="check" tamano={14} grosor={2.6} />
                         </span>
                       ) : (
-                        <span className="size-6 rounded-full border-2 border-marino-100 bg-papel" />
+                        <span className="size-6 rounded-full border-2 border-borde bg-fondo" />
                       )}
-                      {!ultimo && <span className="h-6 w-0.5 bg-marino-100" />}
+                      {!ultimo && <span className="h-6 w-0.5 bg-borde" />}
                     </span>
                     <span className="flex flex-1 justify-between pt-0.5 text-sm">
-                      <span className={fecha ? 'font-bold' : 'text-marino-400'}>{NOMBRE_PASO[paso.estado]}</span>
-                      <span className="text-marino-400">{fecha ? formatearFecha(fecha) : '—'}</span>
+                      <span className={fecha ? 'font-bold' : 'text-tinta-suave'}>{NOMBRE_PASO[paso.estado]}</span>
+                      <span className="text-tinta-suave">{fecha ? formatearFecha(fecha) : '—'}</span>
                     </span>
                   </li>
                 );
@@ -287,22 +287,22 @@ export function DetallePreorden() {
               Pagos
             </h2>
             {pagos.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-marino-100 px-4 py-4 text-sm text-marino-400">
+              <p className="rounded-2xl border border-dashed border-borde px-4 py-4 text-sm text-tinta-suave">
                 Todavía no hay pagos registrados.
               </p>
             ) : (
-              <ul className="rounded-2xl border border-marino-50 bg-white">
+              <ul className="rounded-2xl border border-borde-suave bg-superficie">
                 {pagos.map((pago) => (
-                  <li key={pago.id} className="border-b border-marino-50 last:border-b-0">
+                  <li key={pago.id} className="border-b border-borde-suave last:border-b-0">
                     <button
                       type="button"
                       onClick={() => setHoja({ tipo: 'pago', pago })}
                       aria-label={`Editar ${NOMBRE_MOVIMIENTO[pago.tipo].toLowerCase()} del ${formatearFecha(pago.fecha)}`}
-                      className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left hover:bg-marino-50/60"
+                      className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left hover:bg-superficie-suave/60"
                     >
                       <span className="flex min-w-0 flex-col">
                         <span className="text-sm font-medium">{NOMBRE_MOVIMIENTO[pago.tipo]}</span>
-                        <span className="truncate text-[13px] text-marino-400">
+                        <span className="truncate text-[13px] text-tinta-suave">
                           {formatearFecha(pago.fecha)}
                           {pago.nota && ` · ${pago.nota}`}
                         </span>
@@ -324,13 +324,13 @@ export function DetallePreorden() {
             <h2 id="titulo-notas" className="text-lg font-bold">
               Notas
             </h2>
-            <p className="text-sm leading-relaxed whitespace-pre-line text-marino-400">{preorden.notas}</p>
+            <p className="text-sm leading-relaxed whitespace-pre-line text-tinta-suave">{preorden.notas}</p>
           </section>
         )}
       </div>
 
       {(!esDeseo || siguiente) && (
-        <div className="sticky bottom-0 mt-auto flex gap-2.5 border-t border-marino-100 bg-papel px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 mt-auto flex gap-2.5 border-t border-borde bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
           {!esDeseo && (
             <Boton className="flex-1" onClick={() => setHoja({ tipo: 'pago' })}>
               Registrar pago
@@ -353,7 +353,7 @@ export function DetallePreorden() {
             <li>
               <Link
                 to={`/preordenes/${preorden.id}/editar`}
-                className="flex min-h-12 items-center gap-3 border-b border-marino-50 text-[15px] font-medium"
+                className="flex min-h-12 items-center gap-3 border-b border-borde-suave text-[15px] font-medium"
               >
                 <Icono nombre="editar" />
                 Editar datos
@@ -364,7 +364,7 @@ export function DetallePreorden() {
                 <button
                   type="button"
                   onClick={() => setHoja({ tipo: 'estado', a: estado })}
-                  className="flex min-h-12 w-full items-center gap-3 border-b border-marino-50 text-left text-[15px] font-medium"
+                  className="flex min-h-12 w-full items-center gap-3 border-b border-borde-suave text-left text-[15px] font-medium"
                 >
                   <Icono nombre={estado === 'cancelada' ? 'cerrar' : 'caja'} />
                   {textoTransicion(preorden.estado, estado)}
@@ -375,7 +375,7 @@ export function DetallePreorden() {
               <button
                 type="button"
                 onClick={() => setHoja({ tipo: 'eliminar' })}
-                className="flex min-h-12 w-full items-center gap-3 text-left text-[15px] font-bold text-naranja-700"
+                className="flex min-h-12 w-full items-center gap-3 text-left text-[15px] font-bold text-acento-texto"
               >
                 <Icono nombre="basura" />
                 {esDeseo ? 'Eliminar deseo' : 'Eliminar preorden'}
@@ -386,7 +386,7 @@ export function DetallePreorden() {
       )}
       {hoja?.tipo === 'eliminar' && (
         <HojaInferior titulo={esDeseo ? '¿Eliminar este deseo?' : '¿Eliminar esta preorden?'} onCerrar={cerrar}>
-          <p className="text-[15px] leading-relaxed text-marino-400">
+          <p className="text-[15px] leading-relaxed text-tinta-suave">
             Se borra {preorden.nombre} con todos sus pagos y su historial. No se puede deshacer.
             {!esDeseo && ' Si solo la cancelaste, mejor usá "Cancelar preorden" para conservar el registro.'}
           </p>

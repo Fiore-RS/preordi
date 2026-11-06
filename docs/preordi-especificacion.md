@@ -544,17 +544,22 @@ Igual que en Sobres:
 
 | Token | Uso | Claro | Oscuro |
 |---|---|---|---|
-| `fondo` | Fondo de pantalla | `papel` | `marino-900` |
-| `superficie` | Tarjetas, campos, barra inferior | blanco | `marino-700` |
-| `superficie-suave` | Controles segmentados, chips grises, historial | `marino-50` | `marino-500` |
-| `tinta` | Texto principal | `marino-500` | `papel` |
-| `tinta-suave` | Texto secundario | `marino-400` | `marino-300` |
-| `borde` | Bordes y divisores | `marino-100` | `marino-500` |
-| `exterior` | Fondo alrededor de la tarjeta en PC | `marino-50` | `#081019` |
+| `fondo` | Fondo de pantalla y de las hojas | `#FFFDF8` (papel) | `#0D1726` (marino-900) |
+| `superficie` | Tarjetas, campos, barra inferior | `#FFFFFF` | `#16273D` (marino-700) |
+| `superficie-suave` | Segmentados, íconos de tarjeta, hover | `#E9EDF2` (marino-50) | `#203856` (marino-500) |
+| `exterior` | Fondo alrededor de la tarjeta en PC | `#E9EDF2` | `#070D16` |
+| `tinta` | Texto principal | `#203856` (marino-500) | `#FFFDF8` |
+| `tinta-suave` | Texto secundario | `#4A5F7A` (marino-400) | `#94A8C2` (marino-300) |
+| `tinta-tenue` | Placeholders | `#94A8C2` | `#4A5F7A` |
+| `borde` / `borde-suave` / `borde-fuerte` | Campos y divisores / tarjetas / bordes punteados | `#C9D2DE` / `#E9EDF2` / `#94A8C2` | `#2A4466` / `#1E3350` / `#4A5F7A` |
+| `principal` / `principal-texto` | Botón principal, chip seleccionado | `#203856` / `#FFFDF8` | `#FFFDF8` / `#16273D` |
+| `acento-texto` | Saldo, links, errores | `#A86600` (naranja-700) | `#F0AE4D` (naranja-300) |
+| `acento-tenue` / `acento-tenue-texto` / `acento-borde` | Alertas y opción seleccionada | `#FDF3E3` / `#5C3800` / `#F0AE4D` | `#33240C` / `#FBE0B8` / `#A86600` |
+| `resalte` / `resalte-texto` | Pestaña activa, chip "Pagar saldo" | `#FBE0B8` / `#5C3800` | `#E28C00` / `#0D1726` |
+| `tono-*` / `tono-*-texto` | Badges y rellenos por estado (amarillo, naranja, celeste, marino, gris) | tono `-100` / texto `-900` | tono `-500` / texto `#0D1726` |
 
-- Los **colores de estado** siguen la tabla 10.2: en claro, relleno `-100` con texto `-900`; en oscuro, relleno `-500` con texto marino.
-- El **naranja de marca** (botón +, barras de progreso) no cambia entre modos.
-- El **botón principal** se invierte en oscuro: relleno `papel` con texto `marino-500`.
+- **No cambian entre modos:** el naranja de marca (botón +, logo, barras de progreso, checks del camino), la tarjeta del total pendiente en Inicio y el fondo oscuro detrás de las hojas.
+- Los tokens viven en `src/index.css`: en `@theme` los valores claros y en `.dark` los oscuros. Componentes nuevos: usar siempre tokens, nunca la paleta directa, salvo lo de la lista anterior.
 
 ### 10.5 Tokens (`src/index.css`)
 
@@ -631,7 +636,7 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 3. **Esqueleto** ✅: repo `preordi`, Vite + PWA, tokens de color y fuentes, rutas y workflow de Pages
 4. **Lógica:** tipos ✅, `calculos` ✅, `fechas` ✅, `estados` ✅ y persistencia ✅, verificados con el ejemplo de la sección 9
 5. **Pantallas MVP:** en el orden de la sección 8
-   - Antes de seguir con más pantallas: pasar los componentes a los tokens semánticos de 10.4, para que el modo oscuro no obligue a repasarlas todas después
+   - Componentes pasados a los tokens semánticos de 10.4 ✅ (el modo oscuro ya funciona con la clase `.dark`; falta activarlo según el sistema, en la fase 7)
 6. **Imágenes y respaldo:** compresión, IndexedDB y `.zip`
 7. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro con selector de tema (10.4) y prueba de instalación en el teléfono
 8. **Publicar:** agregar al hub `index`

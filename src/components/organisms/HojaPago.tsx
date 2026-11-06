@@ -53,7 +53,7 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
   if (confirmarEliminar && pago) {
     return (
       <HojaInferior titulo="¿Eliminar este pago?" onCerrar={onCerrar}>
-        <p className="text-[15px] leading-relaxed text-marino-400">
+        <p className="text-[15px] leading-relaxed text-tinta-suave">
           {NOMBRE_MOVIMIENTO[pago.tipo]} de {formatearMonto(pago.monto)}. El saldo se vuelve a calcular sin él.
         </p>
         <div className="flex gap-2.5">
@@ -77,7 +77,7 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
       titulo={pago ? 'Editar pago' : 'Registrar pago'}
       subtitulo={
         <>
-          {preorden.nombre} · saldo <span className="font-bold text-naranja-700 tabular-nums">{formatearMonto(saldo)}</span>
+          {preorden.nombre} · saldo <span className="font-bold text-acento-texto tabular-nums">{formatearMonto(saldo)}</span>
         </>
       }
       onCerrar={onCerrar}
@@ -102,7 +102,7 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
                 if (tipo !== 'deposito') setTipo('saldo');
                 setError(null);
               }}
-              className="self-start rounded-full bg-naranja-100 px-3.5 py-2 text-[13px] font-bold text-naranja-900"
+              className="self-start rounded-full bg-resalte px-3.5 py-2 text-[13px] font-bold text-resalte-texto"
             >
               Pagar saldo ({formatearMonto(saldo)})
             </button>
@@ -155,7 +155,7 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
           <button
             type="button"
             onClick={() => setConfirmarEliminar(true)}
-            className="self-center py-2 text-sm font-bold text-naranja-700"
+            className="self-center py-2 text-sm font-bold text-acento-texto"
           >
             Eliminar pago
           </button>

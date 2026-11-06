@@ -135,8 +135,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
                   onClick={() => cambiar({ categoriaId: c.id }, 'categoriaId')}
                   className={`min-h-10 rounded-full px-3.5 text-sm transition-colors ${
                     activa
-                      ? 'border-[1.5px] border-marino-500 bg-marino-500 font-bold text-papel'
-                      : 'border border-marino-100 bg-white text-marino-500 hover:border-marino-300'
+                      ? 'border-[1.5px] border-principal bg-principal font-bold text-principal-texto'
+                      : 'border border-borde bg-superficie text-tinta hover:border-borde-fuerte'
                   }`}
                 >
                   {c.nombre}
@@ -240,8 +240,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           </Campo>
         </div>
         {haySobrepago && (
-          <p className="-mt-3 flex items-start gap-1.5 rounded-xl bg-naranja-50 px-3 py-2.5 text-[13px] text-naranja-900">
-            <Icono nombre="alerta" tamano={16} grosor={2} className="mt-px shrink-0 text-naranja-700" />
+          <p className="-mt-3 flex items-start gap-1.5 rounded-xl bg-acento-tenue px-3 py-2.5 text-[13px] text-acento-tenue-texto">
+            <Icono nombre="alerta" tamano={16} grosor={2} className="mt-px shrink-0 text-acento-texto" />
             Ya pagaste {formatearMonto(pagado)}, más que el nuevo costo total de {formatearMonto(costo)}.
           </p>
         )}
@@ -292,7 +292,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
               </Campo>
             </div>
             {f.tipoPago !== 'deposito' && costo > 0 && (
-              <p className="-mt-3 text-[13px] text-marino-400">
+              <p className="-mt-3 text-[13px] text-tinta-suave">
                 {f.tipoPago === 'completo'
                   ? `Se registra un pago de ${formatearMonto(costo)}.`
                   : `Queda todo pendiente: ${formatearMonto(costo)}.`}
@@ -311,7 +311,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
             aria-describedby={describe('fechaEstimada')}
           />
           {original?.fechaEstimada && (
-            <p className="text-[13px] text-marino-400">Si la cambiás, queda registrada como reprogramación.</p>
+            <p className="text-[13px] text-tinta-suave">Si la cambiás, queda registrada como reprogramación.</p>
           )}
         </Campo>
 
@@ -336,7 +336,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
                 type="button"
                 aria-label={`Quitar costo ${i + 1}`}
                 onClick={() => cambiar({ costosExtra: f.costosExtra.filter((x) => x.id !== c.id) }, 'costosExtra')}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full text-marino-400 hover:bg-marino-50"
+                className="flex size-11 shrink-0 items-center justify-center rounded-full text-tinta-suave hover:bg-superficie-suave"
               >
                 <Icono nombre="basura" />
               </button>
@@ -377,10 +377,10 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
         </Campo>
       </div>
 
-      <div className="sticky bottom-0 mt-auto border-t border-marino-100 bg-papel px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
+      <div className="sticky bottom-0 mt-auto border-t border-borde bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
         {costo > 0 && (
           <p className="mb-2.5 flex justify-between text-sm">
-            <span className="text-marino-400">Costo total</span>
+            <span className="text-tinta-suave">Costo total</span>
             <span className="font-bold tabular-nums">{formatearMonto(costo)}</span>
           </p>
         )}

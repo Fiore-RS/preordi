@@ -4,9 +4,9 @@ type Variante = 'principal' | 'secundario' | 'discreto';
 
 const ESTILOS: Record<Variante, string> = {
   // Uno solo por pantalla (especificación 10.7).
-  principal: 'bg-marino-500 text-papel hover:bg-marino-700',
-  secundario: 'border-[1.5px] border-marino-500 text-marino-500 hover:bg-marino-50',
-  discreto: 'border border-dashed border-marino-300 text-marino-500 hover:bg-marino-50',
+  principal: 'bg-principal text-principal-texto hover:bg-principal-hover',
+  secundario: 'border-[1.5px] border-tinta text-tinta hover:bg-superficie-suave',
+  discreto: 'border border-dashed border-borde-fuerte text-tinta hover:bg-superficie-suave',
 };
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {

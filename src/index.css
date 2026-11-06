@@ -33,6 +33,92 @@
   --color-marino-900: #0D1726;
 
   --color-papel: #FFFDF8;
+
+  /*
+    Tokens semánticos (especificación 10.4). Los componentes usan estos, no la
+    paleta: así .dark (abajo) cambia toda la app sin tocar ningún componente.
+    La paleta de arriba queda para lo que se ve igual en los dos modos
+    (naranja de marca, tarjeta del total pendiente, botón +).
+  */
+  --color-fondo: #FFFDF8;
+  --color-superficie: #FFFFFF;
+  --color-superficie-suave: #E9EDF2;
+  --color-exterior: #E9EDF2;
+
+  --color-tinta: #203856;
+  --color-tinta-suave: #4A5F7A;
+  --color-tinta-tenue: #94A8C2;
+
+  --color-borde: #C9D2DE;
+  --color-borde-suave: #E9EDF2;
+  --color-borde-fuerte: #94A8C2;
+
+  --color-principal: #203856;
+  --color-principal-hover: #16273D;
+  --color-principal-texto: #FFFDF8;
+
+  /* Naranja para texto, alertas y selección */
+  --color-acento-texto: #A86600;
+  --color-acento-borde: #F0AE4D;
+  --color-acento-tenue: #FDF3E3;
+  --color-acento-tenue-texto: #5C3800;
+  --color-resalte: #FBE0B8;
+  --color-resalte-texto: #5C3800;
+
+  /* Badges y rellenos por estado (tabla 10.2) */
+  --color-tono-amarillo: #FBF1B0;
+  --color-tono-amarillo-texto: #4D4100;
+  --color-tono-naranja: #FBE0B8;
+  --color-tono-naranja-texto: #5C3800;
+  --color-tono-celeste: #D3E8F5;
+  --color-tono-celeste-texto: #16273D;
+  --color-tono-marino: #C9D2DE;
+  --color-tono-marino-texto: #16273D;
+  --color-tono-gris: #E9EDF2;
+  --color-tono-gris-texto: #4A5F7A;
+}
+
+/*
+  Modo oscuro: se activa con la clase .dark en <html> (especificación 10.4).
+  Solo se redefinen los tokens semánticos.
+*/
+.dark {
+  --color-fondo: #0D1726;
+  --color-superficie: #16273D;
+  --color-superficie-suave: #203856;
+  --color-exterior: #070D16;
+
+  --color-tinta: #FFFDF8;
+  --color-tinta-suave: #94A8C2;
+  --color-tinta-tenue: #4A5F7A;
+
+  --color-borde: #2A4466;
+  --color-borde-suave: #1E3350;
+  --color-borde-fuerte: #4A5F7A;
+
+  --color-principal: #FFFDF8;
+  --color-principal-hover: #E9EDF2;
+  --color-principal-texto: #16273D;
+
+  --color-acento-texto: #F0AE4D;
+  --color-acento-borde: #A86600;
+  --color-acento-tenue: #33240C;
+  --color-acento-tenue-texto: #FBE0B8;
+  --color-resalte: #E28C00;
+  --color-resalte-texto: #0D1726;
+
+  --color-tono-amarillo: #ECCD00;
+  --color-tono-amarillo-texto: #0D1726;
+  --color-tono-naranja: #E28C00;
+  --color-tono-naranja-texto: #0D1726;
+  --color-tono-celeste: #62AEDC;
+  --color-tono-celeste-texto: #0D1726;
+  --color-tono-marino: #94A8C2;
+  --color-tono-marino-texto: #0D1726;
+  --color-tono-gris: #203856;
+  --color-tono-gris-texto: #94A8C2;
+
+  color-scheme: dark;
 }
 
 @layer base {
@@ -54,7 +140,7 @@
   }
 
   body {
-    @apply bg-marino-50 font-sans text-marino-500 antialiased;
+    @apply bg-exterior font-sans text-tinta antialiased;
   }
 
   h1,

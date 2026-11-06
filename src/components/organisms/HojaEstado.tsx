@@ -69,7 +69,7 @@ export function HojaEstado({ preorden, a, onGuardar, onCerrar }: Props) {
   return (
     <HojaInferior titulo={textoTransicion(preorden.estado, a)} subtitulo={preorden.nombre} onCerrar={onCerrar}>
       <form noValidate onSubmit={guardar} className="flex flex-col gap-5">
-        {aviso && <p className="text-[15px] leading-relaxed text-marino-400">{aviso}</p>}
+        {aviso && <p className="text-[15px] leading-relaxed text-tinta-suave">{aviso}</p>}
 
         {esApartarDeseo && (
           <Campo id="campo-tipo-apartar" etiqueta="Tipo de pago">
@@ -111,7 +111,7 @@ export function HojaEstado({ preorden, a, onGuardar, onCerrar }: Props) {
           )}
         </div>
         {esApartarDeseo && tipoPago !== 'deposito' && (
-          <p className="-mt-3 text-[13px] text-marino-400">
+          <p className="-mt-3 text-[13px] text-tinta-suave">
             {tipoPago === 'completo'
               ? `Se registra un pago de ${formatearMonto(costo)}.`
               : `Queda todo pendiente: ${formatearMonto(costo)}.`}
@@ -119,7 +119,7 @@ export function HojaEstado({ preorden, a, onGuardar, onCerrar }: Props) {
         )}
 
         {sugerido > 0 && !esApartarDeseo && (
-          <label className="flex cursor-pointer items-center gap-3 rounded-[14px] border border-marino-100 bg-white px-3.5 py-3">
+          <label className="flex cursor-pointer items-center gap-3 rounded-[14px] border border-borde bg-superficie px-3.5 py-3">
             <input
               type="checkbox"
               checked={registrarPago}
@@ -130,7 +130,7 @@ export function HojaEstado({ preorden, a, onGuardar, onCerrar }: Props) {
           </label>
         )}
 
-        {error && <p className="text-[13px] font-medium text-naranja-700">{error}</p>}
+        {error && <p className="text-[13px] font-medium text-acento-texto">{error}</p>}
 
         <div className="flex gap-2.5 pt-1">
           <Boton className="flex-1" onClick={onCerrar}>
