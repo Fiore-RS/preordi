@@ -44,9 +44,9 @@ describe('crear desde el formulario', () => {
     expect(r.ok && [r.preorden.estado, r.preorden.pagos, r.preorden.fechaApartada]).toEqual(['deseada', [], null]);
   });
 
-  it('trimestre y sin fecha', () => {
-    const t = procesarFormulario(figura({ precision: 'trimestre', trimestre: '2' }), { hoy: HOY, ahoraISO: AHORA });
-    expect(t.ok && t.preorden.fechaEstimada).toEqual({ fecha: '2027-04-01', precision: 'trimestre' });
+  it('semana (se guarda el lunes) y sin fecha', () => {
+    const t = procesarFormulario(figura({ precision: 'semana', fechaSemana: '2026-11-19' }), { hoy: HOY, ahoraISO: AHORA });
+    expect(t.ok && t.preorden.fechaEstimada).toEqual({ fecha: '2026-11-16', precision: 'semana' });
     const n = procesarFormulario(figura({ precision: 'ninguna' }), { hoy: HOY, ahoraISO: AHORA });
     expect(n.ok && n.preorden.fechaEstimada).toBeNull();
   });
@@ -85,14 +85,14 @@ describe('editar desde el formulario', () => {
 
   it('cambiar la fecha estimada la registra como reprogramación', () => {
     const p = original();
-    const f = { ...formularioDesdePreorden(p, HOY), precision: 'trimestre' as const, trimestre: '2', anio: '2027' };
+    const f = { ...formularioDesdePreorden(p, HOY), precision: 'semana' as const, fechaSemana: '2027-04-07' };
     const r = procesarFormulario(f, { hoy: HOY, ahoraISO: AHORA, original: p });
     if (!r.ok) throw new Error(JSON.stringify(r.errores));
     expect(r.preorden.historialFechas).toHaveLength(1);
     expect(r.preorden.historialFechas[0]).toMatchObject({
       registradoEl: HOY,
       anterior: { fecha: '2027-03-01', precision: 'mes' },
-      nueva: { fecha: '2027-04-01', precision: 'trimestre' },
+      nueva: { fecha: '2027-04-05', precision: 'semana' },
     });
     expect(r.preorden.pagos).toEqual(p.pagos);
   });

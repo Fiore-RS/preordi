@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { usePreordi } from '../../context/PreordiContext';
 import { totalPagado } from '../../lib/calculos';
 import { formatearMonto } from '../../lib/dinero';
@@ -20,6 +20,8 @@ import type { Preorden } from '../../types';
 import { Boton } from '../atoms/Boton';
 import { Icono } from '../atoms/Icono';
 import { TituloEtiqueta } from '../atoms/TituloEtiqueta';
+import { BotonAgregar, CrearEnLinea } from '../molecules/AgregarNuevo';
+import { Desplegable } from '../molecules/Desplegable';
 import { Campo, CLASE_ENTRADA } from '../molecules/Campo';
 import { CampoMonto } from '../molecules/CampoMonto';
 import { Segmentado } from '../molecules/Segmentado';
@@ -102,14 +104,6 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
     setNuevaTienda(null);
   }
 
-  /** Enter dentro de un campo en línea agrega, en vez de enviar el formulario. */
-  const conEnter = (accion: () => void) => (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      accion();
-    }
-  };
-
   function cambiarCosto(id: string, cambios: { concepto?: string; monto?: string }) {
     cambiar({ costosExtra: f.costosExtra.map((c) => (c.id === id ? { ...c, ...cambios } : c)) }, 'costosExtra');
   }
@@ -173,7 +167,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           />
         </div>
 
-        <TituloEtiqueta etiqueta="Lo" acento="básico" className="-mb-2" />
+        <TituloEtiqueta etiqueta="Información" acento="general" className="-mb-2" />
 
         <Campo id="campo-nombre" etiqueta="Nombre" para="nombre" error={errores.nombre}>
           <input
@@ -188,124 +182,99 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           />
         </Campo>
 
-        <Campo id="campo-categoriaId" etiqueta="Categoría" error={errores.categoriaId}>
-          <div className="flex flex-wrap gap-2">
-            {categorias.map((c) => {
-              const activa = c.id === f.categoriaId;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  aria-pressed={activa}
-                  onClick={() => cambiar({ categoriaId: c.id }, 'categoriaId')}
-                  className={`min-h-10 rounded-xl px-3.5 text-sm transition-colors ${
-                    activa
-                      ? 'border border-tinta bg-tinta font-bold text-fondo'
-                      : 'border border-borde bg-superficie text-tinta hover:border-borde-fuerte'
-                  }`}
-                >
-                  {c.nombre}
-                </button>
-              );
-            })}
-            {nuevaCategoria === null && (
-              <Boton variante="discreto" tamano="chico" onClick={() => setNuevaCategoria('')}>
-                + Nueva
-              </Boton>
-            )}
-          </div>
-          {nuevaCategoria !== null && (
-            <div className="flex gap-2">
-              <label htmlFor="nueva-categoria" className="sr-only">
-                Nombre de la nueva categoría
-              </label>
-              <input
-                id="nueva-categoria"
-                autoFocus
-                value={nuevaCategoria}
-                onChange={(e) => setNuevaCategoria(e.target.value)}
-                onKeyDown={conEnter(agregarCategoria)}
-                placeholder="Artbook"
-                className={`${CLASE_ENTRADA} h-11`}
-              />
-              <Boton tamano="chico" onClick={agregarCategoria}>
-                Agregar
-              </Boton>
-              <Boton variante="discreto" tamano="chico" aria-label="Cancelar" onClick={() => setNuevaCategoria(null)}>
-                <Icono nombre="cerrar" tamano={18} />
-              </Boton>
-            </div>
+        <Campo id="campo-categoriaId" etiqueta="Categoría" para="categoria" error={errores.categoriaId}>
+          <Desplegable
+            id="categoria"
+            etiqueta="Categoría"
+            valor={f.categoriaId}
+            onCambio={(categoriaId) => cambiar({ categoriaId }, 'categoriaId')}
+            opciones={categorias.map((c) => ({ valor: c.id, texto: c.nombre }))}
+            placeholder="Elegí una categoría"
+            invalido={!!errores.categoriaId}
+            aria-describedby={describe('categoriaId')}
+          />
+          {nuevaCategoria === null ? (
+            <BotonAgregar texto="Nueva categoría" onClick={() => setNuevaCategoria('')} />
+          ) : (
+            <CrearEnLinea
+              id="nueva-categoria"
+              etiqueta="Nombre de la nueva categoría"
+              valor={nuevaCategoria}
+              placeholder="Artbook"
+              onCambio={setNuevaCategoria}
+              onAgregar={agregarCategoria}
+              onCancelar={() => setNuevaCategoria(null)}
+            />
           )}
         </Campo>
 
         <Campo id="campo-tienda" etiqueta="Tienda" para="tienda">
-          <div className="flex gap-2">
-            <select
-              id="tienda"
-              value={f.tiendaId ?? ''}
-              onChange={(e) => cambiar({ tiendaId: e.target.value || null })}
-              className={`${CLASE_ENTRADA} h-12`}
-            >
-              <option value="">Ninguna</option>
-              {datos.tiendas.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.nombre}
-                </option>
-              ))}
-            </select>
-            {nuevaTienda === null && (
-              <Boton variante="discreto" tamano="chico" className="shrink-0" onClick={() => setNuevaTienda('')}>
-                + Nueva
-              </Boton>
-            )}
-          </div>
-          {nuevaTienda !== null && (
-            <div className="flex gap-2">
-              <label htmlFor="nueva-tienda" className="sr-only">
-                Nombre de la nueva tienda
-              </label>
-              <input
-                id="nueva-tienda"
-                autoFocus
-                value={nuevaTienda}
-                onChange={(e) => setNuevaTienda(e.target.value)}
-                onKeyDown={conEnter(agregarTienda)}
-                placeholder="Tienda local"
-                className={`${CLASE_ENTRADA} h-11`}
-              />
-              <Boton tamano="chico" onClick={agregarTienda}>
-                Agregar
-              </Boton>
-              <Boton variante="discreto" tamano="chico" aria-label="Cancelar" onClick={() => setNuevaTienda(null)}>
-                <Icono nombre="cerrar" tamano={18} />
-              </Boton>
-            </div>
+          <Desplegable
+            id="tienda"
+            etiqueta="Tienda"
+            valor={f.tiendaId ?? ''}
+            onCambio={(v) => cambiar({ tiendaId: v || null })}
+            opciones={[{ valor: '', texto: 'Ninguna' }, ...datos.tiendas.map((t) => ({ valor: t.id, texto: t.nombre }))]}
+          />
+          {nuevaTienda === null ? (
+            <BotonAgregar texto="Nueva tienda" onClick={() => setNuevaTienda('')} />
+          ) : (
+            <CrearEnLinea
+              id="nueva-tienda"
+              etiqueta="Nombre de la nueva tienda"
+              valor={nuevaTienda}
+              placeholder="Tienda local"
+              onCambio={setNuevaTienda}
+              onAgregar={agregarTienda}
+              onCancelar={() => setNuevaTienda(null)}
+            />
           )}
         </Campo>
 
-        <TituloEtiqueta etiqueta="El" acento="precio" className="-mb-2 pt-2" />
+        <TituloEtiqueta etiqueta="Precios" acento="del pedido" className="-mb-2 pt-2" />
 
-        <div className="grid grid-cols-2 gap-3">
-          <Campo id="campo-precio" etiqueta="Precio" para="precio" error={errores.precio}>
-            <CampoMonto
-              id="precio"
-              valor={f.precio}
-              onCambio={(precio) => cambiar({ precio }, 'precio')}
-              invalido={!!errores.precio}
-              aria-describedby={describe('precio')}
-            />
-          </Campo>
-          <Campo id="campo-referencia" etiqueta="Precio original" para="referencia" ayuda="Opcional, solo de referencia">
-            <input
-              id="referencia"
-              value={f.referenciaOriginal}
-              onChange={(e) => cambiar({ referenciaOriginal: e.target.value })}
-              placeholder="$88"
-              autoComplete="off"
-              className={`${CLASE_ENTRADA} h-12`}
-            />
-          </Campo>
-        </div>
+        <Campo id="campo-precio" etiqueta="Precio" para="precio" error={errores.precio}>
+          <CampoMonto
+            id="precio"
+            valor={f.precio}
+            onCambio={(precio) => cambiar({ precio }, 'precio')}
+            invalido={!!errores.precio}
+            aria-describedby={describe('precio')}
+          />
+        </Campo>
+
+        <Campo id="campo-costosExtra" etiqueta="Envío y otros costos" error={errores.costosExtra}>
+          {f.costosExtra.map((c, i) => (
+            <div key={c.id} className="flex items-center gap-2">
+              <input
+                aria-label={`Concepto del costo ${i + 1}`}
+                value={c.concepto}
+                onChange={(e) => cambiarCosto(c.id, { concepto: e.target.value })}
+                placeholder="Envío"
+                className={`${CLASE_ENTRADA} h-12 min-w-0 flex-[3]`}
+              />
+              <div className="min-w-0 flex-[2]">
+                <CampoMonto
+                  id={`costo-${c.id}`}
+                  valor={c.monto}
+                  onCambio={(monto) => cambiarCosto(c.id, { monto })}
+                />
+              </div>
+              <button
+                type="button"
+                aria-label={`Quitar costo ${i + 1}`}
+                onClick={() => cambiar({ costosExtra: f.costosExtra.filter((x) => x.id !== c.id) }, 'costosExtra')}
+                className="flex size-11 shrink-0 items-center justify-center rounded-xl text-tinta-suave hover:bg-superficie-suave"
+              >
+                <Icono nombre="basura" />
+              </button>
+            </div>
+          ))}
+          <BotonAgregar
+            texto={f.costosExtra.length === 0 ? 'Agregar envío u otro costo' : 'Agregar otro costo'}
+            onClick={() => cambiar({ costosExtra: [...f.costosExtra, { id: nuevoId(), concepto: '', monto: '' }] })}
+          />
+        </Campo>
         {haySobrepago && (
           <p className="-mt-3 flex items-start gap-1.5 rounded-xl bg-acento-tenue px-3 py-2.5 text-[13px] text-acento-tenue-texto">
             <Icono nombre="alerta" tamano={16} grosor={2} className="mt-px shrink-0 text-acento-texto" />
@@ -368,9 +337,9 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           </>
         )}
 
-        <TituloEtiqueta etiqueta="La" acento="llegada" className="-mb-2 pt-2" />
+        <TituloEtiqueta etiqueta="Llegada" acento="estimada" className="-mb-2 pt-2" />
 
-        <Campo id="campo-fechaEstimada" etiqueta="Llegada estimada" error={errores.fechaEstimada}>
+        <Campo id="campo-fechaEstimada" etiqueta="¿Qué tan exacta es la fecha?" error={errores.fechaEstimada}>
           <SelectorFechaEstimada
             idBase="fecha-estimada"
             hoy={hoy}
@@ -384,44 +353,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           )}
         </Campo>
 
-        <TituloEtiqueta etiqueta="Los" acento="detalles" className="-mb-2 pt-2" />
+        <TituloEtiqueta etiqueta="Detalles" acento="extra" className="-mb-2 pt-2" />
 
-        <Campo id="campo-costosExtra" etiqueta="Costos extra" error={errores.costosExtra}>
-          {f.costosExtra.map((c, i) => (
-            <div key={c.id} className="flex items-center gap-2">
-              <input
-                aria-label={`Concepto del costo ${i + 1}`}
-                value={c.concepto}
-                onChange={(e) => cambiarCosto(c.id, { concepto: e.target.value })}
-                placeholder="Courier"
-                className={`${CLASE_ENTRADA} h-12 min-w-0 flex-[3]`}
-              />
-              <div className="min-w-0 flex-[2]">
-                <CampoMonto
-                  id={`costo-${c.id}`}
-                  valor={c.monto}
-                  onCambio={(monto) => cambiarCosto(c.id, { monto })}
-                />
-              </div>
-              <button
-                type="button"
-                aria-label={`Quitar costo ${i + 1}`}
-                onClick={() => cambiar({ costosExtra: f.costosExtra.filter((x) => x.id !== c.id) }, 'costosExtra')}
-                className="flex size-11 shrink-0 items-center justify-center rounded-xl text-tinta-suave hover:bg-superficie-suave"
-              >
-                <Icono nombre="basura" />
-              </button>
-            </div>
-          ))}
-          <Boton
-            variante="discreto"
-            tamano="chico"
-            className="self-start"
-            onClick={() => cambiar({ costosExtra: [...f.costosExtra, { id: nuevoId(), concepto: '', monto: '' }] })}
-          >
-            + Agregar costo
-          </Boton>
-        </Campo>
 
         <Campo id="campo-link" etiqueta="Link del producto" para="link">
           <input

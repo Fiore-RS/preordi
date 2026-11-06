@@ -7,12 +7,13 @@ import type { ReactNode } from 'react';
  * en el celular ocupa toda la pantalla.
  *
  * La tarjeta es `relative`, así que los elementos `absolute` (como el botón +)
- * quedan anclados a ella y no se mueven con el scroll.
+ * quedan anclados a ella y no se mueven con el scroll. Las hojas inferiores se montan
+ * acá adentro con un portal (id="marco"), estén donde estén en el árbol.
  */
 export function MarcoApp({ children }: { children: ReactNode }) {
   return (
     <div className="fixed inset-0 flex justify-center bg-exterior sm:py-6">
-      <div className="relative flex h-full w-full max-w-md flex-col overflow-hidden bg-fondo sm:rounded-3xl">
+      <div id="marco" className="relative flex h-full w-full max-w-md flex-col overflow-hidden bg-fondo sm:rounded-3xl">
         {children}
       </div>
     </div>

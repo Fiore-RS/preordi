@@ -56,7 +56,7 @@ export function Inicio() {
   ].filter((c) => c.cantidad > 0);
 
   return (
-    <main className="flex flex-col gap-6 pt-5 pb-24">
+    <main className="flex flex-col gap-6 pt-5 pb-2">
       <header className="flex items-center justify-between px-5">
         <div className="flex items-center gap-2">
           <span className="flex size-8 items-center justify-center rounded-[9px] bg-naranja-500 text-marino-500">
@@ -144,26 +144,45 @@ export function Inicio() {
       ) : (
         <>
           <section aria-labelledby="titulo-proximas" className="flex flex-col gap-3">
-            <div className="flex items-end justify-between px-5">
-              <TituloEtiqueta id="titulo-proximas" etiqueta="Llegan" acento="pronto" />
-              {r.proximas.length > 0 && (
-                <Link to="/preordenes" className="text-sm font-medium text-acento-texto">
-                  Ver todas
-                </Link>
-              )}
-            </div>
-            {r.proximas.length > 0 ? (
-              <ul className="no-scrollbar flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-1">
-                {r.proximas.map((p) => (
-                  <li key={p.id} className="flex">
-                    <TarjetaVitrina preorden={p} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
+            <TituloEtiqueta id="titulo-proximas" etiqueta="Próximas" acento="en llegar" className="px-5" />
+
+            {r.totalProximas === 0 ? (
               <p className="mx-5 text-sm text-tinta-suave">
                 {r.vencidas.length > 0 ? 'Todo lo que esperás ya está atrasado.' : 'No tenés nada en camino por ahora.'}
               </p>
+            ) : (
+              <>
+                <ul className="carrusel flex snap-x snap-mandatory scroll-px-5 gap-3 overflow-x-auto px-5 pb-1">
+                  {r.destacadas.map((p) => (
+                    <li key={p.id} className="flex">
+                      <TarjetaVitrina preorden={p} />
+                    </li>
+                  ))}
+                </ul>
+
+                {r.masAdelante.length > 0 && (
+                  <div className="flex flex-col px-5">
+                    <h3 className="mb-0.5 font-sans text-[13px] font-bold text-tinta-suave">Más adelante</h3>
+                    <ul className="flex flex-col divide-y divide-borde-suave">
+                      {r.masAdelante.map((p) => (
+                        <li key={p.id}>
+                          <FilaPreorden preorden={p} tienda={p.tiendaId ? nombreTienda.get(p.tiendaId) : undefined} />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {r.totalProximas > 0 && (
+                  <Link
+                    to="/preordenes"
+                    className="mx-5 flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-superficie-suave text-sm font-bold hover:bg-borde-suave"
+                  >
+                    Ver todas las llegadas ({r.totalProximas})
+                    <Icono nombre="adelante" tamano={16} grosor={2.4} />
+                  </Link>
+                )}
+              </>
             )}
           </section>
 
@@ -181,14 +200,6 @@ export function Inicio() {
           )}
         </>
       )}
-
-      <Link
-        to="/preordenes/nueva"
-        aria-label="Agregar preorden"
-        className="absolute right-5 bottom-24 z-10 flex size-15 items-center justify-center rounded-[20px] bg-naranja-500 text-marino-500 shadow-[0_10px_24px_-10px_rgba(13,23,38,0.55)]"
-      >
-        <Icono nombre="mas" tamano={28} grosor={2.2} />
-      </Link>
     </main>
   );
 }

@@ -101,12 +101,12 @@ describe('pagos en el detalle', () => {
 
 describe('cambiar la fecha estimada', () => {
   it('registra la reprogramación con nota', () => {
-    const r = cambiarFechaEstimada(preorden(), { fecha: '2027-04-01', precision: 'trimestre' }, '2026-11-05', AHORA, 'Aviso de la tienda');
+    const r = cambiarFechaEstimada(preorden(), { fecha: '2027-04-05', precision: 'semana' }, '2026-11-05', AHORA, 'Aviso de la tienda');
     expect(r.historialFechas).toEqual([
       expect.objectContaining({
         registradoEl: '2026-11-05',
         anterior: { fecha: '2027-03-01', precision: 'mes' },
-        nueva: { fecha: '2027-04-01', precision: 'trimestre' },
+        nueva: { fecha: '2027-04-05', precision: 'semana' },
         nota: 'Aviso de la tienda',
       }),
     ]);

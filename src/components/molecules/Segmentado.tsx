@@ -16,8 +16,7 @@ export function Segmentado<T extends string>({ etiqueta, opciones, valor, onCamb
     <div
       role="radiogroup"
       aria-label={etiqueta}
-      className="grid gap-1 rounded-[14px] bg-superficie-suave p-1"
-      style={{ gridTemplateColumns: `repeat(${opciones.length}, minmax(0, 1fr))` }}
+      className="flex gap-1 rounded-[14px] bg-superficie-suave p-1"
     >
       {opciones.map((o) => {
         const activa = o.valor === valor;
@@ -28,7 +27,7 @@ export function Segmentado<T extends string>({ etiqueta, opciones, valor, onCamb
             role="radio"
             aria-checked={activa}
             onClick={() => onCambio(o.valor)}
-            className={`min-h-10 rounded-[10px] px-1 text-[13px] transition-colors ${
+            className={`min-h-10 flex-auto rounded-[10px] px-1 text-[13px] whitespace-nowrap transition-colors ${
               activa ? 'bg-tinta font-bold text-fondo' : 'font-medium text-tinta-suave hover:text-tinta'
             }`}
           >

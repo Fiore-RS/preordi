@@ -5,6 +5,7 @@ import { nuevoId } from '../../lib/ids';
 import type { Tienda } from '../../types';
 import { Boton } from '../atoms/Boton';
 import { Campo, CLASE_ENTRADA } from '../molecules/Campo';
+import { Desplegable } from '../molecules/Desplegable';
 import { HojaInferior } from './HojaInferior';
 
 interface Props {
@@ -58,19 +59,16 @@ export function HojaTienda({ tienda, onCerrar }: Props) {
             etiqueta={`${uso} ${uso === 1 ? 'preorden es' : 'preórdenes son'} de esta tienda. ¿Qué hacemos con ${uso === 1 ? 'ella' : 'ellas'}?`}
             para="destino-tienda"
           >
-            <select
+            <Desplegable
               id="destino-tienda"
-              value={destino}
-              onChange={(e) => setDestino(e.target.value)}
-              className={`${CLASE_ENTRADA} h-12`}
-            >
-              <option value="">Dejarlas sin tienda</option>
-              {otras.map((t) => (
-                <option key={t.id} value={t.id}>
-                  Pasarlas a {t.nombre}
-                </option>
-              ))}
-            </select>
+              etiqueta="¿Qué hacemos con ellas?"
+              valor={destino}
+              onCambio={setDestino}
+              opciones={[
+                { valor: '', texto: 'Dejarlas sin tienda' },
+                ...otras.map((t) => ({ valor: t.id, texto: `Pasarlas a ${t.nombre}` })),
+              ]}
+            />
           </Campo>
         )}
         <div className="flex gap-2.5">

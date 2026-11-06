@@ -13,14 +13,14 @@ export function VisorImagen({ url, alt, onCerrar }: Props) {
 
   useEffect(() => {
     const anterior = document.activeElement as HTMLElement | null;
-    cerrarRef.current?.focus();
+    cerrarRef.current?.focus({ preventScroll: true });
     const alTeclear = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onCerrar();
     };
     document.addEventListener('keydown', alTeclear);
     return () => {
       document.removeEventListener('keydown', alTeclear);
-      anterior?.focus?.();
+      anterior?.focus?.({ preventScroll: true });
     };
   }, [onCerrar]);
 

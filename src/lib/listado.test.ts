@@ -39,14 +39,14 @@ const lista = [
 const nombres = (xs: Preorden[]) => xs.map((x) => x.nombre);
 
 describe('filtrar', () => {
-  it('Activas: apartadas y en camino, por fecha y sin fecha al final', () => {
-    expect(nombres(filtrarYOrdenar(lista, FILTROS_POR_DEFECTO))).toEqual(['Peluche', 'Artbook', 'figura', 'Tomo 12']);
+  it('Todas (por defecto): lo que espero primero por fecha, luego recibidas y canceladas; nunca deseos', () => {
+    expect(nombres(filtrarYOrdenar(lista, FILTROS_POR_DEFECTO))).toEqual([
+      'Peluche', 'Artbook', 'figura', 'Tomo 12', 'Novela', 'Póster',
+    ]);
   });
 
-  it('Todas incluye recibidas y canceladas, pero nunca deseos', () => {
-    const r = nombres(filtrarYOrdenar(lista, { ...FILTROS_POR_DEFECTO, estado: 'todas' }));
-    expect(r).toHaveLength(6);
-    expect(r).not.toContain('Deseo');
+  it('Canceladas', () => {
+    expect(nombres(filtrarYOrdenar(lista, { ...FILTROS_POR_DEFECTO, estado: 'cancelada' }))).toEqual(['Póster']);
   });
 
   it('por estado, categoría y tienda', () => {
@@ -58,9 +58,10 @@ describe('filtrar', () => {
 
 describe('ordenar', () => {
   it('saldo mayor, nombre (sin importar mayúsculas) y más recientes', () => {
-    expect(nombres(filtrarYOrdenar(lista, { ...FILTROS_POR_DEFECTO, orden: 'saldo' }))).toEqual(['figura', 'Artbook', 'Peluche', 'Tomo 12']);
-    expect(nombres(filtrarYOrdenar(lista, { ...FILTROS_POR_DEFECTO, orden: 'nombre' }))).toEqual(['Artbook', 'figura', 'Peluche', 'Tomo 12']);
-    expect(nombres(filtrarYOrdenar(lista, { ...FILTROS_POR_DEFECTO, orden: 'recientes' }))[0]).toBe('figura');
+    const activas = lista.filter((x) => x.estado === 'apartada' || x.estado === 'en_camino');
+    expect(nombres(filtrarYOrdenar(activas, { ...FILTROS_POR_DEFECTO, orden: 'saldo' }))).toEqual(['figura', 'Artbook', 'Peluche', 'Tomo 12']);
+    expect(nombres(filtrarYOrdenar(activas, { ...FILTROS_POR_DEFECTO, orden: 'nombre' }))).toEqual(['Artbook', 'figura', 'Peluche', 'Tomo 12']);
+    expect(nombres(filtrarYOrdenar(activas, { ...FILTROS_POR_DEFECTO, orden: 'recientes' }))[0]).toBe('figura');
   });
 
   it('no modifica la lista original', () => {

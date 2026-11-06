@@ -33,9 +33,9 @@ export interface FormularioPreorden {
   fechaDia: string;
   /** 1–12 para precisión 'mes'. */
   mes: string;
-  /** 1–4 para precisión 'trimestre'. */
-  trimestre: string;
-  /** Año para 'mes' y 'trimestre'. */
+  /** Cualquier día de la semana elegida (se guarda el lunes) para precisión 'semana'. */
+  fechaSemana: string;
+  /** Año para 'mes'. */
   anio: string;
 
   costosExtra: FilaCostoExtra[];
@@ -53,7 +53,7 @@ export type CampoConError =
   | 'costosExtra';
 
 /** La parte del formulario que describe la fecha estimada (también la usa la hoja Cambiar fecha). */
-export type ValoresFecha = Pick<FormularioPreorden, 'precision' | 'fechaDia' | 'mes' | 'trimestre' | 'anio'>;
+export type ValoresFecha = Pick<FormularioPreorden, 'precision' | 'fechaDia' | 'fechaSemana' | 'mes' | 'anio'>;
 
 export type ErroresFormulario = Partial<Record<CampoConError, string>>;
 
@@ -62,10 +62,10 @@ export const ORDEN_CAMPOS: CampoConError[] = [
   'nombre',
   'categoriaId',
   'precio',
-  'fechaApartada',
-  'deposito',
-  'fechaEstimada',
   'costosExtra',
+  'deposito',
+  'fechaApartada',
+  'fechaEstimada',
 ];
 
 export function formularioVacio(
@@ -86,8 +86,8 @@ export function formularioVacio(
     fechaApartada: hoy,
     precision: 'mes',
     fechaDia: '',
+    fechaSemana: '',
     mes: String(d.getMonth() + 1),
-    trimestre: String(Math.floor(d.getMonth() / 3) + 1),
     anio: String(d.getFullYear()),
     costosExtra: [],
     link: '',
@@ -103,8 +103,8 @@ export function valoresFecha(fe: FechaEstimada | null, hoy: string): ValoresFech
   return {
     precision: fe ? fe.precision : 'ninguna',
     fechaDia: fe?.precision === 'dia' ? fe.fecha : '',
+    fechaSemana: fe?.precision === 'semana' ? fe.fecha : '',
     mes: String(d.getMonth() + 1),
-    trimestre: String(Math.floor(d.getMonth() / 3) + 1),
     anio: String(d.getFullYear()),
   };
 }
@@ -134,16 +134,16 @@ export function fechaEstimadaDeFormulario(f: ValoresFecha): FechaEstimada | null
   if (f.precision === 'dia') {
     return /^\d{4}-\d{2}-\d{2}$/.test(f.fechaDia) ? { fecha: f.fechaDia, precision: 'dia' } : undefined;
   }
+  if (f.precision === 'semana') {
+    return /^\d{4}-\d{2}-\d{2}$/.test(f.fechaSemana)
+      ? { fecha: normalizarFecha(f.fechaSemana, 'semana'), precision: 'semana' }
+      : undefined;
+  }
   const anio = Number(f.anio);
   if (!Number.isInteger(anio) || anio < 2000 || anio > 2100) return undefined;
-  if (f.precision === 'mes') {
-    const mes = Number(f.mes);
-    if (!Number.isInteger(mes) || mes < 1 || mes > 12) return undefined;
-    return { fecha: `${anio}-${dos(mes)}-01`, precision: 'mes' };
-  }
-  const t = Number(f.trimestre);
-  if (!Number.isInteger(t) || t < 1 || t > 4) return undefined;
-  return { fecha: normalizarFecha(`${anio}-${dos((t - 1) * 3 + 1)}-01`, 'trimestre'), precision: 'trimestre' };
+  const mes = Number(f.mes);
+  if (!Number.isInteger(mes) || mes < 1 || mes > 12) return undefined;
+  return { fecha: `${anio}-${dos(mes)}-01`, precision: 'mes' };
 }
 
 function mismaFecha(a: FechaEstimada | null, b: FechaEstimada | null): boolean {

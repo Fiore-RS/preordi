@@ -25,7 +25,7 @@ Es una app de uso personal (igual que Sobres), así que se prioriza lo funcional
 - Lista de deseos (estado previo a apartar)
 - Registro de pagos: depósito, abonos, saldo y reembolsos
 - Tres tipos de pago: depósito + saldo, pago completo y pago al envío
-- Fecha estimada con precisión variable (día, mes o trimestre) e historial de reprogramaciones
+- Fecha estimada con precisión variable (día, semana o mes) e historial de reprogramaciones
 - Costos extra (envío, courier, aduana)
 - Inicio con totales y próximas llegadas
 - Historial con estadísticas básicas
@@ -119,10 +119,10 @@ export type TipoPago =
   | 'al_envio'; // nada al apartar, todo al despachar (ej. Amazon)
 
 /** Qué tan precisa es la fecha que dio la tienda. */
-export type Precision = 'dia' | 'mes' | 'trimestre';
+export type Precision = 'dia' | 'semana' | 'mes';
 
 export interface FechaEstimada {
-  /** Para 'mes' = primer día del mes; para 'trimestre' = primer día del trimestre. */
+  /** Para 'semana' = el lunes de esa semana; para 'mes' = primer día del mes. */
   fecha: string;
   precision: Precision;
 }
@@ -214,7 +214,9 @@ export type EstadoPago = 'sin_pagar' | 'parcial' | 'completo';
 ```
 
 ### Categorías por defecto
-📚 Libro · 📖 Manga · 🧸 Figura · 🎀 Merch · 📦 Otro
+🧸 Figura · 📚 Libro · 📖 Manga
+
+Vienen incluidas para empezar; se pueden agregar las que se quieran (y editar o borrar estas). Los datos que ya existían conservan sus categorías.
 
 No hay tiendas por defecto. La app arranca limpia, sin datos de ejemplo.
 
@@ -267,14 +269,16 @@ Las `recibida` con saldo mayor que 0 se incluyen en el pendiente, porque puede p
 
 **Fin de periodo**, usado para ordenar y para detectar atrasos:
 - `dia` → la misma fecha
+- `semana` → el domingo de esa semana (las semanas van de lunes a domingo y se guardan por su lunes)
 - `mes` → último día del mes
-- `trimestre` → último día del trimestre (31 mar, 30 jun, 30 set, 31 dic)
 
 **Formato para mostrar:**
 - `dia` → "14 mar 2027"
+- `semana` → "16–22 nov 2026", "30 nov–6 dic 2026" o "28 dic 2026–3 ene 2027"
 - `mes` → "mar 2027"
-- `trimestre` → "T1 2027"
 - sin fecha → "Sin fecha"
+
+Al principio existía `trimestre`; se reemplazó por `semana` porque las tiendas suelen avisar la semana de llegada. Los datos viejos se migran solos (`migrar`, en `lib/persistencia.ts`): un trimestre pasa a ser el último mes de ese trimestre, así el fin del periodo no cambia.
 
 **Reprogramar:** cambiar la fecha estimada de una preorden que ya tenía fecha agrega un `CambioFecha` al historial. Poner la primera fecha no cuenta como reprogramación.
 
@@ -404,7 +408,7 @@ Registrar pago, cambiar fecha y cambiar estado se abren como **hojas modales** (
 - **Estado vacío:** ícono de caja con "Todavía no hay preórdenes" y botón "Agregar preorden".
 
 ### 8.2 Preórdenes (lista)
-- **Filtro de estado (tabs):** Activas (`apartada` + `en_camino`, por defecto) · Apartadas · En camino · Todas
+- **Filtro de estado (tabs):** Apartadas · En camino · Canceladas · Todas (por defecto). En Todas, ordenado por fecha, primero va lo que todavía espero (apartadas y en camino), después las recibidas y al final las canceladas. El orden se elige con un botón que es solo el ícono
 - **Filtros extra:** categoría y tienda
 - **Orden:** fecha estimada (por defecto, sin fecha al final) · saldo mayor · nombre · más recientes
 - **Tarjeta:** imagen cuadrada, nombre, tienda, fecha estimada, saldo, badge de estado de pago y badge de vencida o reprogramada
@@ -435,7 +439,7 @@ Campos en orden:
 6. Referencia original (opcional, ej. "$45")
 7. Estado inicial: **Deseo** o **Ya la aparté** (solo al crear)
 8. Si es "Ya la aparté": tipo de pago, monto de depósito (si aplica) y fecha en que se apartó
-9. Fecha estimada: precisión (día, mes, trimestre o sin fecha) y su selector correspondiente
+9. Fecha estimada: precisión (día, semana, mes o sin fecha) y su selector correspondiente. Para la semana se elige cualquier día de esa semana y se muestra el rango de lunes a domingo (Safari no tiene `<input type="week">`)
 10. Costos extra (lista con "+ Agregar")
 11. Link y notas
 
@@ -459,12 +463,11 @@ Al editar no se muestran los pasos 7–8. Los pagos se manejan desde el detalle.
 - Lista ordenada por fecha de recepción o cancelación (más reciente primero)
 
 ### 8.9 Configuración
-- **Categorías:** crear, renombrar, cambiar emoji, reordenar y borrar (si no están en uso)
+- **Categorías:** igual que las tiendas: una lista para tocar y editar, más "Agregar categoría". Crear, renombrar y borrar (si están en uso, primero se pasan a otra). No hace falta reordenarlas: van en el orden en que se crearon
 - **Tiendas:** crear, editar (nombre, link, notas) y borrar (si no están en uso)
 - **Tema:** Sistema · Claro · Oscuro (ver 10.4)
-- **Respaldo:** exportar e importar
-- **Zona peligrosa:** reiniciar todo
-- **Acerca de:** versión y link al repo
+- **Respaldo:** exportar (flecha hacia arriba: sale del teléfono) e importar (flecha hacia abajo: entra)
+- **Zona peligrosa:** reiniciar todo, con un botón de lado a lado. Es lo último de la pantalla (no hay sección "Acerca de")
 
 ### 8.10 Pantalla de carga
 Igual que en Sobres y Teleo:
@@ -658,10 +661,11 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 - **Títulos de sección:** una etiqueta sólida en mayúsculas más una palabra en Bricolage extrabold naranja (`acento-texto`): "LLEGAN **pronto**", "TAMBIÉN **por pagar**". Átomo `TituloEtiqueta`. Se probó una letra a mano (Caveat), pero se descartó porque se sentía ajena al resto; queda la idea de usar la letra propia de Fiorella más adelante.
 - **Montos destacados:** el símbolo ₡ más pequeño y elevado (átomo `Monto`), en Bricolage extrabold.
 - **Tarjetas con foto:** altas (196 × 264), la foto de fondo con degradado marino hacia abajo, la fecha en una etiqueta clara arriba, el saldo en amarillo y una esquina naranja con flecha (`TarjetaVitrina`). Sin foto: el color fijo del estado (naranja, celeste o amarillo) con la inicial grande. Los colores no cambian en modo oscuro.
+- **PRÓXIMAS en llegar (Inicio):** las **5** llegadas más próximas (activas no vencidas, por fecha) van en tarjetas grandes; las **5** siguientes, en filas bajo "Más adelante" (sin fecha al final). Siempre que haya llegadas, un botón "Ver todas las llegadas (N)" al final lleva a la lista de Preórdenes. **Botón de agregar en la barra de abajo:** un + naranja en el centro de la barra (entre Preórdenes y Deseos), disponible en todas las pantallas con barra; en Deseos agrega un deseo y en el resto una preorden. Así no hay botones flotantes ni espacio vacío al final de las listas. (Se probaron el + flotante y el + en el encabezado.) Así Inicio muestra hasta 10 y no se ve vacío. (Se probó mostrar en grande solo las de este mes, pero dejaba Inicio muy vacío.)
 - **Menos cajas:** el resumen de dinero de Inicio ya no va en una tarjeta marino, sino directo sobre el fondo con el número grande. Las filas de lista van sin borde, solo con miniatura.
 - **Formas:** menos pastillas. Los chips de estado y los botones son rectángulos redondeados (8–20 px) y las tarjetas con foto, de 22 px.
 - **Detalle:** la foto ocupa todo el ancho arriba (340 px) con las esquinas inferiores de 38 px y botones cuadrados claros encima. Debajo van la categoría en etiqueta y el estado en naranja, el nombre, el costo total grande y una fila con Pagado · Saldo · Llega (tocar "Llega" cambia la fecha). Las secciones (Costo *desglosado*, Camino *a casa*, Pagos *hechos*, Notas *para mí*) van sin tarjetas. Sin foto: el color del estado con la inicial gigante (`PortadaSinFoto`).
-- **Acción principal:** naranja de marca con texto marino en los dos modos (tokens `principal`). Los botones son rectángulos de 16 px (grandes) y 12 px (chicos), y el botón + es un cuadrado redondeado de 20 px con sombra.
+- **Acción principal:** naranja de marca con texto marino en los dos modos (tokens `principal`). Los botones son rectángulos de 16 px (grandes) y 12 px (chicos), y el botón + del encabezado es un cuadrado naranja de 44 px con esquinas de 12 px.
 
 - **Lista de Preórdenes:** filas sin caja separadas por una línea fina, con la portada vertical (76 × 96) a la izquierda, el nombre en Bricolage, el saldo grande a la derecha y abajo el estado y la barra de pago. Las vencidas se marcan en el texto de la fecha (naranja con ícono), no con un badge más.
 - **Controles:** la opción activa del control segmentado y los filtros aplicados van sólidos en `tinta`, como las etiquetas. Los badges son rectángulos de 6 px.
@@ -671,6 +675,10 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 - **Historial:** el total del año grande sobre el fondo (naranja si es lo perdido en canceladas). POR **categoría** con barras gruesas que recorren los colores de la bandera, y LLEGARON / CANCELADAS **en 2026** con filas sin caja y portada vertical pequeña; las canceladas, en gris y semitransparentes.
 - **Formulario y hojas:** el formulario se agrupa en LO **básico**, EL **precio**, LA **llegada** y LOS **detalles**. "Agregar imagen" es una tarjeta marino con la esquina naranja de + (como las de Inicio), en vez de la caja punteada. Las categorías elegidas y el tipo de pago activo van en `tinta`, igual que los demás controles.
 - **Sin bordes punteados:** el botón discreto ("+ Nueva", "+ Agregar costo") es un relleno suave (`superficie-suave`), y en Configuración las listas son grupos con relleno suave separados por líneas del color del fondo. Los títulos de Configuración siguen el mismo patrón: MIS **categorías**, MIS **tiendas**, MI **respaldo**, ZONA **peligrosa**.
+- **Formulario (segunda vuelta):** secciones INFORMACIÓN **general** (nombre, categoría y tienda), PRECIOS **del pedido** (precio y "Envío y otros costos", más el estado y el pago al crear), LLEGADA **estimada** y DETALLES **extra** (link y notas). La categoría es un menú desplegable como la tienda. Para crear algo nuevo (categoría, tienda, costo) se usa siempre el mismo botón: un cuadrito naranja con + y el texto (`BotonAgregar`), y la creación en línea va sobre un fondo suave (`CrearEnLinea`). Se quitó el campo "Precio original" (el dato viejo se conserva, pero ya no se muestra).
+- **Detalle:** "Registro **de pagos**" y "Precios **del pedido**". Las hojas toman el foco sin desplazar la pantalla (`focus({ preventScroll: true })`), así la pantalla no brinca al abrir o cerrar el menú de ···.
+- **Filas que se deslizan de lado:** la utilidad `carrusel` deja pasar el scroll vertical cuando el dedo empieza sobre el carrusel de Inicio o los filtros.
+- **Menús desplegables:** ningún `<select>` nativo. Los campos (categoría, tienda, mes y año, a dónde pasar las preórdenes al borrar) y los filtros abren una hoja inferior con la lista de opciones; la elegida va resaltada con el check en un cuadrito naranja (`Desplegable`, `ListaOpciones`). Las hojas se montan con un portal dentro de la tarjeta de la app (`#marco`), así funcionan incluso dentro de otra hoja; Escape cierra solo la de arriba.
 
 Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅ · Deseos ✅ · pantallas vacías ✅ · Historial ✅ · Formulario y hojas ✅ · Configuración ✅
 

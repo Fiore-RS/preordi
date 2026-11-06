@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { Preorden } from '../types';
 import { costoTotal, estadoPago, saldoPendiente, totales, totalPagado, vencida } from './calculos';
 import { aplicarTransicion, pagosAlApartar, validarPago } from './estados';
-import { finDePeriodo, formatearFechaEstimada } from './fechas';
+import { finDePeriodo, formatearFechaEstimada, normalizarFecha } from './fechas';
 import { parsearMonto } from './dinero';
 
 function figura(): Preorden {
@@ -52,9 +52,18 @@ describe('ejemplo de la sección 9', () => {
     expect(vencida(p, '2027-03-31')).toBe(false);
     expect(vencida(p, '2027-04-01')).toBe(true);
 
-    p.fechaEstimada = { fecha: '2027-04-01', precision: 'trimestre' };
-    expect(formatearFechaEstimada(p.fechaEstimada)).toBe('T2 2027');
-    expect(vencida(p, '2027-04-01')).toBe(false);
+    p.fechaEstimada = { fecha: '2027-04-05', precision: 'semana' };
+    expect(formatearFechaEstimada(p.fechaEstimada)).toBe('5–11 abr 2027');
+    expect(vencida(p, '2027-04-11')).toBe(false);
+    expect(vencida(p, '2027-04-12')).toBe(true);
+  });
+
+  it('semanas de lunes a domingo, también entre meses y años', () => {
+    expect(normalizarFecha('2026-11-22', 'semana')).toBe('2026-11-16'); // domingo → su lunes
+    expect(normalizarFecha('2026-11-16', 'semana')).toBe('2026-11-16');
+    expect(finDePeriodo({ fecha: '2026-11-16', precision: 'semana' })).toBe('2026-11-22');
+    expect(formatearFechaEstimada({ fecha: '2026-11-30', precision: 'semana' })).toBe('30 nov–6 dic 2026');
+    expect(formatearFechaEstimada({ fecha: '2026-12-28', precision: 'semana' })).toBe('28 dic 2026–3 ene 2027');
   });
 
   it('caso Amazon: pago al envío', () => {

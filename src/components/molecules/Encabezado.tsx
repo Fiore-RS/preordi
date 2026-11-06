@@ -34,7 +34,7 @@ export function Encabezado({ titulo, volverA, iconoVolver = 'atras' }: Props) {
   return (
     <header className="flex items-center justify-between px-5 pt-6">
       <h1 className="text-[30px] font-extrabold tracking-tight">{titulo}</h1>
-      <Link to="/config" aria-label="Configuración" className="flex size-11 items-center justify-center rounded-full">
+      <Link to="/config" aria-label="Configuración" className="-mr-2 flex size-11 items-center justify-center rounded-full">
         <Icono nombre="ajustes" tamano={22} />
       </Link>
     </header>

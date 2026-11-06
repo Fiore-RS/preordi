@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Boton } from '../components/atoms/Boton';
-import { Icono } from '../components/atoms/Icono';
 import { Monto } from '../components/atoms/Monto';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { TarjetaDeseo } from '../components/molecules/TarjetaDeseo';
@@ -46,7 +45,7 @@ export function Deseos() {
           </Link>
         </section>
       ) : (
-        <div className="flex flex-col gap-4 px-5 pt-4 pb-20">
+        <div className="flex flex-col gap-4 px-5 pt-4 pb-2">
           <section aria-label="Total de deseos" className="flex flex-col gap-1">
             <span className="text-sm text-tinta-suave">Si apartaras todo</span>
             <Monto monto={total} className="font-display text-[44px] leading-none font-extrabold tracking-tight" />
@@ -67,14 +66,6 @@ export function Deseos() {
           </ul>
         </div>
       )}
-
-      <Link
-        to="/preordenes/nueva?estado=deseada"
-        aria-label="Agregar deseo"
-        className="absolute right-5 bottom-24 z-10 flex size-15 items-center justify-center rounded-[20px] bg-naranja-500 text-marino-500 shadow-[0_10px_24px_-10px_rgba(13,23,38,0.55)]"
-      >
-        <Icono nombre="mas" tamano={28} grosor={2.2} />
-      </Link>
 
       {apartando && <HojaEstado preorden={apartando} a="apartada" onGuardar={alApartar} onCerrar={cerrar} />}
     </main>

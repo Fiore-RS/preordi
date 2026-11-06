@@ -17,6 +17,12 @@ export function desdeISO(iso: string): Date {
   return new Date(anio, mes - 1, dia);
 }
 
+/** El lunes de la semana de una fecha (las semanas van de lunes a domingo). */
+export function lunesDe(fecha: Date): Date {
+  const atras = (fecha.getDay() + 6) % 7; // lunes = 0 … domingo = 6
+  return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() - atras);
+}
+
 export function hoy(): string {
   return aISO(new Date());
 }
@@ -25,10 +31,7 @@ export function hoy(): string {
 export function normalizarFecha(iso: string, precision: Precision): string {
   const d = desdeISO(iso);
   if (precision === 'mes') return aISO(new Date(d.getFullYear(), d.getMonth(), 1));
-  if (precision === 'trimestre') {
-    const inicioTrimestre = Math.floor(d.getMonth() / 3) * 3;
-    return aISO(new Date(d.getFullYear(), inicioTrimestre, 1));
-  }
+  if (precision === 'semana') return aISO(lunesDe(d));
   return iso;
 }
 
@@ -36,9 +39,9 @@ export function normalizarFecha(iso: string, precision: Precision): string {
 export function finDePeriodo(fe: FechaEstimada): string {
   const d = desdeISO(fe.fecha);
   if (fe.precision === 'mes') return aISO(new Date(d.getFullYear(), d.getMonth() + 1, 0));
-  if (fe.precision === 'trimestre') {
-    const ultimoMes = Math.floor(d.getMonth() / 3) * 3 + 2;
-    return aISO(new Date(d.getFullYear(), ultimoMes + 1, 0));
+  if (fe.precision === 'semana') {
+    const lunes = lunesDe(d);
+    return aISO(new Date(lunes.getFullYear(), lunes.getMonth(), lunes.getDate() + 6));
   }
   return fe.fecha;
 }
@@ -49,12 +52,20 @@ export function formatearFecha(iso: string): string {
   return `${d.getDate()} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-/** "14 mar 2027" · "mar 2027" · "T1 2027" · "Sin fecha" */
+/** "14 mar 2027" · "16–22 nov 2026" · "30 nov–6 dic 2026" · "mar 2027" · "Sin fecha" */
 export function formatearFechaEstimada(fe: FechaEstimada | null): string {
   if (!fe) return 'Sin fecha';
   const d = desdeISO(fe.fecha);
   if (fe.precision === 'mes') return `${MESES[d.getMonth()]} ${d.getFullYear()}`;
-  if (fe.precision === 'trimestre') return `T${Math.floor(d.getMonth() / 3) + 1} ${d.getFullYear()}`;
+  if (fe.precision === 'semana') {
+    const ini = lunesDe(d);
+    const fin = desdeISO(finDePeriodo(fe));
+    if (ini.getFullYear() !== fin.getFullYear()) return `${formatearFecha(aISO(ini))}–${formatearFecha(aISO(fin))}`;
+    if (ini.getMonth() !== fin.getMonth()) {
+      return `${ini.getDate()} ${MESES[ini.getMonth()]}–${fin.getDate()} ${MESES[fin.getMonth()]} ${fin.getFullYear()}`;
+    }
+    return `${ini.getDate()}–${fin.getDate()} ${MESES[fin.getMonth()]} ${fin.getFullYear()}`;
+  }
   return formatearFecha(fe.fecha);
 }
 

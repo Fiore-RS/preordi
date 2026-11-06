@@ -5,6 +5,7 @@ import { nuevoId } from '../../lib/ids';
 import type { Categoria } from '../../types';
 import { Boton } from '../atoms/Boton';
 import { Campo, CLASE_ENTRADA } from '../molecules/Campo';
+import { Desplegable } from '../molecules/Desplegable';
 import { HojaInferior } from './HojaInferior';
 
 interface Props {
@@ -56,18 +57,13 @@ export function HojaCategoria({ categoria, onCerrar }: Props) {
             etiqueta={`${uso} ${uso === 1 ? 'preorden usa' : 'preórdenes usan'} esta categoría. ¿A cuál las pasamos?`}
             para="destino-categoria"
           >
-            <select
+            <Desplegable
               id="destino-categoria"
-              value={destino}
-              onChange={(e) => setDestino(e.target.value)}
-              className={`${CLASE_ENTRADA} h-12`}
-            >
-              {otras.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.nombre}
-                </option>
-              ))}
-            </select>
+              etiqueta="Pasarlas a"
+              valor={destino}
+              onCambio={setDestino}
+              opciones={otras.map((c) => ({ valor: c.id, texto: c.nombre }))}
+            />
           </Campo>
         )}
         <div className="flex gap-2.5">

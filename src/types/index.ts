@@ -18,10 +18,10 @@ export type TipoPago =
   | 'al_envio'; // nada al apartar, todo al despachar (ej. Amazon)
 
 /** Qué tan precisa es la fecha que dio la tienda. */
-export type Precision = 'dia' | 'mes' | 'trimestre';
+export type Precision = 'dia' | 'semana' | 'mes';
 
 export interface FechaEstimada {
-  /** Para 'mes' = primer día del mes; para 'trimestre' = primer día del trimestre. */
+  /** Para 'semana' = el lunes de esa semana; para 'mes' = primer día del mes. */
   fecha: string;
   precision: Precision;
 }

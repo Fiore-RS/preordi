@@ -67,13 +67,12 @@ export function SelectorImagen({ url, procesando, error, onElegir, onQuitar }: P
     <div className="flex flex-col gap-2">
       <label
         htmlFor={id}
-        className={`relative flex h-[168px] cursor-pointer flex-col justify-end gap-1 overflow-hidden rounded-[22px] bg-marino-500 p-4 pr-16 text-papel ${FOCO}`}
+        className={`relative flex h-[168px] cursor-pointer flex-col justify-end overflow-hidden rounded-[22px] bg-marino-500 p-4 pr-16 text-papel ${FOCO}`}
       >
         {entrada}
         <span className="font-display text-lg leading-tight font-bold">
           {procesando ? 'Procesando…' : 'Agregá una foto'}
         </span>
-        <span className="text-[13px] text-marino-300">Se usa como portada en todas las tarjetas.</span>
         <span
           aria-hidden="true"
           className="absolute right-0 bottom-0 flex size-12 items-center justify-center rounded-tl-[20px] bg-naranja-500 text-marino-500"

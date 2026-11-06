@@ -172,6 +172,23 @@
 }
 
 /*
+  Filas que se deslizan de lado (carrusel de Inicio, filtros de Preórdenes).
+  Sin barra y sin "contain" vertical: en el teléfono, si el dedo empieza sobre la fila y se mueve
+  hacia arriba o abajo, el scroll pasa a la pantalla en vez de quedarse trabado.
+*/
+@utility carrusel {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x pan-y;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
   Entrada suave de cada pantalla al navegar (ver LayoutPrincipal.tsx).
   A diferencia de Sobres, se anima margin-top en vez de transform: un transform
   convierte al contenedor en referencia de los elementos absolute, y el botón +

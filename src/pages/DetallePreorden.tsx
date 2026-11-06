@@ -165,9 +165,6 @@ export function DetallePreorden() {
           )}
           <Monto monto={costoTotal(preorden)} className="mt-1 font-display text-[40px] leading-none font-extrabold tracking-tight" />
           {esDeseo && <span className="text-[13px] text-tinta-suave">Lo que costaría si la apartás</span>}
-          {preorden.referenciaOriginal && (
-            <span className="text-[13px] text-tinta-suave">Precio original: {preorden.referenciaOriginal}</span>
-          )}
         </div>
 
         {preorden.estado === 'cancelada' && preorden.fechaCancelada && (
@@ -252,7 +249,7 @@ export function DetallePreorden() {
 
         {preorden.costosExtra.length > 0 && (
           <section aria-labelledby="titulo-costos" className="flex flex-col gap-2">
-            <TituloEtiqueta id="titulo-costos" etiqueta="Costo" acento="desglosado" />
+            <TituloEtiqueta id="titulo-costos" etiqueta="Precios" acento="del pedido" />
             <dl className="flex flex-col text-sm">
               <div className="flex justify-between border-b border-borde-suave py-2">
                 <dt className="text-tinta-suave">Precio</dt>
@@ -306,7 +303,7 @@ export function DetallePreorden() {
 
         {!esDeseo && (
           <section aria-labelledby="titulo-pagos" className="flex flex-col gap-1">
-            <TituloEtiqueta id="titulo-pagos" etiqueta="Pagos" acento="hechos" className="mb-1" />
+            <TituloEtiqueta id="titulo-pagos" etiqueta="Registro" acento="de pagos" className="mb-1" />
             {pagos.length === 0 ? (
               <p className="py-2 text-sm text-tinta-suave">Todavía no hay pagos registrados.</p>
             ) : (

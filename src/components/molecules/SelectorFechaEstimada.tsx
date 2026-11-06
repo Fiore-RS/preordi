@@ -1,19 +1,27 @@
+import { formatearFechaEstimada, normalizarFecha } from '../../lib/fechas';
 import type { PrecisionFormulario, ValoresFecha } from '../../lib/formulario';
 import { CLASE_ENTRADA } from './Campo';
+import { Desplegable } from './Desplegable';
 import { Segmentado } from './Segmentado';
 
 const MESES = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Setiembre', 'Octubre', 'Noviembre', 'Diciembre',
 ];
-const TRIMESTRES = ['T1 · ene–mar', 'T2 · abr–jun', 'T3 · jul–set', 'T4 · oct–dic'];
 
 const PRECISIONES: { valor: PrecisionFormulario; texto: string }[] = [
   { valor: 'dia', texto: 'Día' },
+  { valor: 'semana', texto: 'Semana' },
   { valor: 'mes', texto: 'Mes' },
-  { valor: 'trimestre', texto: 'Trimestre' },
   { valor: 'ninguna', texto: 'Sin fecha' },
 ];
+
+/** "Semana del lunes 16 al domingo 22 nov 2026", o cómo elegirla si todavía no hay día. */
+function textoSemana(dia: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dia)) return 'Elegí cualquier día de esa semana (de lunes a domingo).';
+  const fe = { fecha: normalizarFecha(dia, 'semana'), precision: 'semana' as const };
+  return `Semana del lunes al domingo: ${formatearFechaEstimada(fe)}`;
+}
 
 interface Props {
   valores: ValoresFecha;
@@ -26,9 +34,9 @@ interface Props {
 }
 
 /**
- * Fecha estimada con precisión (especificación 5.3): día, mes o trimestre, o sin fecha.
- * Usa selectores de mes y año en vez de <input type="month">, que no existe en Firefox
- * ni en Safari de escritorio.
+ * Fecha estimada con precisión (especificación 5.3): día, semana o mes, o sin fecha.
+ * Usa selectores de mes y año en vez de <input type="month">, y un día cualquiera para la semana
+ * en vez de <input type="week">: ninguno de los dos existe en Safari.
  */
 export function SelectorFechaEstimada({ valores, onCambio, hoy, idBase, invalido, ...resto }: Props) {
   const anioActual = Number(hoy.slice(0, 4));
@@ -59,47 +67,37 @@ export function SelectorFechaEstimada({ valores, onCambio, hoy, idBase, invalido
           />
         </>
       )}
-      {(valores.precision === 'mes' || valores.precision === 'trimestre') && (
-        <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2">
-          {valores.precision === 'mes' ? (
-            <select
-              aria-label="Mes estimado"
-              value={valores.mes}
-              onChange={(e) => onCambio({ mes: e.target.value })}
-              className={`${CLASE_ENTRADA} h-12`}
-            >
-              {MESES.map((m, i) => (
-                <option key={m} value={String(i + 1)}>
-                  {m}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <select
-              aria-label="Trimestre estimado"
-              value={valores.trimestre}
-              onChange={(e) => onCambio({ trimestre: e.target.value })}
-              className={`${CLASE_ENTRADA} h-12`}
-            >
-              {TRIMESTRES.map((t, i) => (
-                <option key={t} value={String(i + 1)}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          )}
-          <select
-            aria-label="Año estimado"
-            value={valores.anio}
-            onChange={(e) => onCambio({ anio: e.target.value })}
+      {valores.precision === 'semana' && (
+        <>
+          <label htmlFor={`${idBase}-semana`} className="sr-only">
+            Un día de la semana estimada
+          </label>
+          <input
+            id={`${idBase}-semana`}
+            type="date"
+            value={valores.fechaSemana}
+            onChange={(e) => onCambio({ fechaSemana: e.target.value })}
+            aria-invalid={invalido || undefined}
+            aria-describedby={resto['aria-describedby']}
             className={`${CLASE_ENTRADA} h-12`}
-          >
-            {anios.map((a) => (
-              <option key={a} value={a}>
-                {a}
-              </option>
-            ))}
-          </select>
+          />
+          <p className="text-[13px] text-tinta-suave">{textoSemana(valores.fechaSemana)}</p>
+        </>
+      )}
+      {valores.precision === 'mes' && (
+        <div className="grid grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-2">
+          <Desplegable
+            etiqueta="Mes estimado"
+            valor={valores.mes}
+            onCambio={(mes) => onCambio({ mes })}
+            opciones={MESES.map((m, i) => ({ valor: String(i + 1), texto: m }))}
+          />
+          <Desplegable
+            etiqueta="Año estimado"
+            valor={valores.anio}
+            onCambio={(anio) => onCambio({ anio })}
+            opciones={anios.map((x) => ({ valor: x, texto: x }))}
+          />
         </div>
       )}
     </>

@@ -5,7 +5,7 @@ import { saldoPendiente } from './calculos';
 import { compararFechasEstimadas } from './fechas';
 
 /** Pestañas de estado. Los deseos viven en su propia pantalla y nunca aparecen acá. */
-export type PestanaEstado = 'activas' | 'apartada' | 'en_camino' | 'todas';
+export type PestanaEstado = 'apartada' | 'en_camino' | 'cancelada' | 'todas';
 export type Orden = 'fecha' | 'saldo' | 'nombre' | 'recientes';
 
 export interface FiltrosListado {
@@ -16,16 +16,16 @@ export interface FiltrosListado {
 }
 
 export const FILTROS_POR_DEFECTO: FiltrosListado = {
-  estado: 'activas',
+  estado: 'todas',
   categoriaId: null,
   tiendaId: null,
   orden: 'fecha',
 };
 
 export const PESTANAS: { valor: PestanaEstado; texto: string }[] = [
-  { valor: 'activas', texto: 'Activas' },
   { valor: 'apartada', texto: 'Apartadas' },
   { valor: 'en_camino', texto: 'En camino' },
+  { valor: 'cancelada', texto: 'Canceladas' },
   { valor: 'todas', texto: 'Todas' },
 ];
 
@@ -38,15 +38,18 @@ export const ORDENES: { valor: Orden; texto: string }[] = [
 
 function cumpleEstado(p: Preorden, estado: PestanaEstado): boolean {
   if (p.estado === 'deseada') return false;
-  if (estado === 'activas') return p.estado === 'apartada' || p.estado === 'en_camino';
   if (estado === 'todas') return true;
   return p.estado === estado;
 }
 
 const porNombre = (a: Preorden, b: Preorden) => a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' });
 
+// En "Todas", lo que todavía espero va primero; después las recibidas y al final las canceladas.
+const GRUPO: Record<Preorden['estado'], number> = { apartada: 0, en_camino: 0, deseada: 0, recibida: 1, cancelada: 2 };
+
 const COMPARADORES: Record<Orden, (a: Preorden, b: Preorden) => number> = {
-  fecha: (a, b) => compararFechasEstimadas(a.fechaEstimada, b.fechaEstimada) || porNombre(a, b),
+  fecha: (a, b) =>
+    GRUPO[a.estado] - GRUPO[b.estado] || compararFechasEstimadas(a.fechaEstimada, b.fechaEstimada) || porNombre(a, b),
   saldo: (a, b) => saldoPendiente(b) - saldoPendiente(a) || porNombre(a, b),
   nombre: porNombre,
   recientes: (a, b) => b.creadaEl.localeCompare(a.creadaEl),

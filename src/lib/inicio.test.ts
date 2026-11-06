@@ -33,7 +33,7 @@ const lista = [
   p('Artbook', { estado: 'en_camino', fechaEstimada: { fecha: '2026-11-10', precision: 'dia' } }),
   p('Tomo 12', { fechaEstimada: { fecha: '2026-11-14', precision: 'dia' } }),
   p('Sin fecha', {}),
-  p('Figura', { fechaEstimada: { fecha: '2027-01-01', precision: 'trimestre' } }),
+  p('Figura', { fechaEstimada: { fecha: '2027-03-01', precision: 'mes' } }),
   p('Novela', { estado: 'recibida', fechaRecibida: '2026-10-01' }),
   p('Póster', { estado: 'recibida', fechaRecibida: '2026-10-01', pagos: [{ id: 'x', fecha: '2026-10-01', monto: 10000, tipo: 'saldo' }] }),
   p('Box set', { estado: 'deseada' }),
@@ -52,17 +52,22 @@ describe('resumen de Inicio', () => {
     expect(nombres(r.vencidas)).toEqual(['Llavero', 'Peluche']);
   });
 
-  it('próximas llegadas sin las vencidas y sin fecha al final', () => {
-    expect(nombres(r.proximas)).toEqual(['Artbook', 'Tomo 12', 'Figura', 'Sin fecha']);
-    expect(resumenInicio(lista, HOY, 2).proximas).toHaveLength(2);
+  it('las más próximas en grande y las siguientes en filas (sin fecha al final)', () => {
+    expect(nombres(r.destacadas)).toEqual(['Artbook', 'Tomo 12', 'Figura', 'Sin fecha']);
+    expect(r.masAdelante).toEqual([]);
+    expect(r.totalProximas).toBe(4);
+    const chico = resumenInicio(lista, HOY, 1, 2);
+    expect(nombres(chico.destacadas)).toEqual(['Artbook']);
+    expect(nombres(chico.masAdelante)).toEqual(['Tomo 12', 'Figura']);
   });
 
-  it('por pagar: lo que no sale en próximas, de mayor a menor saldo', () => {
+  it('por pagar: lo que no sale en "llegan pronto", de mayor a menor saldo', () => {
     expect(nombres(r.porPagar)).toEqual(['Llavero', 'Peluche']);
     const corto = resumenInicio(
       lista.map((x) => (x.nombre === 'Figura' ? { ...x, precio: 50000 } : x)),
       HOY,
       2,
+      0,
     );
     expect(nombres(corto.porPagar)).toEqual(['Figura', 'Llavero', 'Peluche', 'Sin fecha']);
   });

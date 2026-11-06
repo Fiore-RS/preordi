@@ -1,5 +1,4 @@
 import { Link, useSearchParams } from 'react-router';
-import { Icono } from '../components/atoms/Icono';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { FiltroPastilla } from '../components/molecules/FiltroPastilla';
 import { Segmentado } from '../components/molecules/Segmentado';
@@ -34,7 +33,7 @@ export function Preordenes() {
   const hayFiltrosExtra = filtros.categoriaId !== null || filtros.tiendaId !== null;
   const saldo = lista.reduce((suma, p) => suma + saldoPendiente(p), 0);
   const nombreTienda = new Map(datos.tiendas.map((t) => [t.id, t.nombre]));
-  const conEstado = filtros.estado === 'activas' || filtros.estado === 'todas';
+  const conEstado = filtros.estado === 'todas';
   const categorias = [...datos.categorias].sort((a, b) => a.orden - b.orden);
 
   return (
@@ -53,7 +52,7 @@ export function Preordenes() {
           </Link>
         </section>
       ) : (
-        <div className="flex flex-col gap-4 px-5 pt-4 pb-20">
+        <div className="flex flex-col gap-4 px-5 pt-4 pb-2">
           <Segmentado
             etiqueta="Filtrar por estado"
             valor={filtros.estado}
@@ -61,10 +60,11 @@ export function Preordenes() {
             opciones={PESTANAS}
           />
 
-          {/* Una sola fila que se desliza de lado si no cabe */}
-          <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5">
+          {/* Una fila: categoría y tienda se reparten el ancho, el orden es solo el ícono */}
+          <div className="flex gap-2">
             <FiltroPastilla
               etiqueta="Categoría"
+              estirar
               textoTodas="Categoría"
               valor={filtros.categoriaId ?? ''}
               onCambio={(v) => cambiar({ categoriaId: v || null })}
@@ -73,6 +73,7 @@ export function Preordenes() {
             {datos.tiendas.length > 0 && (
               <FiltroPastilla
                 etiqueta="Tienda"
+                estirar
                 textoTodas="Tienda"
                 valor={filtros.tiendaId ?? ''}
                 onCambio={(v) => cambiar({ tiendaId: v || null })}
@@ -81,6 +82,8 @@ export function Preordenes() {
             )}
             <FiltroPastilla
               etiqueta="Ordenar por"
+              soloIcono
+              resaltar={filtros.orden !== FILTROS_POR_DEFECTO.orden}
               icono="ordenar"
               valor={filtros.orden}
               onCambio={(v) => cambiar({ orden: v as FiltrosListado['orden'] })}
@@ -132,14 +135,6 @@ export function Preordenes() {
           )}
         </div>
       )}
-
-      <Link
-        to="/preordenes/nueva"
-        aria-label="Agregar preorden"
-        className="absolute right-5 bottom-24 z-10 flex size-15 items-center justify-center rounded-[20px] bg-naranja-500 text-marino-500 shadow-[0_10px_24px_-10px_rgba(13,23,38,0.55)]"
-      >
-        <Icono nombre="mas" tamano={28} grosor={2.2} />
-      </Link>
     </main>
   );
 }

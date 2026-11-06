@@ -94,14 +94,13 @@ export function Historial() {
               opciones={PESTANAS}
             />
           </div>
-          {anios.length > 0 && (
-            <FiltroPastilla
-              etiqueta="Año"
-              valor={String(anio)}
-              onCambio={(v) => cambiar({ anio: Number(v) })}
-              opciones={anios.map((a) => ({ valor: String(a), texto: String(a) }))}
-            />
-          )}
+          {/* Siempre visible (aunque la pestaña esté vacía), para que no cambie el diseño entre Recibidas y Canceladas */}
+          <FiltroPastilla
+            etiqueta="Año"
+            valor={String(anio)}
+            onCambio={(v) => cambiar({ anio: Number(v) })}
+            opciones={(anios.length > 0 ? anios : [anio]).map((a) => ({ valor: String(a), texto: String(a) }))}
+          />
         </div>
 
         {anios.length === 0 ? (

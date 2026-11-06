@@ -2,13 +2,14 @@ import { useCallback, useId, useState } from 'react';
 import { Boton } from '../components/atoms/Boton';
 import { Icono } from '../components/atoms/Icono';
 import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
+import { BotonAgregar } from '../components/molecules/AgregarNuevo';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { MensajeError } from '../components/molecules/Campo';
 import { HojaCategoria } from '../components/organisms/HojaCategoria';
 import { HojaInferior } from '../components/organisms/HojaInferior';
 import { HojaTienda } from '../components/organisms/HojaTienda';
 import { usePreordi } from '../context/PreordiContext';
-import { contarUso, moverCategoria } from '../lib/configuracion';
+import { contarUso } from '../lib/configuracion';
 import { hoy } from '../lib/fechas';
 import { borrarTodasLasImagenes } from '../lib/imagenes';
 import { datosIniciales } from '../lib/persistencia';
@@ -111,9 +112,6 @@ export function Configuracion() {
   const categorias = [...datos.categorias].sort((a, b) => a.orden - b.orden);
   const uso = contarUso(datos.preordenes);
 
-  const mover = (id: string, direccion: -1 | 1) =>
-    dispatch({ tipo: 'reemplazarCategorias', categorias: moverCategoria(datos.categorias, id, direccion) });
-
   return (
     <main className="flex flex-1 flex-col">
       <Encabezado titulo="Configuración" volverA="/" />
@@ -122,41 +120,24 @@ export function Configuracion() {
         <section aria-labelledby="titulo-categorias" className="flex flex-col gap-2.5">
           <TituloEtiqueta id="titulo-categorias" etiqueta="Mis" acento="categorías" />
           <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
-            {categorias.map((c, i) => (
-              <li key={c.id} className="flex items-center border-b-2 border-fondo last:border-b-0">
+            {categorias.map((c) => (
+              <li key={c.id} className="border-b-2 border-fondo last:border-b-0">
                 <button
                   type="button"
                   onClick={() => setHoja({ tipo: 'categoria', categoria: c })}
                   aria-label={`Editar ${c.nombre}`}
-                  className="flex min-h-14 min-w-0 flex-1 flex-col justify-center px-3.5 text-left"
+                  className="flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left"
                 >
-                  <span className="truncate text-[15px]">{c.nombre}</span>
-                  <span className="text-[13px] text-tinta-suave">{textoUso(uso.categorias.get(c.id) ?? 0)}</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Subir ${c.nombre}`}
-                  disabled={i === 0}
-                  onClick={() => mover(c.id, -1)}
-                  className="flex size-11 items-center justify-center rounded-xl text-tinta-suave hover:bg-borde-suave disabled:opacity-30"
-                >
-                  <Icono nombre="arriba" tamano={18} grosor={2} />
-                </button>
-                <button
-                  type="button"
-                  aria-label={`Bajar ${c.nombre}`}
-                  disabled={i === categorias.length - 1}
-                  onClick={() => mover(c.id, 1)}
-                  className="mr-1 flex size-11 items-center justify-center rounded-xl text-tinta-suave hover:bg-borde-suave disabled:opacity-30"
-                >
-                  <Icono nombre="abajo" tamano={18} grosor={2} />
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[15px]">{c.nombre}</span>
+                    <span className="text-[13px] text-tinta-suave">{textoUso(uso.categorias.get(c.id) ?? 0)}</span>
+                  </span>
+                  <Icono nombre="editar" tamano={18} className="shrink-0 text-tinta-suave" />
                 </button>
               </li>
             ))}
           </ul>
-          <Boton variante="discreto" tamano="chico" className="self-start" onClick={() => setHoja({ tipo: 'categoria' })}>
-            + Agregar categoría
-          </Boton>
+          <BotonAgregar texto="Agregar categoría" onClick={() => setHoja({ tipo: 'categoria' })} />
         </section>
 
         <section aria-labelledby="titulo-tiendas" className="flex flex-col gap-2.5">
@@ -187,9 +168,7 @@ export function Configuracion() {
               ))}
             </ul>
           )}
-          <Boton variante="discreto" tamano="chico" className="self-start" onClick={() => setHoja({ tipo: 'tienda' })}>
-            + Agregar tienda
-          </Boton>
+          <BotonAgregar texto="Agregar tienda" onClick={() => setHoja({ tipo: 'tienda' })} />
         </section>
 
         <section aria-labelledby="titulo-respaldo" className="flex flex-col gap-2.5">
@@ -202,7 +181,7 @@ export function Configuracion() {
           <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
             <li className="border-b-2 border-fondo">
               <button type="button" onClick={exportar} disabled={ocupado !== null} className={CLASE_FILA}>
-                <Icono nombre="descargar" tamano={20} className="shrink-0 text-acento-texto" />
+                <Icono nombre="subir" tamano={20} className="shrink-0 text-acento-texto" />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="text-[15px]">{ocupado === 'exportar' ? 'Armando respaldo…' : 'Exportar respaldo'}</span>
                   <span className="truncate text-[13px] text-tinta-suave">{textoResumen(actual)}</span>
@@ -226,7 +205,7 @@ export function Configuracion() {
                     e.target.value = '';
                   }}
                 />
-                <Icono nombre="subir" tamano={20} className="shrink-0 text-acento-texto" />
+                <Icono nombre="descargar" tamano={20} className="shrink-0 text-acento-texto" />
                 <span className="flex min-w-0 flex-1 flex-col">
                   <span className="text-[15px]">{ocupado === 'importar' ? 'Leyendo respaldo…' : 'Importar respaldo'}</span>
                   <span className="text-[13px] text-tinta-suave">Reemplaza lo que tenés ahora</span>
@@ -250,32 +229,14 @@ export function Configuracion() {
               Borra todas las preórdenes, deseos, tiendas e imágenes de este dispositivo. Las categorías vuelven a las de
               siempre.
             </p>
-            <Boton tamano="chico" className="self-start" onClick={() => {
+            <Boton className="w-full" onClick={() => {
                 setMensaje(null);
                 setHoja({ tipo: 'reiniciar', paso: 1 });
               }}>
-              <Icono nombre="basura" tamano={16} />
+              <Icono nombre="basura" tamano={18} />
               Reiniciar todo
             </Boton>
           </div>
-        </section>
-
-        <section aria-labelledby="titulo-acerca" className="flex flex-col items-center gap-1.5 pt-4 text-center">
-          <span className="flex size-10 items-center justify-center rounded-[10px] bg-naranja-500 text-marino-500">
-            <Icono nombre="caja" tamano={22} grosor={2} />
-          </span>
-          <h2 id="titulo-acerca" className="text-base font-bold">
-            Preordi
-          </h2>
-          <p className="text-[13px] text-tinta-suave">Tus datos se guardan solo en este dispositivo.</p>
-          <a
-            href="https://github.com/Fiore-RS/preordi"
-            target="_blank"
-            rel="noreferrer"
-            className="text-[13px] font-medium text-acento-texto underline underline-offset-4"
-          >
-            Ver código en GitHub
-          </a>
         </section>
       </div>
 
@@ -312,7 +273,7 @@ export function Configuracion() {
           </p>
           <div className="flex flex-col gap-2.5">
             <Boton variante="principal" onClick={exportar} disabled={ocupado !== null}>
-              <Icono nombre="descargar" tamano={18} />
+              <Icono nombre="subir" tamano={18} />
               {ocupado === 'exportar' ? 'Armando respaldo…' : 'Exportar respaldo primero'}
             </Boton>
             <div className="flex gap-2.5">

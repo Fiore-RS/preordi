@@ -1,48 +1,80 @@
+import { useCallback, useState } from 'react';
 import { Icono, type NombreIcono } from '../atoms/Icono';
-
-interface Opcion {
-  valor: string;
-  texto: string;
-}
+import { HojaInferior } from '../organisms/HojaInferior';
+import { ListaOpciones, type OpcionDesplegable } from './Desplegable';
 
 interface Props {
   etiqueta: string;
   /** Valor actual; '' es "sin filtro". */
   valor: string;
-  opciones: Opcion[];
+  opciones: OpcionDesplegable[];
   onCambio: (valor: string) => void;
   /** Texto de la opción "sin filtro". Sin él, no hay opción vacía (para el orden). */
   textoTodas?: string;
   icono?: NombreIcono;
+  /** Solo el ícono, sin texto (el orden). */
+  soloIcono?: boolean;
+  /** Resaltar aunque no haya opción vacía (ej. un orden distinto del de siempre). */
+  resaltar?: boolean;
+  /** Ocupar el espacio que sobre en la fila (texto a la izquierda, flecha a la derecha). */
+  estirar?: boolean;
 }
 
 /**
- * Filtro compacto (rectángulo redondeado; sólido cuando tiene un filtro aplicado). Por dentro es un <select> nativo: en el teléfono
- * abre el selector del sistema y es accesible sin trabajo extra.
- * Se resalta cuando tiene un filtro aplicado.
+ * Filtro compacto (rectángulo redondeado; sólido cuando tiene un filtro aplicado).
+ * Al tocarlo abre una hoja con las opciones, con el mismo estilo que los menús desplegables
+ * del formulario (especificación 10.9), en vez de la lista nativa del sistema.
  */
-export function FiltroPastilla({ etiqueta, valor, opciones, onCambio, textoTodas, icono = 'abajo' }: Props) {
-  const activo = textoTodas !== undefined && valor !== '';
+export function FiltroPastilla({
+  etiqueta,
+  valor,
+  opciones,
+  onCambio,
+  textoTodas,
+  icono = 'abajo',
+  soloIcono = false,
+  resaltar = false,
+  estirar = false,
+}: Props) {
+  const [abierto, setAbierto] = useState(false);
+  const cerrar = useCallback(() => setAbierto(false), []);
+  const activo = resaltar || (textoTodas !== undefined && valor !== '');
+  const todas = textoTodas !== undefined ? [{ valor: '', texto: textoTodas === etiqueta ? `Todas` : textoTodas }, ...opciones] : opciones;
+  const actual = todas.find((o) => o.valor === valor);
+  const colores = activo ? 'border-tinta bg-tinta text-fondo font-bold' : 'border-borde bg-superficie text-tinta font-medium';
+
   return (
-    <label
-      className={`relative inline-flex min-h-9 shrink-0 items-center rounded-xl border text-[13px] transition-colors focus-within:border-tinta ${
-        activo ? 'border-tinta bg-tinta font-bold text-fondo' : 'border-borde bg-superficie font-medium text-tinta'
-      }`}
-    >
-      <span className="sr-only">{etiqueta}</span>
-      <select
-        value={valor}
-        onChange={(e) => onCambio(e.target.value)}
-        className="h-9 max-w-44 min-w-0 cursor-pointer appearance-none truncate rounded-xl bg-transparent pr-8 pl-3.5 text-current focus:outline-none"
+    <>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={abierto}
+        aria-label={soloIcono ? etiqueta : `${etiqueta}: ${actual?.texto ?? ''}`}
+        title={soloIcono ? etiqueta : undefined}
+        onClick={() => setAbierto(true)}
+        className={`inline-flex h-9 items-center gap-1.5 rounded-xl border text-[13px] transition-colors ${colores} ${
+          soloIcono
+            ? 'w-9 shrink-0 justify-center'
+            : estirar
+              ? 'min-w-0 flex-1 justify-between pr-2.5 pl-3.5'
+              : 'max-w-44 shrink-0 justify-center pr-2.5 pl-3.5'
+        }`}
       >
-        {textoTodas !== undefined && <option value="">{textoTodas}</option>}
-        {opciones.map((o) => (
-          <option key={o.valor} value={o.valor}>
-            {o.texto}
-          </option>
-        ))}
-      </select>
-      <Icono nombre={icono} tamano={16} grosor={2} className="pointer-events-none absolute right-3" />
-    </label>
+        {!soloIcono && <span className="truncate">{valor === '' ? textoTodas : actual?.texto}</span>}
+        <Icono nombre={icono} tamano={soloIcono ? 18 : 16} grosor={2} className="shrink-0" />
+      </button>
+      {abierto && (
+        <HojaInferior titulo={etiqueta} onCerrar={cerrar}>
+          <ListaOpciones
+            opciones={todas}
+            valor={valor}
+            onElegir={(v) => {
+              onCambio(v);
+              cerrar();
+            }}
+          />
+        </HojaInferior>
+      )}
+    </>
   );
 }
