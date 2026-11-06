@@ -43,9 +43,6 @@ export function Preordenes() {
 
       {!hayAlguna ? (
         <section className="flex flex-1 flex-col items-center justify-center gap-3 px-8 pb-16 text-center">
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-tono-naranja text-tono-naranja-texto">
-            <Icono nombre="caja" tamano={32} grosor={1.6} />
-          </span>
           <p className="font-display text-xl font-bold">Todavía no hay preórdenes</p>
           <p className="text-sm text-tinta-suave">Cuando apartes algo, aparece acá con su saldo y su fecha.</p>
           <Link

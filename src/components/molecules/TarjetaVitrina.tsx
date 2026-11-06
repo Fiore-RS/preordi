@@ -27,20 +27,20 @@ export function TarjetaVitrina({ preorden: p }: { preorden: Preorden }) {
       ) : (
         <PortadaSinFoto nombre={p.nombre} estado={p.estado} />
       )}
-      <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-marino-900/0 from-35% to-marino-900/90" />
+      {url && <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-marino-900/0 from-35% to-marino-900/90" />}
 
       <span className="absolute top-3 left-3 rounded-md bg-papel px-2 py-0.5 text-[11px] font-bold text-marino-500">
         {fecha}
       </span>
 
-      <span className="relative mt-auto flex w-full flex-col gap-1 p-3.5 pr-12 text-papel">
+      <span className={`relative mt-auto flex w-full flex-col gap-1 p-3.5 pr-12 ${url ? 'text-papel' : 'text-marino-500'}`}>
         <span className="line-clamp-2 font-display text-[17px] leading-[1.15] font-bold">{p.nombre}</span>
         {saldo > 0 ? (
-          <Monto monto={saldo} className="font-display text-2xl leading-none font-extrabold text-amarillo-500" />
+          <Monto monto={saldo} className={`font-display text-2xl leading-none font-extrabold ${url ? 'text-amarillo-500' : ''}`} />
         ) : (
-          <span className="font-display text-lg leading-none font-extrabold text-amarillo-500">Pagada</span>
+          <span className={`font-display text-lg leading-none font-extrabold ${url ? 'text-amarillo-500' : ''}`}>Pagada</span>
         )}
-        <span className="mt-0.5 self-start rounded-[5px] bg-papel/15 px-1.5 py-0.5 text-[11px]">
+        <span className={`mt-0.5 self-start rounded-[5px] px-1.5 py-0.5 text-[11px] ${url ? 'bg-papel/15' : 'bg-marino-500/15'}`}>
           {saldo > 0 ? 'saldo · ' : ''}
           {NOMBRE_ESTADO[p.estado].toLowerCase()}
         </span>

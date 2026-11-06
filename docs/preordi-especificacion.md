@@ -665,8 +665,11 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 
 - **Lista de Preórdenes:** filas sin caja separadas por una línea fina, con la portada vertical (76 × 96) a la izquierda, el nombre en Bricolage, el saldo grande a la derecha y abajo el estado y la barra de pago. Las vencidas se marcan en el texto de la fecha (naranja con ícono), no con un badge más.
 - **Controles:** la opción activa del control segmentado y los filtros aplicados van sólidos en `tinta`, como las etiquetas. Los badges son rectángulos de 6 px.
+- **Pantallas vacías:** sin ícono ni ilustración, solo el título, el texto y el botón de agregar (Inicio, Preórdenes, Deseos e Historial).
+- **Deseos:** el total "Si apartaras todo" grande sobre el fondo, sin tarjeta, y una cuadrícula de dos columnas con tarjetas altas (3:4) como las de Inicio: foto de fondo, la categoría arriba y el nombre con el precio en amarillo (`TarjetaDeseo`). El botón "Apartar" va debajo de cada tarjeta.
+- **Tarjetas sin foto:** el color del estado sin degradado, con el texto en marino (el degradado oscuro sobre amarillo o naranja se veía sucio).
 
-Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅
+Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅ · Deseos ✅ · pantallas vacías ✅
 
 ---
 

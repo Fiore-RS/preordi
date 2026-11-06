@@ -65,9 +65,6 @@ export function Historial() {
 
         {anios.length === 0 ? (
           <section className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-            <span className="flex size-16 items-center justify-center rounded-2xl bg-tono-marino text-tono-marino-texto">
-              <Icono nombre={esRecibidas ? 'check' : 'cerrar'} tamano={30} grosor={1.8} />
-            </span>
             <p className="font-display text-xl font-bold">
               {esRecibidas ? 'Todavía no ha llegado nada' : 'No hay preórdenes canceladas'}
             </p>

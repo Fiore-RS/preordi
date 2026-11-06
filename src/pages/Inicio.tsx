@@ -69,6 +69,7 @@ export function Inicio() {
         </Link>
       </header>
 
+      {!sinNada && (
       <section aria-label="Resumen de dinero" className="flex flex-col gap-2.5 px-5">
         <span className="text-sm text-tinta-suave">{t.totalPendiente > 0 ? 'Te falta pagar' : 'Estás al día'}</span>
         <Monto
@@ -100,6 +101,7 @@ export function Inicio() {
           </nav>
         )}
       </section>
+      )}
 
       {(r.vencidas.length > 0 || r.recibidasConSaldo.length > 0) && (
         <div className="flex flex-col gap-2 px-5">
@@ -130,7 +132,6 @@ export function Inicio() {
 
       {sinNada ? (
         <section className="flex flex-col items-center gap-3 px-10 py-8 text-center">
-          <span className="font-display text-[28px] leading-none font-extrabold tracking-tight text-acento-texto">¡A estrenar!</span>
           <p className="font-display text-xl font-bold">Todavía no hay preórdenes</p>
           <p className="text-sm text-tinta-suave">Agregá lo que ya apartaste o lo que tenés en la mira.</p>
           <Link
