@@ -81,6 +81,11 @@ export function DetallePreorden() {
   const tienda = datos.tiendas.find((t) => t.id === preorden.tiendaId);
   const esDeseo = preorden.estado === 'deseada';
   const siguiente = accionPrincipal(preorden);
+  const esCancelada = preorden.estado === 'cancelada';
+  // Lo pagado que todavía no te devolvieron (los reembolsos ya restan en totalPagado).
+  const porReembolsar = esCancelada ? Math.max(0, totalPagado(preorden)) : 0;
+  const reembolsado = preorden.pagos.filter((x) => x.tipo === 'reembolso').reduce((s, x) => s + x.monto, 0);
+  const pagadoBruto = preorden.pagos.filter((x) => x.tipo !== 'reembolso').reduce((s, x) => s + x.monto, 0);
   const otrasTransiciones = TRANSICIONES[preorden.estado].filter((e) => e !== siguiente);
   const pagos = [...preorden.pagos].sort((a, b) => b.fecha.localeCompare(a.fecha));
   const saldo = saldoPendiente(preorden);
@@ -170,7 +175,6 @@ export function DetallePreorden() {
         {preorden.estado === 'cancelada' && preorden.fechaCancelada && (
           <p className="rounded-xl bg-superficie-suave px-3.5 py-3 text-sm text-tinta">
             Cancelada el {formatearFecha(preorden.fechaCancelada)}.
-            {totalPagado(preorden) > 0 && ` Quedan ${formatearMonto(totalPagado(preorden))} pagados sin reembolsar.`}
           </p>
         )}
         {recibidaConSaldo(preorden) && (
@@ -181,54 +185,76 @@ export function DetallePreorden() {
         )}
 
         <section aria-label="Pagos y llegada" className="-mt-2 flex flex-col gap-3">
+          {esCancelada ? (
+            <div className="grid grid-cols-3 gap-3">
+              <div className="flex flex-col">
+                <span className="text-xs text-tinta-suave">Pagaste</span>
+                <Monto monto={pagadoBruto} className="font-display text-lg font-extrabold" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-tinta-suave">Reembolsado</span>
+                <Monto monto={reembolsado} className="font-display text-lg font-extrabold" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-tinta-suave">Sin reembolsar</span>
+                <Monto
+                  monto={porReembolsar}
+                  className={`font-display text-lg font-extrabold ${porReembolsar > 0 ? 'text-acento-texto' : ''}`}
+                />
+              </div>
+            </div>
+          ) : (
+            <>
           <div className="grid grid-cols-3 gap-3">
-            {!esDeseo && (
-              <>
-                <div className="flex flex-col">
-                  <span className="text-xs text-tinta-suave">Pagado</span>
-                  <Monto monto={totalPagado(preorden)} className="font-display text-lg font-extrabold" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs text-tinta-suave">Saldo</span>
-                  <Monto
-                    monto={saldo}
-                    className={`font-display text-lg font-extrabold ${saldo > 0 ? 'text-acento-texto' : ''}`}
-                  />
-                </div>
-              </>
-            )}
-            <button
-              type="button"
-              onClick={() => setHoja({ tipo: 'fecha' })}
-              aria-label={`Llega ${formatearFechaEstimada(preorden.fechaEstimada)}. Cambiar fecha estimada`}
-              className="-m-1.5 flex flex-col items-start rounded-xl p-1.5 text-left hover:bg-superficie-suave"
-            >
-              <span className="flex items-center gap-1 text-xs text-tinta-suave">
-                Llega <Icono nombre="editar" tamano={12} grosor={2.2} />
-              </span>
-              <span className={`font-display text-lg font-extrabold ${vencidaHoy ? 'text-acento-texto' : ''}`}>
-                {formatearFechaEstimada(preorden.fechaEstimada)}
-              </span>
-            </button>
-          </div>
-          {!esDeseo && (
-            <div className="h-2 overflow-hidden rounded-full bg-borde-suave">
-              <div
-                className="h-2 rounded-full bg-naranja-500"
-                style={{ width: `${Math.round(progresoPago(preorden) * 100)}%` }}
-              />
-            </div>
-          )}
-          {(vencidaHoy || vecesReprogramada > 0 || !esDeseo) && (
-            <div className="flex flex-wrap gap-1.5">
-              {!esDeseo && <BadgePago estadoPago={estadoPago(preorden)} />}
-              {vencidaHoy && <BadgeVencida />}
-              {vecesReprogramada > 0 && (
-                <Badge tono="gris">
-                  Reprogramada {vecesReprogramada} {vecesReprogramada === 1 ? 'vez' : 'veces'}
-                </Badge>
+              {!esDeseo && (
+                <>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-tinta-suave">Pagado</span>
+                    <Monto monto={totalPagado(preorden)} className="font-display text-lg font-extrabold" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-tinta-suave">Saldo</span>
+                    <Monto
+                      monto={saldo}
+                      className={`font-display text-lg font-extrabold ${saldo > 0 ? 'text-acento-texto' : ''}`}
+                    />
+                  </div>
+                </>
               )}
+              <button
+                type="button"
+                onClick={() => setHoja({ tipo: 'fecha' })}
+                aria-label={`Llega ${formatearFechaEstimada(preorden.fechaEstimada)}. Cambiar fecha estimada`}
+                className="-m-1.5 flex flex-col items-start rounded-xl p-1.5 text-left hover:bg-superficie-suave"
+              >
+                <span className="flex items-center gap-1 text-xs text-tinta-suave">
+                  Llega <Icono nombre="editar" tamano={12} grosor={2.2} />
+                </span>
+                <span className={`font-display text-lg font-extrabold ${vencidaHoy ? 'text-acento-texto' : ''}`}>
+                  {formatearFechaEstimada(preorden.fechaEstimada)}
+                </span>
+              </button>
             </div>
+            {!esDeseo && (
+              <div className="h-2 overflow-hidden rounded-full bg-borde-suave">
+                <div
+                  className="h-2 rounded-full bg-naranja-500"
+                  style={{ width: `${Math.round(progresoPago(preorden) * 100)}%` }}
+                />
+              </div>
+            )}
+            {(vencidaHoy || vecesReprogramada > 0 || !esDeseo) && (
+              <div className="flex flex-wrap gap-1.5">
+                {!esDeseo && <BadgePago estadoPago={estadoPago(preorden)} />}
+                {vencidaHoy && <BadgeVencida />}
+                {vecesReprogramada > 0 && (
+                  <Badge tono="gris">
+                    Reprogramada {vecesReprogramada} {vecesReprogramada === 1 ? 'vez' : 'veces'}
+                  </Badge>
+                )}
+              </div>
+            )}
+            </>
           )}
           {preorden.historialFechas.length > 0 && (
             <ul className="flex flex-col gap-2 border-l-2 border-borde pl-3 text-[13px]">
@@ -343,9 +369,14 @@ export function DetallePreorden() {
         )}
       </div>
 
-      {(!esDeseo || siguiente) && (
+      {((!esDeseo && !esCancelada) || siguiente || porReembolsar > 0) && (
         <div className="sticky bottom-0 mt-auto flex gap-2.5 border-t border-borde-suave bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
-          {!esDeseo && (
+          {esCancelada && porReembolsar > 0 && (
+            <Boton variante="principal" className="flex-1" onClick={() => setHoja({ tipo: 'pago' })}>
+              Registrar reembolso
+            </Boton>
+          )}
+          {!esDeseo && !esCancelada && (
             <Boton className="flex-1" onClick={() => setHoja({ tipo: 'pago' })}>
               Registrar pago
             </Boton>

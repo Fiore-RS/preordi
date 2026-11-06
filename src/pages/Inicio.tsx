@@ -7,8 +7,8 @@ import { TarjetaVitrina } from '../components/molecules/TarjetaVitrina';
 import { usePreordi } from '../context/PreordiContext';
 import { saldoPendiente, totales } from '../lib/calculos';
 import { formatearMonto } from '../lib/dinero';
-import { formatearFechaEstimada, hoy as fechaDeHoy } from '../lib/fechas';
-import { resumenInicio } from '../lib/inicio';
+import { MESES, formatearFechaEstimada, hoy as fechaDeHoy } from '../lib/fechas';
+import { resumenInicio, saldoPorMes } from '../lib/inicio';
 import type { Preorden } from '../types';
 
 interface PropsAlerta {
@@ -45,15 +45,17 @@ export function Inicio() {
   const hoy = fechaDeHoy();
   const t = totales(datos.preordenes);
   const r = resumenInicio(datos.preordenes, hoy);
-  const progreso = t.comprometido > 0 ? t.yaPagado / t.comprometido : 0;
   const nombreTienda = new Map(datos.tiendas.map((x) => [x.id, x.nombre]));
   const sinNada = datos.preordenes.length === 0;
 
-  const chips = [
-    { cantidad: r.apartadas, texto: r.apartadas === 1 ? 'apartada' : 'apartadas', a: '/preordenes?estado=apartada', tono: 'bg-tono-naranja text-tono-naranja-texto' },
-    { cantidad: r.enCamino, texto: 'en camino', a: '/preordenes?estado=en_camino', tono: 'bg-tono-celeste text-tono-celeste-texto' },
-    { cantidad: r.deseos, texto: r.deseos === 1 ? 'deseo' : 'deseos', a: '/deseos', tono: 'bg-tono-amarillo text-tono-amarillo-texto' },
-  ].filter((c) => c.cantidad > 0);
+  const meses = saldoPorMes(datos.preordenes, hoy);
+  const maximoMes = Math.max(1, ...meses.map((m) => m.saldo));
+  const anioHoy = hoy.slice(0, 4);
+  /** "nov" (y el año abajo solo si no es este año); "Sin fecha" para las que no tienen. */
+  const etiquetaMes = (clave: string) =>
+    clave === 'sin_fecha'
+      ? { nombre: 'Sin fecha', anio: '' }
+      : { nombre: MESES[Number(clave.slice(5, 7)) - 1], anio: clave.slice(0, 4) === anioHoy ? '' : clave.slice(0, 4) };
 
   return (
     <main className="flex flex-col gap-6 pt-5 pb-2">
@@ -70,37 +72,42 @@ export function Inicio() {
       </header>
 
       {!sinNada && (
-      <section aria-label="Resumen de dinero" className="flex flex-col gap-2.5 px-5">
-        <span className="text-sm text-tinta-suave">{t.totalPendiente > 0 ? 'Te falta pagar' : 'Estás al día'}</span>
-        <Monto
-          monto={t.totalPendiente}
-          className="-mt-1 font-display text-[52px] leading-none font-extrabold tracking-tight"
-        />
-        {t.comprometido > 0 && (
-          <>
-            <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-borde-suave">
-              <div className="h-2 rounded-full bg-naranja-500" style={{ width: `${Math.round(progreso * 100)}%` }} />
-            </div>
-            <span className="text-[13px] text-tinta-suave">
-              Pagaste <span className="font-bold text-tinta tabular-nums">{formatearMonto(t.yaPagado)}</span> de{' '}
-              <span className="tabular-nums">{formatearMonto(t.comprometido)}</span>
-            </span>
-          </>
-        )}
-        {chips.length > 0 && (
-          <nav aria-label="Resumen por estado" className="mt-1 flex flex-wrap gap-1.5">
-            {chips.map((c) => (
-              <Link
-                key={c.a}
-                to={c.a}
-                className={`flex min-h-8 items-center gap-1 rounded-lg px-2.5 text-[13px] font-medium ${c.tono}`}
-              >
-                <span className="font-bold tabular-nums">{c.cantidad}</span> {c.texto}
-              </Link>
-            ))}
-          </nav>
-        )}
-      </section>
+        <section aria-labelledby="titulo-por-mes" className="flex flex-col gap-3 px-5">
+          <TituloEtiqueta id="titulo-por-mes" etiqueta="Por pagar" acento="cada mes" />
+          {meses.length === 0 ? (
+            <p className="text-sm text-tinta-suave">Estás al día: no tenés nada por pagar.</p>
+          ) : (
+            <>
+              <ol className="carrusel -mx-5 flex gap-2.5 overflow-x-auto px-5">
+                {meses.map((m, i) => {
+                  const { nombre, anio } = etiquetaMes(m.clave);
+                  return (
+                    <li
+                      key={m.clave}
+                      aria-label={`${nombre}${anio ? ` ${anio}` : ''}: ${formatearMonto(m.saldo)}, ${m.cantidad} ${m.cantidad === 1 ? 'preorden' : 'preórdenes'}`}
+                      className="flex h-[168px] min-w-[60px] flex-1 flex-col items-center justify-end gap-1.5"
+                    >
+                      <Monto monto={m.saldo} className="font-display text-[13px] font-extrabold whitespace-nowrap" />
+                      <span
+                        aria-hidden="true"
+                        className={`w-full rounded-t-[10px] rounded-b-md ${i === 0 ? 'bg-naranja-500' : 'bg-superficie-suave'}`}
+                        style={{ height: `${Math.max(6, Math.round((m.saldo / maximoMes) * 100))}px` }}
+                      />
+                      <span aria-hidden="true" className="flex flex-col items-center leading-tight">
+                        <span className={`text-xs ${i === 0 ? 'font-bold text-tinta' : 'text-tinta-suave'}`}>{nombre}</span>
+                        <span className="h-3.5 text-[10.5px] text-tinta-tenue">{anio}</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+              <div className="flex items-baseline justify-between border-t border-borde-suave pt-3">
+                <span className="text-sm text-tinta-suave">Total pendiente</span>
+                <Monto monto={t.totalPendiente} className="font-display text-2xl leading-none font-extrabold" />
+              </div>
+            </>
+          )}
+        </section>
       )}
 
       {(r.vencidas.length > 0 || r.recibidasConSaldo.length > 0) && (
@@ -173,17 +180,17 @@ export function Inicio() {
                   </div>
                 )}
 
-                {r.totalProximas > 0 && (
-                  <Link
-                    to="/preordenes"
-                    className="mx-5 flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-superficie-suave text-sm font-bold hover:bg-borde-suave"
-                  >
-                    Ver todas las llegadas ({r.totalProximas})
-                    <Icono nombre="adelante" tamano={16} grosor={2.4} />
-                  </Link>
-                )}
               </>
             )}
+
+            {/* Siempre visible, aunque todas quepan en las tarjetas grandes o no haya ninguna por llegar */}
+            <Link
+              to="/preordenes"
+              className="mx-5 flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-superficie-suave text-sm font-bold hover:bg-borde-suave"
+            >
+              Ver todas
+              <Icono nombre="adelante" tamano={16} grosor={2.4} />
+            </Link>
           </section>
 
           {r.porPagar.length > 0 && (

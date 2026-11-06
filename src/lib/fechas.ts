@@ -2,7 +2,7 @@
 
 import type { FechaEstimada, Precision } from '../types';
 
-const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'dic'];
+export const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'set', 'oct', 'nov', 'dic'];
 
 const dos = (n: number) => String(n).padStart(2, '0');
 

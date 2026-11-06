@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Preorden } from '../types';
-import { resumenInicio } from './inicio';
+import { totales } from './calculos';
+import { resumenInicio, saldoPorMes } from './inicio';
 
 function p(nombre: string, cambios: Partial<Preorden>): Preorden {
   return {
@@ -74,5 +75,14 @@ describe('resumen de Inicio', () => {
 
   it('recibidas con saldo pendiente', () => {
     expect(nombres(r.recibidasConSaldo)).toEqual(['Novela']);
+  });
+
+  it('saldo por mes: solo meses con algo por pagar; lo atrasado cae en el mes de hoy y sin fecha al final', () => {
+    const meses = saldoPorMes(lista, HOY);
+    expect(meses.map((m) => m.clave)).toEqual(['2026-11', '2027-03', 'sin_fecha']);
+    // noviembre: Artbook y Tomo 12 (llegan este mes) + Llavero y Peluche (vencidas) + la recibida con saldo
+    expect(meses[0].cantidad).toBe(5);
+    expect(meses.map((m) => m.saldo)).toEqual([50000, 10000, 10000]);
+    expect(meses.reduce((s, m) => s + m.saldo, 0)).toBe(totales(lista).totalPendiente);
   });
 });

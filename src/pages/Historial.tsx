@@ -117,7 +117,7 @@ export function Historial() {
         ) : (
           <>
             <section aria-label={`Resumen de ${anio}`} className="flex flex-col gap-1">
-              <span className="text-sm text-tinta-suave">{esRecibidas ? `Gastado en ${anio}` : `Perdido en ${anio}`}</span>
+              <span className="text-sm text-tinta-suave">{esRecibidas ? 'Total gastado' : 'Total perdido'}</span>
               <Monto
                 monto={r.total}
                 className={`font-display text-[44px] leading-none font-extrabold tracking-tight ${
@@ -135,7 +135,7 @@ export function Historial() {
 
             {esRecibidas && r.porCategoria.length > 0 && (
               <section aria-labelledby="titulo-categorias" className="flex flex-col gap-3">
-                <TituloEtiqueta id="titulo-categorias" etiqueta="Por" acento="categoría" />
+                <TituloEtiqueta id="titulo-categorias" etiqueta="Resumen" acento="por categoría" />
                 <ul className="flex flex-col gap-3">
                   {r.porCategoria.map((c, i) => (
                     <li key={c.categoriaId} className="flex flex-col gap-1.5">
@@ -158,8 +158,8 @@ export function Historial() {
             <section aria-labelledby="titulo-lista" className="flex flex-col gap-1">
               <TituloEtiqueta
                 id="titulo-lista"
-                etiqueta={esRecibidas ? 'Llegaron' : 'Canceladas'}
-                acento={`en ${anio}`}
+                etiqueta="Todas"
+                acento="las preórdenes"
                 className="mb-1"
               />
               <ul className="flex flex-col divide-y divide-borde-suave">

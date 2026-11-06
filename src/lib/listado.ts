@@ -23,10 +23,10 @@ export const FILTROS_POR_DEFECTO: FiltrosListado = {
 };
 
 export const PESTANAS: { valor: PestanaEstado; texto: string }[] = [
+  { valor: 'todas', texto: 'Todas' },
   { valor: 'apartada', texto: 'Apartadas' },
   { valor: 'en_camino', texto: 'En camino' },
   { valor: 'cancelada', texto: 'Canceladas' },
-  { valor: 'todas', texto: 'Todas' },
 ];
 
 export const ORDENES: { valor: Orden; texto: string }[] = [

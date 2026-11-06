@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { NOMBRE_MOVIMIENTO, agregarPago, quitarPago, reemplazarPago, validarPagoEnDetalle } from '../../lib/acciones';
-import { saldoPendiente } from '../../lib/calculos';
+import { saldoPendiente, totalPagado } from '../../lib/calculos';
 import { formatearMonto, parsearMonto } from '../../lib/dinero';
 import { hoy as fechaDeHoy } from '../../lib/fechas';
 import type { Pago, Preorden, TipoMovimiento } from '../../types';
@@ -27,12 +27,21 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
   const base = pago ? { ...preorden, pagos: preorden.pagos.filter((x) => x.id !== pago.id) } : preorden;
   const saldo = saldoPendiente(base);
 
-  const tipos: TipoMovimiento[] =
-    base.pagos.length === 0 ? ['deposito', 'abono', 'saldo'] : ['abono', 'saldo', 'reembolso'];
+  // En una cancelada solo tiene sentido registrar lo que te devolvieron.
+  const esReembolso = preorden.estado === 'cancelada' && !pago;
+  const porReembolsar = Math.max(0, totalPagado(base));
+
+  const tipos: TipoMovimiento[] = esReembolso
+    ? ['reembolso']
+    : base.pagos.length === 0
+      ? ['deposito', 'abono', 'saldo']
+      : ['abono', 'saldo', 'reembolso'];
   if (pago && !tipos.includes(pago.tipo)) tipos.push(pago.tipo);
 
-  const [monto, setMonto] = useState(pago ? conGrupos(pago.monto) : '');
-  const [tipo, setTipo] = useState<TipoMovimiento>(pago?.tipo ?? (base.pagos.length === 0 ? 'deposito' : 'abono'));
+  const [monto, setMonto] = useState(pago ? conGrupos(pago.monto) : esReembolso && porReembolsar > 0 ? conGrupos(porReembolsar) : '');
+  const [tipo, setTipo] = useState<TipoMovimiento>(
+    pago?.tipo ?? (esReembolso ? 'reembolso' : base.pagos.length === 0 ? 'deposito' : 'abono'),
+  );
   const [fecha, setFecha] = useState(pago?.fecha ?? hoy);
   const [nota, setNota] = useState(pago?.nota ?? '');
   const [error, setError] = useState<string | null>(null);
@@ -74,11 +83,18 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
 
   return (
     <HojaInferior
-      titulo={pago ? 'Editar pago' : 'Registrar pago'}
+      titulo={pago ? 'Editar pago' : esReembolso ? 'Registrar reembolso' : 'Registrar pago'}
       subtitulo={
-        <>
-          {preorden.nombre} · saldo <span className="font-bold text-acento-texto tabular-nums">{formatearMonto(saldo)}</span>
-        </>
+        esReembolso ? (
+          <>
+            {preorden.nombre} · pagaste{' '}
+            <span className="font-bold text-acento-texto tabular-nums">{formatearMonto(porReembolsar)}</span>
+          </>
+        ) : (
+          <>
+            {preorden.nombre} · saldo <span className="font-bold text-acento-texto tabular-nums">{formatearMonto(saldo)}</span>
+          </>
+        )
       }
       onCerrar={onCerrar}
     >
@@ -94,7 +110,12 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
             invalido={!!error}
             aria-describedby={error ? 'campo-monto-pago-error' : undefined}
           />
-          {saldo > 0 && tipo !== 'reembolso' && (
+          {esReembolso && (
+            <p className="text-[13px] text-tinta-suave">
+              Si te devolvieron solo una parte, cambiá el monto. Lo que no se reembolse queda como perdido en Historial.
+            </p>
+          )}
+          {saldo > 0 && tipo !== 'reembolso' && !esReembolso && (
             <button
               type="button"
               onClick={() => {
@@ -109,17 +130,19 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
           )}
         </Campo>
 
-        <Campo id="campo-tipo-pago" etiqueta="Tipo">
-          <Segmentado
-            etiqueta="Tipo de pago"
-            valor={tipo}
-            onCambio={(t) => {
-              setTipo(t);
-              setError(null);
-            }}
-            opciones={tipos.map((t) => ({ valor: t, texto: NOMBRE_MOVIMIENTO[t] }))}
-          />
-        </Campo>
+        {!esReembolso && (
+          <Campo id="campo-tipo-pago" etiqueta="Tipo">
+            <Segmentado
+              etiqueta="Tipo de pago"
+              valor={tipo}
+              onCambio={(t) => {
+                setTipo(t);
+                setError(null);
+              }}
+              opciones={tipos.map((t) => ({ valor: t, texto: NOMBRE_MOVIMIENTO[t] }))}
+            />
+          </Campo>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <Campo id="campo-fecha-pago" etiqueta="Fecha" para="fecha-pago">
@@ -148,7 +171,7 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
             Cancelar
           </Boton>
           <Boton type="submit" variante="principal" className="flex-[1.4]">
-            Guardar pago
+            {esReembolso ? 'Guardar reembolso' : 'Guardar pago'}
           </Boton>
         </div>
         {pago && (
