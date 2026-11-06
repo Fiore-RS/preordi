@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, type Dispatch, type ReactNode } from 'react';
 import type { Categoria, DatosPreordi, ID, Preorden, Tienda } from '../types';
 import { reasignarCategoria, reasignarTienda } from '../lib/configuracion';
+import { limpiarHuerfanas } from '../lib/imagenes';
 import { cargarDatos, guardarDatos } from '../lib/persistencia';
 
 export type Accion =
@@ -76,6 +77,16 @@ const PreordiContext = createContext<ValorContexto | null>(null);
 
 export function PreordiProvider({ children }: { children: ReactNode }) {
   const [datos, dispatch] = useReducer(reducer, undefined, cargarDatos);
+
+  // Al abrir la app, borra imágenes que ya no pertenecen a ninguna preorden (6.2).
+  useEffect(() => {
+    const enUso = new Set(datos.preordenes.flatMap((p) => (p.imagenId ? [p.imagenId] : [])));
+    limpiarHuerfanas(enUso).catch(() => {
+      // Si IndexedDB no está disponible, no hay nada que limpiar.
+    });
+    // Solo una vez, con los datos con los que arrancó la app.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Guarda en localStorage unos 300 ms después del último cambio.
   useEffect(() => {

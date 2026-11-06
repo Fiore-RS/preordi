@@ -4,7 +4,7 @@ import { formatearMonto } from '../../lib/dinero';
 import { formatearFechaEstimada } from '../../lib/fechas';
 import type { Preorden } from '../../types';
 import { Badge, BadgeEstado, BadgePago, BadgeVencida, claseTonoEstado } from '../atoms/Badge';
-import { Icono } from '../atoms/Icono';
+import { Miniatura } from '../atoms/Miniatura';
 
 interface Props {
   preorden: Preorden;
@@ -29,13 +29,12 @@ export function TarjetaPreorden({ preorden: p, tienda, hoy, conEstado = false }:
         estaVencida ? 'border-acento-borde' : 'border-borde-suave'
       }`}
     >
-      {/* Miniatura (la imagen llega en la fase 6) */}
-      <span
-        aria-hidden="true"
-        className={`flex size-[72px] shrink-0 items-center justify-center rounded-xl ${claseTonoEstado(p.estado)}`}
-      >
-        <Icono nombre="imagen" tamano={26} grosor={1.6} />
-      </span>
+      <Miniatura
+        imagenId={p.imagenId}
+        className="size-[72px] rounded-xl"
+        clasesMarcador={claseTonoEstado(p.estado)}
+        tamanoIcono={26}
+      />
 
       <span className="flex min-w-0 flex-1 flex-col gap-1.5">
         <span className="flex items-start justify-between gap-2">

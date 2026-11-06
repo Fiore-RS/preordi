@@ -4,7 +4,7 @@ import { formatearMonto } from '../../lib/dinero';
 import { formatearFechaEstimada } from '../../lib/fechas';
 import type { Preorden } from '../../types';
 import { BadgeEstado, BadgePago, claseTonoEstado } from '../atoms/Badge';
-import { Icono } from '../atoms/Icono';
+import { Miniatura } from '../atoms/Miniatura';
 
 interface Props {
   preorden: Preorden;
@@ -24,12 +24,12 @@ export function FilaPreorden({ preorden: p, tienda }: Props) {
       to={`/preordenes/${p.id}`}
       className="flex items-center gap-3 rounded-[14px] border border-borde-suave bg-superficie p-2.5 transition-colors hover:border-borde-fuerte"
     >
-      <span
-        aria-hidden="true"
-        className={`flex size-[52px] shrink-0 items-center justify-center rounded-[10px] ${claseTonoEstado(p.estado)}`}
-      >
-        <Icono nombre="imagen" tamano={22} />
-      </span>
+      <Miniatura
+        imagenId={p.imagenId}
+        className="size-[52px] rounded-[10px]"
+        clasesMarcador={claseTonoEstado(p.estado)}
+        tamanoIcono={22}
+      />
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-[15px] font-medium">{p.nombre}</span>
         <span className="truncate text-[13px] text-tinta-suave">{detalle}</span>

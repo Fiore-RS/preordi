@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Boton } from '../components/atoms/Boton';
 import { Icono } from '../components/atoms/Icono';
+import { Miniatura } from '../components/atoms/Miniatura';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { HojaEstado } from '../components/organisms/HojaEstado';
 import { usePreordi } from '../context/PreordiContext';
@@ -68,13 +69,12 @@ export function Deseos() {
             {deseos.map((p) => (
               <li key={p.id} className="flex flex-col overflow-hidden rounded-[18px] border border-borde-suave bg-superficie">
                 <Link to={`/preordenes/${p.id}`} className="flex flex-1 flex-col">
-                  {/* Imagen (fase 6) */}
-                  <span
-                    aria-hidden="true"
-                    className="flex aspect-square items-center justify-center bg-tono-amarillo-tenue text-tono-amarillo-tenue-texto"
-                  >
-                    <Icono nombre="imagen" tamano={34} grosor={1.5} />
-                  </span>
+                  <Miniatura
+                    imagenId={p.imagenId}
+                    className="aspect-square w-full"
+                    clasesMarcador="bg-tono-amarillo-tenue text-tono-amarillo-tenue-texto"
+                    tamanoIcono={34}
+                  />
                   <span className="flex flex-col gap-0.5 px-3 pt-3">
                     <span className="line-clamp-2 text-[15px] leading-snug font-medium">{p.nombre}</span>
                     <span className="text-[13px] text-tinta-suave">

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { Badge, BadgeEstado, BadgePago, BadgeVencida } from '../components/atoms/Badge';
+import { Badge, BadgeEstado, BadgePago, BadgeVencida, claseTonoEstado } from '../components/atoms/Badge';
 import { Boton } from '../components/atoms/Boton';
 import { Icono } from '../components/atoms/Icono';
 import { Encabezado } from '../components/molecules/Encabezado';
@@ -8,6 +8,7 @@ import { HojaEstado } from '../components/organisms/HojaEstado';
 import { HojaFecha } from '../components/organisms/HojaFecha';
 import { HojaInferior } from '../components/organisms/HojaInferior';
 import { HojaPago } from '../components/organisms/HojaPago';
+import { VisorImagen } from '../components/organisms/VisorImagen';
 import { usePreordi } from '../context/PreordiContext';
 import { NOMBRE_MOVIMIENTO, accionPrincipal, textoTransicion } from '../lib/acciones';
 import {
@@ -23,6 +24,8 @@ import {
 import { formatearMonto } from '../lib/dinero';
 import { TRANSICIONES } from '../lib/estados';
 import { formatearFecha, formatearFechaEstimada, hoy as fechaDeHoy } from '../lib/fechas';
+import { borrarImagen } from '../lib/imagenes';
+import { useImagen } from '../lib/useImagen';
 import type { Estado, Pago, Preorden } from '../types';
 
 type Hoja =
@@ -31,6 +34,7 @@ type Hoja =
   | { tipo: 'estado'; a: Estado }
   | { tipo: 'acciones' }
   | { tipo: 'eliminar' }
+  | { tipo: 'imagen' }
   | null;
 
 const PASOS: { estado: Estado; campo: 'fechaApartada' | 'fechaEnviada' | 'fechaRecibida' }[] = [
@@ -51,6 +55,7 @@ export function DetallePreorden() {
   const cerrar = useCallback(() => setHoja(null), []);
 
   const p = datos.preordenes.find((x) => x.id === id);
+  const urlImagen = useImagen(p?.imagenId ?? null);
 
   if (!p) {
     return (
@@ -89,15 +94,28 @@ export function DetallePreorden() {
   }
 
   function eliminar() {
+    if (preorden.imagenId) borrarImagen(preorden.imagenId).catch(() => {});
     dispatch({ tipo: 'eliminarPreorden', id: preorden.id });
     navigate(esDeseo ? '/deseos' : '/preordenes', { replace: true });
   }
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* Imagen (fase 6): por ahora, un marcador con el color del estado */}
-      <div className="relative flex h-56 shrink-0 flex-col items-center justify-center gap-2 bg-tono-naranja text-tono-naranja-texto">
-        <Icono nombre="imagen" tamano={44} grosor={1.4} />
+      <div className="relative h-64 shrink-0">
+        {urlImagen ? (
+          <button
+            type="button"
+            aria-label="Ver imagen completa"
+            onClick={() => setHoja({ tipo: 'imagen' })}
+            className="block size-full"
+          >
+            <img src={urlImagen} alt={preorden.nombre} className="size-full object-cover" />
+          </button>
+        ) : (
+          <div className={`flex size-full items-center justify-center ${claseTonoEstado(preorden.estado)}`}>
+            <Icono nombre="imagen" tamano={44} grosor={1.4} />
+          </div>
+        )}
         <div className="absolute inset-x-4 top-4 flex justify-between">
           <button
             type="button"
@@ -353,6 +371,9 @@ export function DetallePreorden() {
       )}
 
       {hoja?.tipo === 'pago' && <HojaPago preorden={preorden} pago={hoja.pago} onGuardar={guardar} onCerrar={cerrar} />}
+      {hoja?.tipo === 'imagen' && urlImagen && (
+        <VisorImagen url={urlImagen} alt={preorden.nombre} onCerrar={cerrar} />
+      )}
       {hoja?.tipo === 'fecha' && <HojaFecha preorden={preorden} onGuardar={guardar} onCerrar={cerrar} />}
       {hoja?.tipo === 'estado' && <HojaEstado preorden={preorden} a={hoja.a} onGuardar={guardar} onCerrar={cerrar} />}
       {hoja?.tipo === 'acciones' && (

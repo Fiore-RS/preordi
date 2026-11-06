@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { usePreordi } from '../../context/PreordiContext';
 import { totalPagado } from '../../lib/calculos';
 import { formatearMonto } from '../../lib/dinero';
@@ -14,6 +14,8 @@ import {
   type FormularioPreorden as Formulario,
 } from '../../lib/formulario';
 import { nuevoId } from '../../lib/ids';
+import { borrarImagen, comprimirImagen, guardarImagen } from '../../lib/imagenes';
+import { useImagen } from '../../lib/useImagen';
 import type { Preorden } from '../../types';
 import { Boton } from '../atoms/Boton';
 import { Icono } from '../atoms/Icono';
@@ -21,7 +23,11 @@ import { Campo, CLASE_ENTRADA } from '../molecules/Campo';
 import { CampoMonto } from '../molecules/CampoMonto';
 import { Segmentado } from '../molecules/Segmentado';
 import { SelectorFechaEstimada } from '../molecules/SelectorFechaEstimada';
+import { SelectorImagen } from '../molecules/SelectorImagen';
 import { SelectorTipoPago } from '../molecules/SelectorTipoPago';
+
+/** La imagen mientras se edita: la que ya estaba, una nueva elegida, o quitada. */
+type EstadoImagen = { tipo: 'original' } | { tipo: 'nueva'; blob: Blob; url: string } | { tipo: 'quitada' };
 
 interface Props {
   /** Preorden a editar. Sin ella, el formulario crea una nueva. */
@@ -44,6 +50,31 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
   const [errores, setErrores] = useState<ErroresFormulario>({});
   const [nuevaCategoria, setNuevaCategoria] = useState<string | null>(null);
   const [nuevaTienda, setNuevaTienda] = useState<string | null>(null);
+
+  const [imagen, setImagen] = useState<EstadoImagen>({ tipo: 'original' });
+  const [procesandoImagen, setProcesandoImagen] = useState(false);
+  const [errorImagen, setErrorImagen] = useState<string | null>(null);
+  const urlOriginal = useImagen(original?.imagenId ?? null);
+  const urlVista = imagen.tipo === 'nueva' ? imagen.url : imagen.tipo === 'original' ? urlOriginal : null;
+
+  // Libera la vista previa de una imagen nueva cuando se reemplaza o se sale del formulario.
+  const urlNueva = imagen.tipo === 'nueva' ? imagen.url : null;
+  useEffect(() => () => {
+    if (urlNueva) URL.revokeObjectURL(urlNueva);
+  }, [urlNueva]);
+
+  async function elegirImagen(archivo: File) {
+    setProcesandoImagen(true);
+    setErrorImagen(null);
+    try {
+      const blob = await comprimirImagen(archivo);
+      setImagen({ tipo: 'nueva', blob, url: URL.createObjectURL(blob) });
+    } catch {
+      setErrorImagen('No se pudo leer esa imagen. Probá con otra.');
+    } finally {
+      setProcesandoImagen(false);
+    }
+  }
 
   /** Actualiza campos y limpia el error del campo que se está corrigiendo. */
   function cambiar(cambios: Partial<Formulario>, campo?: CampoConError) {
@@ -82,11 +113,29 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
     cambiar({ costosExtra: f.costosExtra.map((c) => (c.id === id ? { ...c, ...cambios } : c)) }, 'costosExtra');
   }
 
-  function guardar(e: FormEvent) {
+  async function guardar(e: FormEvent) {
     e.preventDefault();
+    if (procesandoImagen) return;
     const resultado = procesarFormulario(f, { hoy, ahoraISO: new Date().toISOString(), original });
     if (resultado.ok) {
-      onGuardado(resultado.preorden);
+      let preorden = resultado.preorden;
+      try {
+        // La imagen va a IndexedDB; la preorden solo guarda su id (6.2).
+        if (imagen.tipo === 'nueva') {
+          const imagenId = nuevoId();
+          await guardarImagen(imagenId, imagen.blob);
+          if (original?.imagenId) await borrarImagen(original.imagenId);
+          preorden = { ...preorden, imagenId };
+        } else if (imagen.tipo === 'quitada' && original?.imagenId) {
+          await borrarImagen(original.imagenId);
+          preorden = { ...preorden, imagenId: null };
+        }
+      } catch {
+        setErrorImagen('No se pudo guardar la imagen. Intentá de nuevo.');
+        document.getElementById('campo-imagen')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+      onGuardado(preorden);
       return;
     }
     setErrores(resultado.errores);
@@ -110,6 +159,19 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
   return (
     <form noValidate onSubmit={guardar} className="flex flex-1 flex-col">
       <div className="flex flex-col gap-6 px-5 pt-2 pb-8">
+        <div id="campo-imagen">
+          <SelectorImagen
+            url={urlVista}
+            procesando={procesandoImagen}
+            error={errorImagen}
+            onElegir={elegirImagen}
+            onQuitar={() => {
+              setImagen({ tipo: 'quitada' });
+              setErrorImagen(null);
+            }}
+          />
+        </div>
+
         <Campo id="campo-nombre" etiqueta="Nombre" para="nombre" error={errores.nombre}>
           <input
             id="nombre"

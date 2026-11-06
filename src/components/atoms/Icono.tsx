@@ -30,6 +30,8 @@ const TRAZOS = {
     'M8 3v4',
     'M4 11h16',
   ],
+  descargar: ['M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2', 'M7 11l5 5l5 -5', 'M12 4l0 12'],
+  subir: ['M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2', 'M7 9l5 -5l5 5', 'M12 4l0 12'],
   abajo: ['M6 9l6 6l6 -6'],
   arriba: ['M6 15l6 -6l6 6'],
   adelante: ['M9 6l6 6l-6 6'],
