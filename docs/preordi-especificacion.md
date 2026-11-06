@@ -478,7 +478,8 @@ Igual que en Sobres y Teleo:
 - Es el **mismo dibujo que las pantallas de arranque de iOS** (`apple-touch-startup-image` en `public/splash/`), así el paso de una a la otra no se nota.
 - `aria-hidden="true"`. Con "reducir movimiento" activado, el pulso se desactiva por la regla global de `index.css`.
 - Componente: `components/organisms/PantallaCarga.tsx`, montado en `App.tsx` fuera de las rutas.
-- Fondo: `marino-500`, el mismo del ícono final.
+- Fondo: `marino-500`, el mismo del ícono final. El ícono (`favicon.svg`) va a 128 px, centrado; como su fondo es el mismo marino, solo se ve la caja con las rayas. ✅
+- **Splash de iOS** ✅: 12 imágenes en `public/splash/` (`splash-<ancho>x<alto>.png`) para los iPhone desde el SE hasta el 16 Pro Max, vertical, generadas con el mismo dibujo y tamaño, enlazadas en `index.html` con `apple-touch-startup-image` y su `media`. Para que iOS las use, `index.html` declara `apple-mobile-web-app-capable`. No se guardan en la caché del service worker (`globIgnores: ['splash/**']`), porque solo las usa iOS al abrir.
 
 ---
 
@@ -702,7 +703,7 @@ Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅ · Deseos ✅ · pantallas 
    - Componentes pasados a los tokens semánticos de 10.4 ✅ (el modo oscuro ya funciona con la clase `.dark`; falta activarlo según el sistema, en la fase 8)
 6. **Imágenes y respaldo** ✅: compresión, IndexedDB y `.zip`
 7. **Refinamiento visual (10.9)** ✅: revisar el diseño general para que se sienta más natural, con más carácter y menos "generado con IA"; va antes del pulido PWA porque el ícono, la pantalla de carga y los splash dependen de la dirección visual que salga de acá
-8. **Pulido PWA:** modo oscuro con selector de tema (10.4) ✅, ícono final ✅, pantalla de carga (8.10) y splash de iOS, y prueba de instalación en el teléfono
+8. **Pulido PWA:** modo oscuro con selector de tema (10.4) ✅, ícono final ✅, pantalla de carga (8.10) ✅ y splash de iOS ✅, y prueba de instalación en el teléfono
 9. **Publicar:** agregar al hub `index`
 
 ---

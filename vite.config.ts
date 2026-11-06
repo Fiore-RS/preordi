@@ -39,6 +39,8 @@ export default defineConfig(({ command, isPreview }) => ({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        // Los splash de iOS solo los usa iOS al abrir; no hace falta guardarlos en caché.
+        globIgnores: ['splash/**'],
       },
     }),
   ],
