@@ -61,9 +61,7 @@ export function Inicio() {
     <main className="flex flex-col gap-6 pt-5 pb-2">
       <header className="flex items-center justify-between px-5">
         <div className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-[9px] bg-naranja-500 text-marino-500">
-            <Icono nombre="caja" tamano={19} grosor={2.2} />
-          </span>
+          <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" className="size-8" />
           <span className="font-display text-xl font-extrabold tracking-tight">Preordi</span>
         </div>
         <Link to="/config" aria-label="Configuración" className="-mr-2 flex size-11 items-center justify-center rounded-full">
