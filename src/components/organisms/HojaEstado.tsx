@@ -119,7 +119,7 @@ export function HojaEstado({ preorden, a, onGuardar, onCerrar }: Props) {
         )}
 
         {sugerido > 0 && !esApartarDeseo && (
-          <label className="flex cursor-pointer items-center gap-3 rounded-[14px] border border-borde bg-superficie px-3.5 py-3">
+          <label className="flex cursor-pointer items-center gap-3 rounded-[14px] bg-superficie-suave px-3.5 py-3">
             <input
               type="checkbox"
               checked={registrarPago}

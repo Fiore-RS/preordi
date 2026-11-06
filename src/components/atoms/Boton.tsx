@@ -6,7 +6,8 @@ const ESTILOS: Record<Variante, string> = {
   // Uno solo por pantalla (especificación 10.7). Naranja con texto marino desde la Vitrina (10.9).
   principal: 'bg-principal text-principal-texto hover:bg-principal-hover',
   secundario: 'border-[1.5px] border-tinta text-tinta hover:bg-superficie-suave',
-  discreto: 'border border-dashed border-borde-fuerte text-tinta hover:bg-superficie-suave',
+  // Sin borde punteado desde la Vitrina (10.9): relleno suave.
+  discreto: 'bg-superficie-suave text-tinta hover:bg-borde-suave',
 };
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {

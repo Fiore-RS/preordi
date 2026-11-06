@@ -102,7 +102,7 @@ export function HojaPago({ preorden, pago, onGuardar, onCerrar }: Props) {
                 if (tipo !== 'deposito') setTipo('saldo');
                 setError(null);
               }}
-              className="self-start rounded-full bg-resalte px-3.5 py-2 text-[13px] font-bold text-resalte-texto"
+              className="self-start rounded-xl bg-resalte px-3.5 py-2 text-[13px] font-bold text-resalte-texto"
             >
               Pagar saldo ({formatearMonto(saldo)})
             </button>

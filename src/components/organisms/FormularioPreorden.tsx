@@ -19,6 +19,7 @@ import { useImagen } from '../../lib/useImagen';
 import type { Preorden } from '../../types';
 import { Boton } from '../atoms/Boton';
 import { Icono } from '../atoms/Icono';
+import { TituloEtiqueta } from '../atoms/TituloEtiqueta';
 import { Campo, CLASE_ENTRADA } from '../molecules/Campo';
 import { CampoMonto } from '../molecules/CampoMonto';
 import { Segmentado } from '../molecules/Segmentado';
@@ -172,6 +173,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           />
         </div>
 
+        <TituloEtiqueta etiqueta="Lo" acento="básico" className="-mb-2" />
+
         <Campo id="campo-nombre" etiqueta="Nombre" para="nombre" error={errores.nombre}>
           <input
             id="nombre"
@@ -195,9 +198,9 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
                   type="button"
                   aria-pressed={activa}
                   onClick={() => cambiar({ categoriaId: c.id }, 'categoriaId')}
-                  className={`min-h-10 rounded-full px-3.5 text-sm transition-colors ${
+                  className={`min-h-10 rounded-xl px-3.5 text-sm transition-colors ${
                     activa
-                      ? 'border-[1.5px] border-principal bg-principal font-bold text-principal-texto'
+                      ? 'border border-tinta bg-tinta font-bold text-fondo'
                       : 'border border-borde bg-superficie text-tinta hover:border-borde-fuerte'
                   }`}
                 >
@@ -279,6 +282,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
             </div>
           )}
         </Campo>
+
+        <TituloEtiqueta etiqueta="El" acento="precio" className="-mb-2 pt-2" />
 
         <div className="grid grid-cols-2 gap-3">
           <Campo id="campo-precio" etiqueta="Precio" para="precio" error={errores.precio}>
@@ -363,6 +368,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
           </>
         )}
 
+        <TituloEtiqueta etiqueta="La" acento="llegada" className="-mb-2 pt-2" />
+
         <Campo id="campo-fechaEstimada" etiqueta="Llegada estimada" error={errores.fechaEstimada}>
           <SelectorFechaEstimada
             idBase="fecha-estimada"
@@ -376,6 +383,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
             <p className="text-[13px] text-tinta-suave">Si la cambiás, queda registrada como reprogramación.</p>
           )}
         </Campo>
+
+        <TituloEtiqueta etiqueta="Los" acento="detalles" className="-mb-2 pt-2" />
 
         <Campo id="campo-costosExtra" etiqueta="Costos extra" error={errores.costosExtra}>
           {f.costosExtra.map((c, i) => (
@@ -398,7 +407,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
                 type="button"
                 aria-label={`Quitar costo ${i + 1}`}
                 onClick={() => cambiar({ costosExtra: f.costosExtra.filter((x) => x.id !== c.id) }, 'costosExtra')}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full text-tinta-suave hover:bg-superficie-suave"
+                className="flex size-11 shrink-0 items-center justify-center rounded-xl text-tinta-suave hover:bg-superficie-suave"
               >
                 <Icono nombre="basura" />
               </button>
@@ -439,11 +448,11 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
         </Campo>
       </div>
 
-      <div className="sticky bottom-0 mt-auto border-t border-borde bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
+      <div className="sticky bottom-0 mt-auto border-t border-borde-suave bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
         {costo > 0 && (
           <p className="mb-2.5 flex justify-between text-sm">
             <span className="text-tinta-suave">Costo total</span>
-            <span className="font-bold tabular-nums">{formatearMonto(costo)}</span>
+            <span className="font-display font-extrabold tabular-nums">{formatearMonto(costo)}</span>
           </p>
         )}
         <Boton type="submit" variante="principal" className="w-full">

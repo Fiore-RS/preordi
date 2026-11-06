@@ -1,6 +1,7 @@
 import { useCallback, useId, useState } from 'react';
 import { Boton } from '../components/atoms/Boton';
 import { Icono } from '../components/atoms/Icono';
+import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { MensajeError } from '../components/molecules/Campo';
 import { HojaCategoria } from '../components/organisms/HojaCategoria';
@@ -119,12 +120,10 @@ export function Configuracion() {
 
       <div className="flex flex-col gap-7 px-5 pt-2 pb-10">
         <section aria-labelledby="titulo-categorias" className="flex flex-col gap-2.5">
-          <h2 id="titulo-categorias" className="text-lg font-bold">
-            Categorías
-          </h2>
-          <ul className="rounded-2xl border border-borde-suave bg-superficie">
+          <TituloEtiqueta id="titulo-categorias" etiqueta="Mis" acento="categorías" />
+          <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
             {categorias.map((c, i) => (
-              <li key={c.id} className="flex items-center border-b border-borde-suave last:border-b-0">
+              <li key={c.id} className="flex items-center border-b-2 border-fondo last:border-b-0">
                 <button
                   type="button"
                   onClick={() => setHoja({ tipo: 'categoria', categoria: c })}
@@ -139,7 +138,7 @@ export function Configuracion() {
                   aria-label={`Subir ${c.nombre}`}
                   disabled={i === 0}
                   onClick={() => mover(c.id, -1)}
-                  className="flex size-11 items-center justify-center rounded-full text-tinta-suave hover:bg-superficie-suave disabled:opacity-30"
+                  className="flex size-11 items-center justify-center rounded-xl text-tinta-suave hover:bg-borde-suave disabled:opacity-30"
                 >
                   <Icono nombre="arriba" tamano={18} grosor={2} />
                 </button>
@@ -148,7 +147,7 @@ export function Configuracion() {
                   aria-label={`Bajar ${c.nombre}`}
                   disabled={i === categorias.length - 1}
                   onClick={() => mover(c.id, 1)}
-                  className="mr-1 flex size-11 items-center justify-center rounded-full text-tinta-suave hover:bg-superficie-suave disabled:opacity-30"
+                  className="mr-1 flex size-11 items-center justify-center rounded-xl text-tinta-suave hover:bg-borde-suave disabled:opacity-30"
                 >
                   <Icono nombre="abajo" tamano={18} grosor={2} />
                 </button>
@@ -161,17 +160,15 @@ export function Configuracion() {
         </section>
 
         <section aria-labelledby="titulo-tiendas" className="flex flex-col gap-2.5">
-          <h2 id="titulo-tiendas" className="text-lg font-bold">
-            Tiendas
-          </h2>
+          <TituloEtiqueta id="titulo-tiendas" etiqueta="Mis" acento="tiendas" />
           {datos.tiendas.length === 0 ? (
-            <p className="rounded-2xl border border-dashed border-borde px-4 py-4 text-sm text-tinta-suave">
+            <p className="text-sm text-tinta-suave">
               Todavía no agregaste tiendas. También podés crearlas al registrar una preorden.
             </p>
           ) : (
-            <ul className="rounded-2xl border border-borde-suave bg-superficie">
+            <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
               {datos.tiendas.map((t) => (
-                <li key={t.id} className="border-b border-borde-suave last:border-b-0">
+                <li key={t.id} className="border-b-2 border-fondo last:border-b-0">
                   <button
                     type="button"
                     onClick={() => setHoja({ tipo: 'tienda', tienda: t })}
@@ -197,15 +194,13 @@ export function Configuracion() {
 
         <section aria-labelledby="titulo-respaldo" className="flex flex-col gap-2.5">
           <div className="flex flex-col gap-0.5">
-            <h2 id="titulo-respaldo" className="text-lg font-bold">
-              Respaldo
-            </h2>
+            <TituloEtiqueta id="titulo-respaldo" etiqueta="Mi" acento="respaldo" />
             <p className="text-[13px] text-tinta-suave">
               Un .zip con tus preórdenes, deseos, categorías, tiendas e imágenes.
             </p>
           </div>
-          <ul className="rounded-2xl border border-borde-suave bg-superficie">
-            <li className="border-b border-borde-suave">
+          <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
+            <li className="border-b-2 border-fondo">
               <button type="button" onClick={exportar} disabled={ocupado !== null} className={CLASE_FILA}>
                 <Icono nombre="descargar" tamano={20} className="shrink-0 text-acento-texto" />
                 <span className="flex min-w-0 flex-1 flex-col">
@@ -249,10 +244,8 @@ export function Configuracion() {
         </section>
 
         <section aria-labelledby="titulo-peligro" className="flex flex-col gap-2.5">
-          <h2 id="titulo-peligro" className="text-lg font-bold">
-            Zona peligrosa
-          </h2>
-          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-borde-fuerte px-4 py-4">
+          <TituloEtiqueta id="titulo-peligro" etiqueta="Zona" acento="peligrosa" />
+          <div className="flex flex-col gap-3">
             <p className="text-sm leading-relaxed text-tinta-suave">
               Borra todas las preórdenes, deseos, tiendas e imágenes de este dispositivo. Las categorías vuelven a las de
               siempre.
