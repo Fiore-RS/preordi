@@ -68,6 +68,9 @@
   /* Badges y rellenos por estado (tabla 10.2) */
   --color-tono-amarillo: #FBF1B0;
   --color-tono-amarillo-texto: #4D4100;
+  /* Para superficies grandes (recuadros de imagen de los deseos): en oscuro no encandila */
+  --color-tono-amarillo-tenue: #FBF1B0;
+  --color-tono-amarillo-tenue-texto: #4D4100;
   --color-tono-naranja: #FBE0B8;
   --color-tono-naranja-texto: #5C3800;
   --color-tono-celeste: #D3E8F5;
@@ -109,6 +112,8 @@
 
   --color-tono-amarillo: #ECCD00;
   --color-tono-amarillo-texto: #0D1726;
+  --color-tono-amarillo-tenue: #2E2A0E;
+  --color-tono-amarillo-tenue-texto: #ECCD00;
   --color-tono-naranja: #E28C00;
   --color-tono-naranja-texto: #0D1726;
   --color-tono-celeste: #62AEDC;

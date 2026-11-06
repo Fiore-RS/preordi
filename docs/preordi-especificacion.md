@@ -557,6 +557,7 @@ Igual que en Sobres:
 | `acento-tenue` / `acento-tenue-texto` / `acento-borde` | Alertas y opción seleccionada | `#FDF3E3` / `#5C3800` / `#F0AE4D` | `#33240C` / `#FBE0B8` / `#A86600` |
 | `resalte` / `resalte-texto` | Pestaña activa, chip "Pagar saldo" | `#FBE0B8` / `#5C3800` | `#E28C00` / `#0D1726` |
 | `tono-*` / `tono-*-texto` | Badges y rellenos por estado (amarillo, naranja, celeste, marino, gris) | tono `-100` / texto `-900` | tono `-500` / texto `#0D1726` |
+| `tono-amarillo-tenue` / `-texto` | Recuadros grandes de imagen en Deseos | `#FBF1B0` / `#4D4100` | `#2E2A0E` / `#ECCD00` |
 
 - **No cambian entre modos:** el naranja de marca (botón +, logo, barras de progreso, checks del camino), la tarjeta del total pendiente en Inicio y el fondo oscuro detrás de las hojas.
 - Los tokens viven en `src/index.css`: en `@theme` los valores claros y en `.dark` los oscuros. Componentes nuevos: usar siempre tokens, nunca la paleta directa, salvo lo de la lista anterior.
