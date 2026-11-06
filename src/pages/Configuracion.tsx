@@ -43,7 +43,7 @@ function textoResumen(r: ResumenRespaldo): string {
 
 const CLASE_FILA = 'flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left disabled:opacity-60';
 
-// Especificación 8.9 y 6.3. El selector de tema llega en la fase 7.
+// Especificación 8.9 y 6.3. El selector de tema llega en la fase 8.
 export function Configuracion() {
   const { datos, dispatch } = usePreordi();
   const [hoja, setHoja] = useState<Hoja>(null);

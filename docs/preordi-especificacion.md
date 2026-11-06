@@ -628,6 +628,32 @@ Igual que en Sobres:
 ### 10.8 Ícono de la app
 Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo marino. Se usa en el ícono de instalación, la pantalla de carga (8.10), los splash de iOS y los estados vacíos. Hay una versión provisional en `public/` (`favicon.svg` y los PNG).
 
+### 10.9 Refinamiento visual (fase 7)
+
+**Objetivo:** que la interfaz se vea hecha a mano y con identidad propia, no como una plantilla genérica. Se mantienen la paleta de la bandera, las fuentes y los tokens; lo que cambia es cómo se usan.
+
+**Lo que hoy se siente genérico:**
+- Todo es una tarjeta redondeada con borde fino y el mismo radio, así que las pantallas se ven iguales entre sí
+- Botones y filtros en forma de pastilla en todas partes
+- La misma estructura en todas las secciones: título, subtítulo gris y lista dentro de una tarjeta
+- Mucho texto gris secundario y jerarquía plana: casi todo pesa igual
+- Badges en tonos pastel, cajas punteadas y espaciado uniforme
+- Íconos de línea genéricos sin ajustes propios
+
+**Direcciones a explorar:**
+- **La bandera como motivo:** usar las cinco franjas con intención (bordes, separadores, encabezados, barras de progreso) en vez de solo como colores sueltos
+- **Tipografía con más contraste:** títulos más grandes y expresivos con Bricolage Grotesque, números y montos con más presencia, y menos texto auxiliar
+- **Menos cajas:** quitar tarjetas donde no hacen falta y dejar que el contenido respire sobre el fondo, con divisores, alineaciones y espacios distintos según la importancia
+- **Formas propias:** variar los radios y probar esquinas, etiquetas y botones con una forma reconocible de Preordi
+- **Toques de autor:** detalles ilustrados o a mano (estados vacíos, texturas suaves, pequeños gestos), aprovechando que Fiorella ilustra
+- **Imágenes protagonistas:** dar más espacio a las fotos de las figuras y libros, que son lo más personal de la app
+- **Movimiento con criterio:** pocas animaciones pero con carácter (al marcar recibida, al completar el pago)
+
+**Cómo se trabaja:**
+1. Juntar referencias que le gusten a Fiorella (apps, revistas, empaques, tiendas de figuras)
+2. Probar dos o tres direcciones sobre Inicio y Detalle antes de tocar el resto
+3. Elegir una, documentarla en esta sección y aplicarla pantalla por pantalla, revisando claro y oscuro
+
 ---
 
 ## 11. Fases de trabajo
@@ -636,14 +662,16 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 2. **Identidad y diseño:** paleta ✅, tipografía ✅, mockups de las pantallas ✅, ícono
 3. **Esqueleto** ✅: repo `preordi`, Vite + PWA, tokens de color y fuentes, rutas y workflow de Pages
 4. **Lógica:** tipos ✅, `calculos` ✅, `fechas` ✅, `estados` ✅ y persistencia ✅, verificados con el ejemplo de la sección 9
-5. **Pantallas MVP** ✅: las nueve de la sección 8 (Configuración por ahora sin respaldo ni tema, que llegan en las fases 6 y 7)
-   - Componentes pasados a los tokens semánticos de 10.4 ✅ (el modo oscuro ya funciona con la clase `.dark`; falta activarlo según el sistema, en la fase 7)
+5. **Pantallas MVP** ✅: las nueve de la sección 8 (Configuración por ahora sin respaldo ni tema, que llegan en las fases 6 y 8)
+   - Componentes pasados a los tokens semánticos de 10.4 ✅ (el modo oscuro ya funciona con la clase `.dark`; falta activarlo según el sistema, en la fase 8)
 6. **Imágenes y respaldo** ✅: compresión, IndexedDB y `.zip`
-7. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro con selector de tema (10.4) y prueba de instalación en el teléfono
-8. **Publicar:** agregar al hub `index`
+7. **Refinamiento visual (10.9):** revisar el diseño general para que se sienta más natural, con más carácter y menos "generado con IA"; va antes del pulido PWA porque el ícono, la pantalla de carga y los splash dependen de la dirección visual que salga de acá
+8. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro con selector de tema (10.4) y prueba de instalación en el teléfono
+9. **Publicar:** agregar al hub `index`
 
 ---
 
 ## 12. Pendientes por decidir
+- Dirección visual del refinamiento (10.9), a partir de referencias
 - Diseño final del ícono (caja)
 - Fondo de la pantalla de carga y de los splash de iOS (junto con el ícono final)
