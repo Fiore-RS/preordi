@@ -541,6 +541,7 @@ Igual que en Sobres:
 - **Sin destello claro al abrir:** un script corto en `index.html` lee el tema guardado y pone `.dark` antes de pintar la página. La misma lógica vive en el código de la app.
 - La etiqueta `<meta name="theme-color">` se crea desde el código con el color de fondo del tema activo, para que la barra del navegador se funda con la app. El manifest no declara colores, así Android usa los del modo del teléfono.
 - El tema se guarda en `localStorage` con la llave `preordi:tema`, aparte de los datos: así no cambia el modelo ni hace falta migrar.
+- **Hecho ✅:** `lib/tema.ts` (`useTema`, `useAplicarTema` en `App`), script en `index.html`, `color-scheme` en `<html>` (así los campos de fecha nativos también se ven oscuros) y la sección MODO **de color** en Configuración, antes del respaldo.
 - La pantalla de carga (8.10) usa colores de marca fijos y se ve igual en los dos modos.
 
 **Tokens semánticos.** Como en Sobres, los componentes usan colores por **rol** en lugar de colores fijos de la paleta. `.dark` solo redefine esos tokens y toda la app cambia de tema sin tocar ningún componente.
@@ -695,13 +696,13 @@ Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅ · Deseos ✅ · pantallas 
 5. **Pantallas MVP** ✅: las nueve de la sección 8 (Configuración por ahora sin respaldo ni tema, que llegan en las fases 6 y 8)
    - Componentes pasados a los tokens semánticos de 10.4 ✅ (el modo oscuro ya funciona con la clase `.dark`; falta activarlo según el sistema, en la fase 8)
 6. **Imágenes y respaldo** ✅: compresión, IndexedDB y `.zip`
-7. **Refinamiento visual (10.9):** revisar el diseño general para que se sienta más natural, con más carácter y menos "generado con IA"; va antes del pulido PWA porque el ícono, la pantalla de carga y los splash dependen de la dirección visual que salga de acá
-8. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro con selector de tema (10.4) y prueba de instalación en el teléfono
+7. **Refinamiento visual (10.9)** ✅: revisar el diseño general para que se sienta más natural, con más carácter y menos "generado con IA"; va antes del pulido PWA porque el ícono, la pantalla de carga y los splash dependen de la dirección visual que salga de acá
+8. **Pulido PWA:** modo oscuro con selector de tema (10.4) ✅, ícono final, pantalla de carga (8.10) y splash de iOS, y prueba de instalación en el teléfono
 9. **Publicar:** agregar al hub `index`
 
 ---
 
 ## 12. Pendientes por decidir
-- Dirección visual del refinamiento (10.9), a partir de referencias
+- ~~Dirección visual del refinamiento (10.9)~~ → Vitrina ✅
 - Diseño final del ícono (caja)
 - Fondo de la pantalla de carga y de los splash de iOS (junto con el ícono final)

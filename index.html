@@ -7,6 +7,17 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Preordi</title>
+    <script>
+      // Sin destello claro al abrir (especificación 10.4): pone .dark antes de pintar.
+      // La misma lógica vive en src/lib/tema.ts.
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem('preordi:tema'); } catch (e) {}
+        var oscuro = t === 'oscuro' || (t !== 'claro' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        if (oscuro) document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = oscuro ? 'dark' : 'light';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -1,3 +1,4 @@
+import { useAplicarTema } from './lib/tema';
 import { Navigate, Route, Routes } from 'react-router';
 import { LayoutConBarra, LayoutSinBarra } from './components/organisms/LayoutPrincipal';
 import { Configuracion } from './pages/Configuracion';
@@ -10,6 +11,7 @@ import { Preordenes } from './pages/Preordenes';
 
 // Rutas — especificación sección 7.
 export default function App() {
+  useAplicarTema();
   return (
     <Routes>
       <Route element={<LayoutConBarra />}>

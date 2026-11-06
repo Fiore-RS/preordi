@@ -4,12 +4,14 @@ import { Icono } from '../components/atoms/Icono';
 import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { BotonAgregar } from '../components/molecules/AgregarNuevo';
 import { Encabezado } from '../components/molecules/Encabezado';
+import { Segmentado } from '../components/molecules/Segmentado';
 import { MensajeError } from '../components/molecules/Campo';
 import { HojaCategoria } from '../components/organisms/HojaCategoria';
 import { HojaInferior } from '../components/organisms/HojaInferior';
 import { HojaTienda } from '../components/organisms/HojaTienda';
 import { usePreordi } from '../context/PreordiContext';
 import { contarUso } from '../lib/configuracion';
+import { useTema } from '../lib/tema';
 import { hoy } from '../lib/fechas';
 import { borrarTodasLasImagenes } from '../lib/imagenes';
 import { datosIniciales } from '../lib/persistencia';
@@ -45,10 +47,11 @@ function textoResumen(r: ResumenRespaldo): string {
 
 const CLASE_FILA = 'flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left disabled:opacity-60';
 
-// Especificación 8.9 y 6.3. El selector de tema llega en la fase 8.
+// Especificación 8.9, 6.3 (respaldo) y 10.4 (modo de color).
 export function Configuracion() {
   const { datos, dispatch } = usePreordi();
   const [hoja, setHoja] = useState<Hoja>(null);
+  const [tema, setTema] = useTema();
   const cerrar = useCallback(() => setHoja(null), []);
   const idArchivo = useId();
   const [ocupado, setOcupado] = useState<'exportar' | 'importar' | 'reiniciar' | null>(null);
@@ -169,6 +172,23 @@ export function Configuracion() {
             </ul>
           )}
           <BotonAgregar texto="Agregar tienda" onClick={() => setHoja({ tipo: 'tienda' })} />
+        </section>
+
+        <section aria-labelledby="titulo-tema" className="flex flex-col gap-2.5">
+          <TituloEtiqueta id="titulo-tema" etiqueta="Modo" acento="de color" />
+          <Segmentado
+            etiqueta="Modo de color"
+            valor={tema}
+            onCambio={setTema}
+            opciones={[
+              { valor: 'sistema', texto: 'Sistema' },
+              { valor: 'claro', texto: 'Claro' },
+              { valor: 'oscuro', texto: 'Oscuro' },
+            ]}
+          />
+          <p className="text-[13px] text-tinta-suave">
+            {tema === 'sistema' ? 'Cambia solo cuando tu teléfono pasa a modo claro u oscuro.' : 'Se queda así aunque cambie el teléfono.'}
+          </p>
         </section>
 
         <section aria-labelledby="titulo-respaldo" className="flex flex-col gap-2.5">
