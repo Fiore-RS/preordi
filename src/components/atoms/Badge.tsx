@@ -31,6 +31,11 @@ const TONO_ESTADO: Record<Estado, Tono> = {
   cancelada: 'gris',
 };
 
+/** Relleno y texto del tono de un estado, para miniaturas y marcadores de imagen. */
+export function claseTonoEstado(estado: Estado): string {
+  return TONOS[TONO_ESTADO[estado]];
+}
+
 export function BadgeEstado({ estado }: { estado: Estado }) {
   return <Badge tono={TONO_ESTADO[estado]}>{NOMBRE_ESTADO[estado]}</Badge>;
 }

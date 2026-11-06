@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { Badge, BadgeEstado, BadgePago, BadgeVencida } from '../components/atoms/Badge';
 import { Boton } from '../components/atoms/Boton';
 import { Icono } from '../components/atoms/Icono';
@@ -45,6 +45,7 @@ const NOMBRE_PASO: Record<string, string> = { apartada: 'Apartada', en_camino: '
 export function DetallePreorden() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { datos, dispatch } = usePreordi();
   const [hoja, setHoja] = useState<Hoja>(null);
   const cerrar = useCallback(() => setHoja(null), []);
@@ -81,6 +82,12 @@ export function DetallePreorden() {
     setHoja(null);
   }
 
+  /** Vuelve a la pantalla anterior (con sus filtros); si se abrió directo, a la lista. */
+  function volver() {
+    if (location.key !== 'default') navigate(-1);
+    else navigate(esDeseo ? '/deseos' : '/preordenes');
+  }
+
   function eliminar() {
     dispatch({ tipo: 'eliminarPreorden', id: preorden.id });
     navigate(esDeseo ? '/deseos' : '/preordenes', { replace: true });
@@ -92,13 +99,14 @@ export function DetallePreorden() {
       <div className="relative flex h-56 shrink-0 flex-col items-center justify-center gap-2 bg-tono-naranja text-tono-naranja-texto">
         <Icono nombre="imagen" tamano={44} grosor={1.4} />
         <div className="absolute inset-x-4 top-4 flex justify-between">
-          <Link
-            to={esDeseo ? '/deseos' : '/preordenes'}
+          <button
+            type="button"
             aria-label="Volver"
+            onClick={volver}
             className="flex size-11 items-center justify-center rounded-full bg-fondo text-tinta"
           >
             <Icono nombre="atras" tamano={22} grosor={2} />
-          </Link>
+          </button>
           <button
             type="button"
             aria-label="Más acciones"

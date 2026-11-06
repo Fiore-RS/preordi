@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { FormularioPreorden } from '../components/organisms/FormularioPreorden';
 import { usePreordi } from '../context/PreordiContext';
@@ -10,6 +10,7 @@ export function EditarPreorden() {
   const { id } = useParams();
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { datos, dispatch } = usePreordi();
 
   const original = id ? datos.preordenes.find((p) => p.id === id) : undefined;
@@ -35,7 +36,10 @@ export function EditarPreorden() {
 
   function alGuardar(preorden: Preorden) {
     dispatch({ tipo: 'guardarPreorden', preorden });
-    navigate(`/preordenes/${preorden.id}`, { replace: true });
+    // Al editar se vuelve al Detalle de donde se vino; al crear, se reemplaza
+    // el formulario por el Detalle nuevo (así "volver" no regresa al formulario).
+    if (original && location.key !== 'default') navigate(-1);
+    else navigate(`/preordenes/${preorden.id}`, { replace: true });
   }
 
   return (
