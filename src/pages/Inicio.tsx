@@ -130,7 +130,7 @@ export function Inicio() {
 
       {sinNada ? (
         <section className="flex flex-col items-center gap-3 px-10 py-8 text-center">
-          <span className="font-mano text-[34px] leading-none font-bold text-acento-texto">¡a estrenar!</span>
+          <span className="font-display text-[28px] leading-none font-extrabold tracking-tight text-acento-texto">¡A estrenar!</span>
           <p className="font-display text-xl font-bold">Todavía no hay preórdenes</p>
           <p className="text-sm text-tinta-suave">Agregá lo que ya apartaste o lo que tenés en la mira.</p>
           <Link
@@ -144,7 +144,7 @@ export function Inicio() {
         <>
           <section aria-labelledby="titulo-proximas" className="flex flex-col gap-3">
             <div className="flex items-end justify-between px-5">
-              <TituloEtiqueta id="titulo-proximas" etiqueta="Llegan" mano="pronto" />
+              <TituloEtiqueta id="titulo-proximas" etiqueta="Llegan" acento="pronto" />
               {r.proximas.length > 0 && (
                 <Link to="/preordenes" className="text-sm font-medium text-acento-texto">
                   Ver todas
@@ -168,7 +168,7 @@ export function Inicio() {
 
           {r.porPagar.length > 0 && (
             <section aria-labelledby="titulo-por-pagar" className="flex flex-col gap-1 px-5">
-              <TituloEtiqueta id="titulo-por-pagar" etiqueta="También" mano="por pagar" className="mb-1" />
+              <TituloEtiqueta id="titulo-por-pagar" etiqueta="También" acento="por pagar" className="mb-1" />
               <ul className="flex flex-col">
                 {r.porPagar.map((p) => (
                   <li key={p.id}>

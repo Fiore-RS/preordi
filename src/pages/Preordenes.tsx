@@ -133,7 +133,7 @@ export function Preordenes() {
       <Link
         to="/preordenes/nueva"
         aria-label="Agregar preorden"
-        className="absolute right-5 bottom-24 z-10 flex size-15 items-center justify-center rounded-full bg-naranja-500 text-marino-500"
+        className="absolute right-5 bottom-24 z-10 flex size-15 items-center justify-center rounded-[20px] bg-naranja-500 text-marino-500 shadow-[0_10px_24px_-10px_rgba(13,23,38,0.55)]"
       >
         <Icono nombre="mas" tamano={28} grosor={2.2} />
       </Link>

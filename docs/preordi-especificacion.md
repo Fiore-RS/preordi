@@ -654,15 +654,16 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 2. Probar dos o tres direcciones sobre Inicio y Detalle antes de tocar el resto
 3. Elegir una, documentarla en esta sección y aplicarla pantalla por pantalla, revisando claro y oscuro
 
-**Dirección elegida: A · Vitrina** (a partir de referencias de apps de comida). Las fotos mandan y la letra a mano da el toque personal.
-- **Títulos de sección:** una etiqueta sólida en mayúsculas más una palabra a mano ("LLEGAN *pronto*", "TAMBIÉN *por pagar*"), con el átomo `TituloEtiqueta`. La letra a mano es Caveat (`--font-mano`, incluida en `assets/fonts`) y se puede reemplazar por una letra propia sin tocar los componentes.
+**Dirección elegida: A · Vitrina** (a partir de referencias de apps de comida). Las fotos mandan.
+- **Títulos de sección:** una etiqueta sólida en mayúsculas más una palabra en Bricolage extrabold naranja (`acento-texto`): "LLEGAN **pronto**", "TAMBIÉN **por pagar**". Átomo `TituloEtiqueta`. Se probó una letra a mano (Caveat), pero se descartó porque se sentía ajena al resto; queda la idea de usar la letra propia de Fiorella más adelante.
 - **Montos destacados:** el símbolo ₡ más pequeño y elevado (átomo `Monto`), en Bricolage extrabold.
 - **Tarjetas con foto:** altas (196 × 264), la foto de fondo con degradado marino hacia abajo, la fecha en una etiqueta clara arriba, el saldo en amarillo y una esquina naranja con flecha (`TarjetaVitrina`). Sin foto: el color fijo del estado (naranja, celeste o amarillo) con la inicial grande. Los colores no cambian en modo oscuro.
 - **Menos cajas:** el resumen de dinero de Inicio ya no va en una tarjeta marino, sino directo sobre el fondo con el número grande. Las filas de lista van sin borde, solo con miniatura.
 - **Formas:** menos pastillas. Los chips de estado y los botones son rectángulos redondeados (8–20 px) y las tarjetas con foto, de 22 px.
-- **Detalle (siguiente):** la foto ocupa todo el ancho arriba con las esquinas inferiores muy redondeadas, botones cuadrados claros encima, etiqueta + palabra a mano con la categoría y el estado, y el precio grande.
+- **Detalle:** la foto ocupa todo el ancho arriba (340 px) con las esquinas inferiores de 38 px y botones cuadrados claros encima. Debajo van la categoría en etiqueta y el estado en naranja, el nombre, el costo total grande y una fila con Pagado · Saldo · Llega (tocar "Llega" cambia la fecha). Las secciones (Costo *desglosado*, Camino *a casa*, Pagos *hechos*, Notas *para mí*) van sin tarjetas. Sin foto: el color del estado con la inicial gigante (`PortadaSinFoto`).
+- **Acción principal:** naranja de marca con texto marino en los dos modos (tokens `principal`). Los botones son rectángulos de 16 px (grandes) y 12 px (chicos), y el botón + es un cuadrado redondeado de 20 px con sombra.
 
-Avance: Inicio ✅
+Avance: Inicio ✅ · Detalle ✅
 
 ---
 

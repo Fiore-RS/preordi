@@ -1,8 +1,11 @@
 import { useCallback, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
-import { Badge, BadgeEstado, BadgePago, BadgeVencida, claseTonoEstado } from '../components/atoms/Badge';
+import { Badge, BadgePago, BadgeVencida } from '../components/atoms/Badge';
 import { Boton } from '../components/atoms/Boton';
 import { Icono } from '../components/atoms/Icono';
+import { Monto } from '../components/atoms/Monto';
+import { PortadaSinFoto } from '../components/atoms/PortadaSinFoto';
+import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { HojaEstado } from '../components/organisms/HojaEstado';
 import { HojaFecha } from '../components/organisms/HojaFecha';
@@ -10,7 +13,7 @@ import { HojaInferior } from '../components/organisms/HojaInferior';
 import { HojaPago } from '../components/organisms/HojaPago';
 import { VisorImagen } from '../components/organisms/VisorImagen';
 import { usePreordi } from '../context/PreordiContext';
-import { NOMBRE_MOVIMIENTO, accionPrincipal, textoTransicion } from '../lib/acciones';
+import { NOMBRE_ESTADO, NOMBRE_MOVIMIENTO, accionPrincipal, textoTransicion } from '../lib/acciones';
 import {
   costoTotal,
   estadoPago,
@@ -45,7 +48,7 @@ const PASOS: { estado: Estado; campo: 'fechaApartada' | 'fechaEnviada' | 'fechaR
 
 const NOMBRE_PASO: Record<string, string> = { apartada: 'Apartada', en_camino: 'En camino', recibida: 'Recibida' };
 
-// Especificación 8.4, con las hojas de 8.6 (pago) y 8.7 (fecha).
+// Especificación 8.4, con las hojas de 8.6 (pago) y 8.7 (fecha), en la dirección Vitrina (10.9).
 export function DetallePreorden() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -99,9 +102,13 @@ export function DetallePreorden() {
     navigate(esDeseo ? '/deseos' : '/preordenes', { replace: true });
   }
 
+  const vencidaHoy = vencida(preorden, hoy);
+  const vecesReprogramada = reprogramaciones(preorden);
+  const BOTON_FLOTANTE = 'flex size-11 items-center justify-center rounded-xl bg-papel text-marino-500 shadow-[0_6px_16px_-8px_rgba(13,23,38,0.6)]';
+
   return (
     <main className="flex flex-1 flex-col">
-      <div className="relative h-64 shrink-0">
+      <div className="relative h-[340px] shrink-0 overflow-hidden rounded-b-[38px] bg-marino-500">
         {urlImagen ? (
           <button
             type="button"
@@ -112,58 +119,55 @@ export function DetallePreorden() {
             <img src={urlImagen} alt={preorden.nombre} className="size-full object-cover" />
           </button>
         ) : (
-          <div className={`flex size-full items-center justify-center ${claseTonoEstado(preorden.estado)}`}>
-            <Icono nombre="imagen" tamano={44} grosor={1.4} />
-          </div>
+          <PortadaSinFoto nombre={preorden.nombre} estado={preorden.estado} className="pt-14 text-[230px]" />
         )}
+        <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-marino-900/35 to-transparent" />
         <div className="absolute inset-x-4 top-4 flex justify-between">
-          <button
-            type="button"
-            aria-label="Volver"
-            onClick={volver}
-            className="flex size-11 items-center justify-center rounded-full bg-fondo text-tinta"
-          >
-            <Icono nombre="atras" tamano={22} grosor={2} />
+          <button type="button" aria-label="Volver" onClick={volver} className={BOTON_FLOTANTE}>
+            <Icono nombre="atras" tamano={22} grosor={2.2} />
           </button>
-          <button
-            type="button"
-            aria-label="Más acciones"
-            onClick={() => setHoja({ tipo: 'acciones' })}
-            className="flex size-11 items-center justify-center rounded-full bg-fondo text-tinta"
-          >
-            <Icono nombre="puntos" tamano={22} grosor={2} />
+          <button type="button" aria-label="Más acciones" onClick={() => setHoja({ tipo: 'acciones' })} className={BOTON_FLOTANTE}>
+            <Icono nombre="puntos" tamano={22} grosor={2.2} />
           </button>
         </div>
       </div>
 
-      <div className="flex flex-col gap-5 px-5 pt-5 pb-8">
+      <div className="flex flex-col gap-7 px-5 pt-5 pb-8">
         <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap gap-1.5">
-            <BadgeEstado estado={preorden.estado} />
-            {categoria && <Badge tono="gris">{categoria.nombre}</Badge>}
-          </div>
-          <h1 className="text-[28px] leading-tight font-bold tracking-tight">{preorden.nombre}</h1>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-            {tienda &&
-              (tienda.link ? (
-                <a href={tienda.link} target="_blank" rel="noreferrer" className="text-tinta-suave underline underline-offset-2">
-                  {tienda.nombre}
+          <TituloEtiqueta
+            como="p"
+            etiqueta={categoria?.nombre ?? 'Preorden'}
+            acento={NOMBRE_ESTADO[preorden.estado].toLowerCase()}
+          />
+          <h1 className="text-[28px] leading-[1.1] font-extrabold tracking-tight">{preorden.nombre}</h1>
+          {(tienda || preorden.link) && (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              {tienda &&
+                (tienda.link ? (
+                  <a href={tienda.link} target="_blank" rel="noreferrer" className="text-tinta-suave underline underline-offset-2">
+                    {tienda.nombre}
+                  </a>
+                ) : (
+                  <span className="text-tinta-suave">{tienda.nombre}</span>
+                ))}
+              {preorden.link && (
+                <a
+                  href={preorden.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1 font-medium text-acento-texto"
+                >
+                  <Icono nombre="enlace" tamano={16} grosor={2} />
+                  Ver producto
                 </a>
-              ) : (
-                <span className="text-tinta-suave">{tienda.nombre}</span>
-              ))}
-            {preorden.link && (
-              <a
-                href={preorden.link}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1 font-medium text-acento-texto"
-              >
-                <Icono nombre="enlace" tamano={16} grosor={2} />
-                Ver producto
-              </a>
-            )}
-          </div>
+              )}
+            </div>
+          )}
+          <Monto monto={costoTotal(preorden)} className="mt-1 font-display text-[40px] leading-none font-extrabold tracking-tight" />
+          {esDeseo && <span className="text-[13px] text-tinta-suave">Lo que costaría si la apartás</span>}
+          {preorden.referenciaOriginal && (
+            <span className="text-[13px] text-tinta-suave">Precio original: {preorden.referenciaOriginal}</span>
+          )}
         </div>
 
         {preorden.estado === 'cancelada' && preorden.fechaCancelada && (
@@ -173,93 +177,64 @@ export function DetallePreorden() {
           </p>
         )}
         {recibidaConSaldo(preorden) && (
-          <p className="flex items-start gap-2 rounded-xl border border-acento-borde bg-acento-tenue px-3.5 py-3 text-sm text-acento-tenue-texto">
+          <p className="flex items-start gap-2 rounded-xl bg-acento-tenue px-3.5 py-3 text-sm text-acento-tenue-texto">
             <Icono nombre="alerta" tamano={18} grosor={2} className="mt-px shrink-0 text-acento-texto" />
             Ya la recibiste, pero todavía queda saldo por pagar.
           </p>
         )}
 
-        <section aria-label="Dinero" className="flex flex-col gap-3 rounded-[18px] border border-borde-suave bg-superficie p-4">
-          {esDeseo ? (
-            <div className="flex flex-col">
-              <span className="text-[13px] text-tinta-suave">Costo si la apartás</span>
-              <span className="font-display text-2xl font-bold tabular-nums">{formatearMonto(costoTotal(preorden))}</span>
-            </div>
-          ) : (
-            <>
-              <div className="flex items-end justify-between gap-3">
+        <section aria-label="Pagos y llegada" className="-mt-2 flex flex-col gap-3">
+          <div className="grid grid-cols-3 gap-3">
+            {!esDeseo && (
+              <>
                 <div className="flex flex-col">
-                  <span className="text-[13px] text-tinta-suave">Pagado</span>
-                  <span className="font-display text-2xl font-bold tabular-nums">
-                    {formatearMonto(totalPagado(preorden))}
-                  </span>
+                  <span className="text-xs text-tinta-suave">Pagado</span>
+                  <Monto monto={totalPagado(preorden)} className="font-display text-lg font-extrabold" />
                 </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[13px] text-tinta-suave">Saldo</span>
-                  <span
-                    className={`font-display text-2xl font-bold tabular-nums ${saldo > 0 ? 'text-acento-texto' : ''}`}
-                  >
-                    {formatearMonto(saldo)}
-                  </span>
+                <div className="flex flex-col">
+                  <span className="text-xs text-tinta-suave">Saldo</span>
+                  <Monto
+                    monto={saldo}
+                    className={`font-display text-lg font-extrabold ${saldo > 0 ? 'text-acento-texto' : ''}`}
+                  />
                 </div>
-              </div>
-              <div className="h-2.5 overflow-hidden rounded-full bg-superficie-suave">
-                <div
-                  className="h-2.5 rounded-full bg-naranja-500"
-                  style={{ width: `${Math.round(progresoPago(preorden) * 100)}%` }}
-                />
-              </div>
-              <div className="flex">
-                <BadgePago estadoPago={estadoPago(preorden)} />
-              </div>
-            </>
-          )}
-          <dl className="flex flex-col gap-1.5 border-t border-borde-suave pt-3 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-tinta-suave">Precio</dt>
-              <dd className="tabular-nums">{formatearMonto(preorden.precio)}</dd>
-            </div>
-            {preorden.costosExtra.map((c) => (
-              <div key={c.id} className="flex justify-between">
-                <dt className="text-tinta-suave">{c.concepto}</dt>
-                <dd className="tabular-nums">{formatearMonto(c.monto)}</dd>
-              </div>
-            ))}
-            <div className="flex justify-between font-bold">
-              <dt>Costo total</dt>
-              <dd className="tabular-nums">{formatearMonto(costoTotal(preorden))}</dd>
-            </div>
-          </dl>
-          {preorden.referenciaOriginal && (
-            <p className="text-[13px] text-tinta-suave">Precio original: {preorden.referenciaOriginal}</p>
-          )}
-        </section>
-
-        <section aria-label="Fecha estimada" className="flex flex-col gap-3 rounded-[18px] border border-borde-suave bg-superficie p-4">
-          <div className="flex items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-superficie-suave">
-              <Icono nombre="calendario" />
-            </span>
-            <span className="flex min-w-0 flex-1 flex-col">
-              <span className="text-[13px] text-tinta-suave">Llegada estimada</span>
-              <span className="text-[17px] font-bold">{formatearFechaEstimada(preorden.fechaEstimada)}</span>
-            </span>
-            <Boton tamano="chico" onClick={() => setHoja({ tipo: 'fecha' })}>
-              Cambiar
-            </Boton>
+              </>
+            )}
+            <button
+              type="button"
+              onClick={() => setHoja({ tipo: 'fecha' })}
+              aria-label={`Llega ${formatearFechaEstimada(preorden.fechaEstimada)}. Cambiar fecha estimada`}
+              className="-m-1.5 flex flex-col items-start rounded-xl p-1.5 text-left hover:bg-superficie-suave"
+            >
+              <span className="flex items-center gap-1 text-xs text-tinta-suave">
+                Llega <Icono nombre="editar" tamano={12} grosor={2.2} />
+              </span>
+              <span className={`font-display text-lg font-extrabold ${vencidaHoy ? 'text-acento-texto' : ''}`}>
+                {formatearFechaEstimada(preorden.fechaEstimada)}
+              </span>
+            </button>
           </div>
-          {(vencida(preorden, hoy) || reprogramaciones(preorden) > 0) && (
+          {!esDeseo && (
+            <div className="h-2 overflow-hidden rounded-full bg-borde-suave">
+              <div
+                className="h-2 rounded-full bg-naranja-500"
+                style={{ width: `${Math.round(progresoPago(preorden) * 100)}%` }}
+              />
+            </div>
+          )}
+          {(vencidaHoy || vecesReprogramada > 0 || !esDeseo) && (
             <div className="flex flex-wrap gap-1.5">
-              {vencida(preorden, hoy) && <BadgeVencida />}
-              {reprogramaciones(preorden) > 0 && (
+              {!esDeseo && <BadgePago estadoPago={estadoPago(preorden)} />}
+              {vencidaHoy && <BadgeVencida />}
+              {vecesReprogramada > 0 && (
                 <Badge tono="gris">
-                  Reprogramada {reprogramaciones(preorden)} {reprogramaciones(preorden) === 1 ? 'vez' : 'veces'}
+                  Reprogramada {vecesReprogramada} {vecesReprogramada === 1 ? 'vez' : 'veces'}
                 </Badge>
               )}
             </div>
           )}
           {preorden.historialFechas.length > 0 && (
-            <ul className="flex flex-col gap-2 rounded-xl bg-superficie-suave px-3 py-2.5 text-[13px]">
+            <ul className="flex flex-col gap-2 border-l-2 border-borde pl-3 text-[13px]">
               {[...preorden.historialFechas].reverse().map((c) => (
                 <li key={c.id} className="flex flex-col">
                   <span className="font-medium">
@@ -275,11 +250,31 @@ export function DetallePreorden() {
           )}
         </section>
 
+        {preorden.costosExtra.length > 0 && (
+          <section aria-labelledby="titulo-costos" className="flex flex-col gap-2">
+            <TituloEtiqueta id="titulo-costos" etiqueta="Costo" acento="desglosado" />
+            <dl className="flex flex-col text-sm">
+              <div className="flex justify-between border-b border-borde-suave py-2">
+                <dt className="text-tinta-suave">Precio</dt>
+                <dd className="tabular-nums">{formatearMonto(preorden.precio)}</dd>
+              </div>
+              {preorden.costosExtra.map((c) => (
+                <div key={c.id} className="flex justify-between border-b border-borde-suave py-2">
+                  <dt className="text-tinta-suave">{c.concepto}</dt>
+                  <dd className="tabular-nums">{formatearMonto(c.monto)}</dd>
+                </div>
+              ))}
+              <div className="flex justify-between py-2 font-bold">
+                <dt>Costo total</dt>
+                <dd className="tabular-nums">{formatearMonto(costoTotal(preorden))}</dd>
+              </div>
+            </dl>
+          </section>
+        )}
+
         {!esDeseo && preorden.estado !== 'cancelada' && (
-          <section aria-labelledby="titulo-camino" className="flex flex-col gap-2.5">
-            <h2 id="titulo-camino" className="text-lg font-bold">
-              Camino
-            </h2>
+          <section aria-labelledby="titulo-camino" className="flex flex-col gap-3">
+            <TituloEtiqueta id="titulo-camino" etiqueta="Camino" acento="a casa" />
             <ol className="flex flex-col">
               {PASOS.map((paso, i) => {
                 const fecha = preorden[paso.campo];
@@ -288,13 +283,15 @@ export function DetallePreorden() {
                   <li key={paso.estado} className="flex gap-3">
                     <span className="flex flex-col items-center">
                       {fecha ? (
-                        <span className="flex size-6 items-center justify-center rounded-full bg-naranja-500 text-marino-500">
+                        <span className="flex size-6 items-center justify-center rounded-lg bg-naranja-500 text-marino-500">
                           <Icono nombre="check" tamano={14} grosor={2.6} />
                         </span>
                       ) : (
-                        <span className="size-6 rounded-full border-2 border-borde bg-fondo" />
+                        <span className="size-6 rounded-lg border-2 border-borde bg-fondo" />
                       )}
-                      {!ultimo && <span className="h-6 w-0.5 bg-borde" />}
+                      {!ultimo && (
+                        <span className={`h-6 w-0.5 ${preorden[PASOS[i + 1].campo] ? 'bg-naranja-500' : 'bg-borde'}`} />
+                      )}
                     </span>
                     <span className="flex flex-1 justify-between pt-0.5 text-sm">
                       <span className={fecha ? 'font-bold' : 'text-tinta-suave'}>{NOMBRE_PASO[paso.estado]}</span>
@@ -308,23 +305,19 @@ export function DetallePreorden() {
         )}
 
         {!esDeseo && (
-          <section aria-labelledby="titulo-pagos" className="flex flex-col gap-2.5">
-            <h2 id="titulo-pagos" className="text-lg font-bold">
-              Pagos
-            </h2>
+          <section aria-labelledby="titulo-pagos" className="flex flex-col gap-1">
+            <TituloEtiqueta id="titulo-pagos" etiqueta="Pagos" acento="hechos" className="mb-1" />
             {pagos.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-borde px-4 py-4 text-sm text-tinta-suave">
-                Todavía no hay pagos registrados.
-              </p>
+              <p className="py-2 text-sm text-tinta-suave">Todavía no hay pagos registrados.</p>
             ) : (
-              <ul className="rounded-2xl border border-borde-suave bg-superficie">
+              <ul className="flex flex-col">
                 {pagos.map((pago) => (
                   <li key={pago.id} className="border-b border-borde-suave last:border-b-0">
                     <button
                       type="button"
                       onClick={() => setHoja({ tipo: 'pago', pago })}
                       aria-label={`Editar ${NOMBRE_MOVIMIENTO[pago.tipo].toLowerCase()} del ${formatearFecha(pago.fecha)}`}
-                      className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left hover:bg-superficie-suave/60"
+                      className="-mx-2 flex w-[calc(100%+1rem)] items-center justify-between gap-3 rounded-xl px-2 py-3 text-left hover:bg-superficie-suave"
                     >
                       <span className="flex min-w-0 flex-col">
                         <span className="text-sm font-medium">{NOMBRE_MOVIMIENTO[pago.tipo]}</span>
@@ -333,7 +326,7 @@ export function DetallePreorden() {
                           {pago.nota && ` · ${pago.nota}`}
                         </span>
                       </span>
-                      <span className="text-[15px] font-bold whitespace-nowrap tabular-nums">
+                      <span className="font-display text-base font-extrabold whitespace-nowrap tabular-nums">
                         {pago.tipo === 'reembolso' ? '−' : ''}
                         {formatearMonto(pago.monto)}
                       </span>
@@ -347,16 +340,14 @@ export function DetallePreorden() {
 
         {preorden.notas && (
           <section aria-labelledby="titulo-notas" className="flex flex-col gap-2">
-            <h2 id="titulo-notas" className="text-lg font-bold">
-              Notas
-            </h2>
+            <TituloEtiqueta id="titulo-notas" etiqueta="Notas" acento="para mí" />
             <p className="text-sm leading-relaxed whitespace-pre-line text-tinta-suave">{preorden.notas}</p>
           </section>
         )}
       </div>
 
       {(!esDeseo || siguiente) && (
-        <div className="sticky bottom-0 mt-auto flex gap-2.5 border-t border-borde bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 mt-auto flex gap-2.5 border-t border-borde-suave bg-fondo px-5 pt-3.5 pb-[max(1.375rem,env(safe-area-inset-bottom))]">
           {!esDeseo && (
             <Boton className="flex-1" onClick={() => setHoja({ tipo: 'pago' })}>
               Registrar pago

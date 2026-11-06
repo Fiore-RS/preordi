@@ -3,16 +3,10 @@ import { saldoPendiente } from '../../lib/calculos';
 import { NOMBRE_ESTADO } from '../../lib/acciones';
 import { formatearFechaEstimada } from '../../lib/fechas';
 import { useImagen } from '../../lib/useImagen';
-import type { Estado, Preorden } from '../../types';
+import type { Preorden } from '../../types';
 import { Icono } from '../atoms/Icono';
 import { Monto } from '../atoms/Monto';
-
-// Sin foto, la tarjeta lleva un color fijo de la bandera según el estado y la inicial grande.
-const FONDO_SIN_FOTO: Partial<Record<Estado, string>> = {
-  apartada: 'bg-naranja-500 text-marino-500',
-  en_camino: 'bg-celeste-500 text-marino-500',
-  recibida: 'bg-amarillo-500 text-marino-500',
-};
+import { PortadaSinFoto } from '../atoms/PortadaSinFoto';
 
 /**
  * Tarjeta alta con la foto de fondo para "Llegan pronto" (Vitrina, especificación 10.9).
@@ -31,14 +25,7 @@ export function TarjetaVitrina({ preorden: p }: { preorden: Preorden }) {
       {url ? (
         <img src={url} alt="" className="absolute inset-0 size-full object-cover" />
       ) : (
-        <span
-          aria-hidden="true"
-          className={`absolute inset-0 flex items-start justify-center overflow-hidden pt-9 ${FONDO_SIN_FOTO[p.estado] ?? 'bg-marino-300 text-marino-500'}`}
-        >
-          <span className="font-display text-[150px] leading-none font-extrabold">
-            {p.nombre.trim().charAt(0).toUpperCase()}
-          </span>
-        </span>
+        <PortadaSinFoto nombre={p.nombre} estado={p.estado} />
       )}
       <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-b from-marino-900/0 from-35% to-marino-900/90" />
 

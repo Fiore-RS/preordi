@@ -1,23 +1,9 @@
 @import 'tailwindcss';
 
-/*
-  Letra a mano para las etiquetas (refinamiento visual, especificación 10.9).
-  Caveat (SIL OFL, ver assets/fonts/caveat-OFL.txt), incluida en el repo para que funcione sin internet.
-  Si más adelante se usa una letra propia, basta con cambiar este archivo y --font-mano.
-*/
-@font-face {
-  font-family: 'Caveat';
-  src: url('./assets/fonts/caveat-latin-700.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* Tokens de Preordi — ver docs/preordi-especificacion.md, sección 10 */
 @theme {
   --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
   --font-sans: 'DM Sans Variable', 'DM Sans', sans-serif;
-  --font-mano: 'Caveat', cursive;
 
   --color-naranja-50: #FDF3E3;
   --color-naranja-100: #FBE0B8;
@@ -67,9 +53,10 @@
   --color-borde-suave: #E9EDF2;
   --color-borde-fuerte: #94A8C2;
 
-  --color-principal: #203856;
-  --color-principal-hover: #16273D;
-  --color-principal-texto: #FFFDF8;
+  /* Acción principal en naranja de marca, igual en los dos modos (Vitrina, 10.9). */
+  --color-principal: #E28C00;
+  --color-principal-hover: #F0AE4D;
+  --color-principal-texto: #16273D;
 
   /* Naranja para texto, alertas y selección */
   --color-acento-texto: #A86600;
@@ -113,9 +100,9 @@
   --color-borde-suave: #1E3350;
   --color-borde-fuerte: #4A5F7A;
 
-  --color-principal: #FFFDF8;
-  --color-principal-hover: #E9EDF2;
-  --color-principal-texto: #16273D;
+  --color-principal: #E28C00;
+  --color-principal-hover: #F0AE4D;
+  --color-principal-texto: #0D1726;
 
   --color-acento-texto: #F0AE4D;
   --color-acento-borde: #A86600;
