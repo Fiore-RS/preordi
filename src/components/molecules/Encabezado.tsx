@@ -27,13 +27,13 @@ export function Encabezado({ titulo, volverA, iconoVolver = 'atras' }: Props) {
         >
           <Icono nombre={iconoVolver} tamano={22} grosor={2} />
         </button>
-        <h1 className="text-[22px] font-bold">{titulo}</h1>
+        <h1 className="text-[22px] font-extrabold tracking-tight">{titulo}</h1>
       </header>
     );
   }
   return (
     <header className="flex items-center justify-between px-5 pt-6">
-      <h1 className="text-[28px] font-bold tracking-tight">{titulo}</h1>
+      <h1 className="text-[30px] font-extrabold tracking-tight">{titulo}</h1>
       <Link to="/config" aria-label="Configuración" className="flex size-11 items-center justify-center rounded-full">
         <Icono nombre="ajustes" tamano={22} />
       </Link>

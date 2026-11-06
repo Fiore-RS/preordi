@@ -10,7 +10,7 @@ interface Props<T extends string> {
   onCambio: (valor: T) => void;
 }
 
-/** Control segmentado: una sola opción activa (pastilla de superficie sobre superficie suave). */
+/** Control segmentado: una sola opción activa, sólida como las etiquetas de la Vitrina (10.9). */
 export function Segmentado<T extends string>({ etiqueta, opciones, valor, onCambio }: Props<T>) {
   return (
     <div
@@ -29,7 +29,7 @@ export function Segmentado<T extends string>({ etiqueta, opciones, valor, onCamb
             aria-checked={activa}
             onClick={() => onCambio(o.valor)}
             className={`min-h-10 rounded-[10px] px-1 text-[13px] transition-colors ${
-              activa ? 'bg-superficie font-bold text-tinta' : 'font-medium text-tinta-suave hover:text-tinta'
+              activa ? 'bg-tinta font-bold text-fondo' : 'font-medium text-tinta-suave hover:text-tinta'
             }`}
           >
             {o.texto}

@@ -50,7 +50,7 @@ export function Preordenes() {
           <p className="text-sm text-tinta-suave">Cuando apartes algo, aparece acá con su saldo y su fecha.</p>
           <Link
             to="/preordenes/nueva"
-            className="mt-1 flex min-h-[50px] items-center rounded-full bg-principal px-6 font-bold text-principal-texto"
+            className="mt-1 flex min-h-[50px] items-center rounded-2xl bg-principal px-6 font-bold text-principal-texto"
           >
             Agregar preorden
           </Link>
@@ -93,11 +93,17 @@ export function Preordenes() {
 
           {lista.length > 0 ? (
             <>
-              <p className="text-[13px] text-tinta-suave" aria-live="polite">
-                {lista.length} {lista.length === 1 ? 'preorden' : 'preórdenes'}
-                {saldo > 0 && ` · saldo ${formatearMonto(saldo)}`}
+              <p className="flex items-baseline justify-between text-[13px] text-tinta-suave" aria-live="polite">
+                <span>
+                  {lista.length} {lista.length === 1 ? 'preorden' : 'preórdenes'}
+                </span>
+                {saldo > 0 && (
+                  <span>
+                    Saldo <span className="font-bold text-tinta tabular-nums">{formatearMonto(saldo)}</span>
+                  </span>
+                )}
               </p>
-              <ul className="flex flex-col gap-2.5">
+              <ul className="-mt-1 flex flex-col divide-y divide-borde-suave">
                 {lista.map((p) => (
                   <li key={p.id}>
                     <TarjetaPreorden
@@ -111,7 +117,7 @@ export function Preordenes() {
               </ul>
             </>
           ) : (
-            <section className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-borde px-6 py-10 text-center">
+            <section className="flex flex-col items-center gap-2 px-6 py-10 text-center">
               <p className="font-display text-lg font-bold">Nada por acá</p>
               <p className="text-sm text-tinta-suave">
                 {hayFiltrosExtra ? 'No hay preórdenes con estos filtros.' : 'No hay preórdenes en este estado.'}

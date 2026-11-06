@@ -663,7 +663,10 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 - **Detalle:** la foto ocupa todo el ancho arriba (340 px) con las esquinas inferiores de 38 px y botones cuadrados claros encima. Debajo van la categoría en etiqueta y el estado en naranja, el nombre, el costo total grande y una fila con Pagado · Saldo · Llega (tocar "Llega" cambia la fecha). Las secciones (Costo *desglosado*, Camino *a casa*, Pagos *hechos*, Notas *para mí*) van sin tarjetas. Sin foto: el color del estado con la inicial gigante (`PortadaSinFoto`).
 - **Acción principal:** naranja de marca con texto marino en los dos modos (tokens `principal`). Los botones son rectángulos de 16 px (grandes) y 12 px (chicos), y el botón + es un cuadrado redondeado de 20 px con sombra.
 
-Avance: Inicio ✅ · Detalle ✅
+- **Lista de Preórdenes:** filas sin caja separadas por una línea fina, con la portada vertical (76 × 96) a la izquierda, el nombre en Bricolage, el saldo grande a la derecha y abajo el estado y la barra de pago. Las vencidas se marcan en el texto de la fecha (naranja con ícono), no con un badge más.
+- **Controles:** la opción activa del control segmentado y los filtros aplicados van sólidos en `tinta`, como las etiquetas. Los badges son rectángulos de 6 px.
+
+Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅
 
 ---
 
