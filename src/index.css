@@ -1,9 +1,23 @@
 @import 'tailwindcss';
 
+/*
+  Letra a mano para las etiquetas (refinamiento visual, especificación 10.9).
+  Caveat (SIL OFL, ver assets/fonts/caveat-OFL.txt), incluida en el repo para que funcione sin internet.
+  Si más adelante se usa una letra propia, basta con cambiar este archivo y --font-mano.
+*/
+@font-face {
+  font-family: 'Caveat';
+  src: url('./assets/fonts/caveat-latin-700.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Tokens de Preordi — ver docs/preordi-especificacion.md, sección 10 */
 @theme {
   --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', sans-serif;
   --font-sans: 'DM Sans Variable', 'DM Sans', sans-serif;
+  --font-mano: 'Caveat', cursive;
 
   --color-naranja-50: #FDF3E3;
   --color-naranja-100: #FBE0B8;

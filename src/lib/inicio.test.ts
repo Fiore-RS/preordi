@@ -57,6 +57,16 @@ describe('resumen de Inicio', () => {
     expect(resumenInicio(lista, HOY, 2).proximas).toHaveLength(2);
   });
 
+  it('por pagar: lo que no sale en próximas, de mayor a menor saldo', () => {
+    expect(nombres(r.porPagar)).toEqual(['Llavero', 'Peluche']);
+    const corto = resumenInicio(
+      lista.map((x) => (x.nombre === 'Figura' ? { ...x, precio: 50000 } : x)),
+      HOY,
+      2,
+    );
+    expect(nombres(corto.porPagar)).toEqual(['Figura', 'Llavero', 'Peluche', 'Sin fecha']);
+  });
+
   it('recibidas con saldo pendiente', () => {
     expect(nombres(r.recibidasConSaldo)).toEqual(['Novela']);
   });

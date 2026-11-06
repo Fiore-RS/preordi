@@ -1,10 +1,10 @@
 import { Link } from 'react-router';
 import { saldoPendiente } from '../../lib/calculos';
-import { formatearMonto } from '../../lib/dinero';
 import { formatearFechaEstimada } from '../../lib/fechas';
 import type { Preorden } from '../../types';
 import { BadgeEstado, BadgePago, claseTonoEstado } from '../atoms/Badge';
 import { Miniatura } from '../atoms/Miniatura';
+import { Monto } from '../atoms/Monto';
 
 interface Props {
   preorden: Preorden;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 /**
- * Fila compacta para "Próximas llegadas" en Inicio (especificación 8.1).
+ * Fila compacta para "También por pagar" en Inicio (especificación 8.1).
  * A la derecha va el saldo; si ya está pagada, el estado (en camino) o "Pagado".
  */
 export function FilaPreorden({ preorden: p, tienda }: Props) {
@@ -22,11 +22,11 @@ export function FilaPreorden({ preorden: p, tienda }: Props) {
   return (
     <Link
       to={`/preordenes/${p.id}`}
-      className="flex items-center gap-3 rounded-[14px] border border-borde-suave bg-superficie p-2.5 transition-colors hover:border-borde-fuerte"
+      className="-mx-2 flex items-center gap-3 rounded-2xl px-2 py-2.5 transition-colors hover:bg-superficie-suave"
     >
       <Miniatura
         imagenId={p.imagenId}
-        className="size-[52px] rounded-[10px]"
+        className="size-[54px] rounded-[14px]"
         clasesMarcador={claseTonoEstado(p.estado)}
         tamanoIcono={22}
       />
@@ -36,8 +36,8 @@ export function FilaPreorden({ preorden: p, tienda }: Props) {
       </span>
       {saldo > 0 ? (
         <span className="flex shrink-0 flex-col items-end">
-          <span className="text-xs text-tinta-suave">Saldo</span>
-          <span className="text-[15px] font-bold tabular-nums">{formatearMonto(saldo)}</span>
+          <span className="text-[11px] text-tinta-suave">Saldo</span>
+          <Monto monto={saldo} className="font-display text-[17px] leading-tight font-extrabold" />
         </span>
       ) : (
         <span className="shrink-0">
