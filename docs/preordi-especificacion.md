@@ -636,7 +636,7 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 2. **Identidad y diseño:** paleta ✅, tipografía ✅, mockups de las pantallas ✅, ícono
 3. **Esqueleto** ✅: repo `preordi`, Vite + PWA, tokens de color y fuentes, rutas y workflow de Pages
 4. **Lógica:** tipos ✅, `calculos` ✅, `fechas` ✅, `estados` ✅ y persistencia ✅, verificados con el ejemplo de la sección 9
-5. **Pantallas MVP:** en el orden de la sección 8
+5. **Pantallas MVP** ✅: las nueve de la sección 8 (Configuración por ahora sin respaldo ni tema, que llegan en las fases 6 y 7)
    - Componentes pasados a los tokens semánticos de 10.4 ✅ (el modo oscuro ya funciona con la clase `.dark`; falta activarlo según el sistema, en la fase 7)
 6. **Imágenes y respaldo:** compresión, IndexedDB y `.zip`
 7. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro con selector de tema (10.4) y prueba de instalación en el teléfono

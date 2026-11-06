@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useReducer, type Dispatch, type ReactNode } from 'react';
 import type { Categoria, DatosPreordi, ID, Preorden, Tienda } from '../types';
+import { reasignarCategoria, reasignarTienda } from '../lib/configuracion';
 import { cargarDatos, guardarDatos } from '../lib/persistencia';
 
 export type Accion =
@@ -9,7 +10,13 @@ export type Accion =
   | { tipo: 'guardarCategoria'; categoria: Categoria }
   | { tipo: 'eliminarCategoria'; id: ID }
   | { tipo: 'guardarTienda'; tienda: Tienda }
-  | { tipo: 'eliminarTienda'; id: ID };
+  | { tipo: 'eliminarTienda'; id: ID }
+  /** Nuevo orden de las categorías (Configuración). */
+  | { tipo: 'reemplazarCategorias'; categorias: Categoria[] }
+  /** Borrar una categoría en uso: primero pasa sus preórdenes a otra (5.7). */
+  | { tipo: 'moverYEliminarCategoria'; de: ID; a: ID }
+  /** Borrar una tienda en uso: sus preórdenes pasan a otra tienda o a ninguna. */
+  | { tipo: 'moverYEliminarTienda'; de: ID; a: ID | null };
 
 function upsert<T extends { id: ID }>(lista: T[], item: T): T[] {
   const i = lista.findIndex((x) => x.id === item.id);
@@ -41,6 +48,22 @@ function reducer(datos: DatosPreordi, accion: Accion): DatosPreordi {
     case 'eliminarTienda':
       if (datos.preordenes.some((p) => p.tiendaId === accion.id)) return datos;
       return { ...datos, tiendas: datos.tiendas.filter((t) => t.id !== accion.id) };
+    case 'reemplazarCategorias':
+      return { ...datos, categorias: accion.categorias };
+    case 'moverYEliminarCategoria':
+      if (accion.de === accion.a || !datos.categorias.some((c) => c.id === accion.a)) return datos;
+      return {
+        ...datos,
+        preordenes: reasignarCategoria(datos.preordenes, accion.de, accion.a, new Date().toISOString()),
+        categorias: datos.categorias.filter((c) => c.id !== accion.de),
+      };
+    case 'moverYEliminarTienda':
+      if (accion.de === accion.a) return datos;
+      return {
+        ...datos,
+        preordenes: reasignarTienda(datos.preordenes, accion.de, accion.a, new Date().toISOString()),
+        tiendas: datos.tiendas.filter((t) => t.id !== accion.de),
+      };
   }
 }
 
