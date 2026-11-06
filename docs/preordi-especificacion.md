@@ -668,8 +668,9 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 - **Pantallas vacías:** sin ícono ni ilustración, solo el título, el texto y el botón de agregar (Inicio, Preórdenes, Deseos e Historial).
 - **Deseos:** el total "Si apartaras todo" grande sobre el fondo, sin tarjeta, y una cuadrícula de dos columnas con tarjetas altas (3:4) como las de Inicio: foto de fondo, la categoría arriba y el nombre con el precio en amarillo (`TarjetaDeseo`). El botón "Apartar" va debajo de cada tarjeta.
 - **Tarjetas sin foto:** el color del estado sin degradado, con el texto en marino (el degradado oscuro sobre amarillo o naranja se veía sucio).
+- **Historial:** el total del año grande sobre el fondo (naranja si es lo perdido en canceladas). POR **categoría** con barras gruesas que recorren los colores de la bandera, y LLEGARON / CANCELADAS **en 2026** con filas sin caja y portada vertical pequeña; las canceladas, en gris y semitransparentes.
 
-Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅ · Deseos ✅ · pantallas vacías ✅
+Avance: Inicio ✅ · Detalle ✅ · Preórdenes ✅ · Deseos ✅ · pantallas vacías ✅ · Historial ✅
 
 ---
 
