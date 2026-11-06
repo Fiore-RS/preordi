@@ -461,6 +461,7 @@ Al editar no se muestran los pasos 7–8. Los pagos se manejan desde el detalle.
 ### 8.9 Configuración
 - **Categorías:** crear, renombrar, cambiar emoji, reordenar y borrar (si no están en uso)
 - **Tiendas:** crear, editar (nombre, link, notas) y borrar (si no están en uso)
+- **Tema:** Sistema · Claro · Oscuro (ver 10.4)
 - **Respaldo:** exportar e importar
 - **Zona peligrosa:** reiniciar todo
 - **Acerca de:** versión y link al repo
@@ -530,9 +531,30 @@ Igual que en Sobres y Teleo:
 - **Alertas** (vencida, saldo en recibida, eliminar): `naranja-700` con ícono de advertencia. Sin rojo, para no romper la paleta.
 
 ### 10.4 Modo oscuro
-- Fondo `marino-900`, superficies `marino-700` / `marino-500` y texto `papel`.
-- Los colores de estado se usan en su tono `-500` como rellenos sólidos con texto marino.
-- Se sigue `prefers-color-scheme`, con opción manual en Configuración (fase de pulido).
+Igual que en Sobres:
+- **Tema** con tres opciones en Configuración: *Sistema* (por defecto), *Claro* y *Oscuro*.
+- En *Sistema* sigue `prefers-color-scheme` y **escucha los cambios en tiempo real**: si el teléfono pasa a modo oscuro con la app abierta, la app cambia también.
+- Se aplica con la clase `.dark` en `<html>`.
+- **Sin destello claro al abrir:** un script corto en `index.html` lee el tema guardado y pone `.dark` antes de pintar la página. La misma lógica vive en el código de la app.
+- La etiqueta `<meta name="theme-color">` se crea desde el código con el color de fondo del tema activo, para que la barra del navegador se funda con la app. El manifest no declara colores, así Android usa los del modo del teléfono.
+- El tema se guarda en `localStorage` con la llave `preordi:tema`, aparte de los datos: así no cambia el modelo ni hace falta migrar.
+- La pantalla de carga (8.10) usa colores de marca fijos y se ve igual en los dos modos.
+
+**Tokens semánticos.** Como en Sobres, los componentes usan colores por **rol** en lugar de colores fijos de la paleta. `.dark` solo redefine esos tokens y toda la app cambia de tema sin tocar ningún componente.
+
+| Token | Uso | Claro | Oscuro |
+|---|---|---|---|
+| `fondo` | Fondo de pantalla | `papel` | `marino-900` |
+| `superficie` | Tarjetas, campos, barra inferior | blanco | `marino-700` |
+| `superficie-suave` | Controles segmentados, chips grises, historial | `marino-50` | `marino-500` |
+| `tinta` | Texto principal | `marino-500` | `papel` |
+| `tinta-suave` | Texto secundario | `marino-400` | `marino-300` |
+| `borde` | Bordes y divisores | `marino-100` | `marino-500` |
+| `exterior` | Fondo alrededor de la tarjeta en PC | `marino-50` | `#081019` |
+
+- Los **colores de estado** siguen la tabla 10.2: en claro, relleno `-100` con texto `-900`; en oscuro, relleno `-500` con texto marino.
+- El **naranja de marca** (botón +, barras de progreso) no cambia entre modos.
+- El **botón principal** se invierte en oscuro: relleno `papel` con texto `marino-500`.
 
 ### 10.5 Tokens (`src/index.css`)
 
@@ -609,8 +631,9 @@ Una caja sencilla, sin personaje: caja naranja con cinta amarilla sobre fondo ma
 3. **Esqueleto** ✅: repo `preordi`, Vite + PWA, tokens de color y fuentes, rutas y workflow de Pages
 4. **Lógica:** tipos ✅, `calculos` ✅, `fechas` ✅, `estados` ✅ y persistencia ✅, verificados con el ejemplo de la sección 9
 5. **Pantallas MVP:** en el orden de la sección 8
+   - Antes de seguir con más pantallas: pasar los componentes a los tokens semánticos de 10.4, para que el modo oscuro no obligue a repasarlas todas después
 6. **Imágenes y respaldo:** compresión, IndexedDB y `.zip`
-7. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro y prueba de instalación en el teléfono
+7. **Pulido PWA:** ícono final, pantalla de carga (8.10) y splash de iOS, modo oscuro con selector de tema (10.4) y prueba de instalación en el teléfono
 8. **Publicar:** agregar al hub `index`
 
 ---
