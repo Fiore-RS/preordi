@@ -9,6 +9,7 @@ describe('nivelDe', () => {
     expect(nivelDe('/preordenes/abc')).toBe(1);
     expect(nivelDe('/preordenes/nueva')).toBe(1);
     expect(nivelDe('/config')).toBe(1);
+    expect(nivelDe('/por-pagar')).toBe(0.5);
     expect(nivelDe('/preordenes/abc/editar')).toBe(2);
   });
 });
@@ -23,6 +24,13 @@ describe('transicionEntre', () => {
   it('entra desde la derecha al ir más adentro', () => {
     expect(transicionEntre('/preordenes', '/preordenes/abc', false)).toBe('animate-subpantalla-entra');
     expect(transicionEntre('/preordenes/abc', '/preordenes/abc/editar', false)).toBe('animate-subpantalla-entra');
+  });
+
+  it('por pagar: entra desde Inicio y el detalle entra desde ella', () => {
+    expect(transicionEntre('/', '/por-pagar', true)).toBe('animate-subpantalla-entra');
+    expect(transicionEntre('/por-pagar', '/preordenes/abc', false)).toBe('animate-subpantalla-entra');
+    expect(transicionEntre('/preordenes/abc', '/por-pagar', true)).toBe('animate-subpantalla-vuelve');
+    expect(transicionEntre('/por-pagar', '/', true)).toBe('animate-subpantalla-vuelve');
   });
 
   it('vuelve desde la izquierda al ir hacia afuera, aunque la pestaña sea nueva', () => {

@@ -6,7 +6,7 @@ import { useLocation } from 'react-router';
  *
  * - Pestañas (Inicio, Preórdenes, Deseos, Historial): la entrada suave solo la primera vez
  *   que se abre cada una en la sesión. Al volver a una pestaña, aparece de una.
- * - Pantallas secundarias (detalle, nueva/editar preorden, configuración): entrar "más
+ * - Pantallas secundarias (detalle, nueva/editar preorden, configuración, por pagar): entrar "más
  *   adentro" llega desde la derecha; volver hacia afuera llega un poco desde la izquierda.
  * - Cualquier otro cambio (por ejemplo, de una pantalla secundaria a otra del mismo nivel):
  *   sin animación.
@@ -19,6 +19,8 @@ export type ClaseTransicion = '' | 'animate-entrar' | 'animate-subpantalla-entra
 /** Profundidad de cada pantalla. Las pestañas están en el nivel 0. */
 export function nivelDe(ruta: string): number {
   if (ruta === '/config') return 1;
+  // Entre Inicio y el detalle: así abrir una preorden desde Por pagar también entra desde la derecha.
+  if (ruta === '/por-pagar') return 0.5;
   if (/^\/preordenes\/[^/]+\/editar$/.test(ruta)) return 2;
   if (/^\/preordenes\/[^/]+$/.test(ruta)) return 1; // detalle y /preordenes/nueva
   return 0;
