@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Preorden } from '../types';
 import { totales } from './calculos';
-import { etiquetaMes, resumenInicio, saldoPorMes } from './inicio';
+import { etiquetaMes, progresoMes, resumenInicio, saldoPorMes } from './inicio';
 
 function p(nombre: string, cambios: Partial<Preorden>): Preorden {
   return {
@@ -86,6 +86,17 @@ describe('resumen de Inicio', () => {
     expect(meses.reduce((s, m) => s + m.saldo, 0)).toBe(totales(lista).totalPendiente);
     expect(nombres(meses[0].preordenes)).toEqual(['Peluche', 'Llavero', 'Artbook', 'Tomo 12', 'Novela']);
     expect(nombres(meses[2].preordenes)).toEqual(['Sin fecha']);
+  });
+
+  it('progreso del mes: lo pagado sobre lo que cuestan sus preórdenes', () => {
+    const conAbono = [
+      p('Tomo', { fechaEstimada: { fecha: '2026-12-10', precision: 'dia' }, pagos: [{ id: 'a', fecha: '2026-11-01', monto: 4000, tipo: 'deposito' }] }),
+      p('Figura', { fechaEstimada: { fecha: '2026-12-20', precision: 'dia' } }),
+    ];
+    const [dic] = saldoPorMes(conAbono, HOY);
+    expect(dic).toMatchObject({ clave: '2026-12', costo: 20000, pagado: 4000, saldo: 16000 });
+    expect(progresoMes(dic)).toBeCloseTo(0.2);
+    expect(progresoMes({ ...dic, costo: 0 })).toBe(0);
   });
 
   it('etiqueta del mes: el año solo si no es el de hoy', () => {

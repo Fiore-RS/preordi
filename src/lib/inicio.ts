@@ -1,7 +1,7 @@
 // Resumen de la pantalla de Inicio — especificación 8.1.
 
 import type { Preorden } from '../types';
-import { esActiva, recibidaConSaldo, saldoPendiente, vencida } from './calculos';
+import { costoTotal, esActiva, recibidaConSaldo, saldoPendiente, vencida } from './calculos';
 import { MESES, compararFechasEstimadas, finDePeriodo } from './fechas';
 
 export interface ResumenInicio {
@@ -54,6 +54,10 @@ export interface SaldoDelMes {
   /** "2026-11", o "sin_fecha" para las que no tienen fecha estimada. */
   clave: string;
   saldo: number;
+  /** Lo que cuestan en total las preórdenes del mes (precio + costos extra). */
+  costo: number;
+  /** Lo que ya se pagó de ese costo: costo − saldo. */
+  pagado: number;
   cantidad: number;
   /** Las preórdenes que suman en ese mes, de mayor a menor saldo. */
   preordenes: Preorden[];
@@ -77,8 +81,10 @@ export function saldoPorMes(preordenes: Preorden[], hoy: string): SaldoDelMes[] 
       const mes = finDePeriodo(p.fechaEstimada).slice(0, 7);
       clave = mes < mesHoy ? mesHoy : mes;
     }
-    const g = grupos.get(clave) ?? { clave, saldo: 0, cantidad: 0, preordenes: [] };
+    const g = grupos.get(clave) ?? { clave, saldo: 0, costo: 0, pagado: 0, cantidad: 0, preordenes: [] };
     g.saldo += saldo;
+    g.costo += costoTotal(p);
+    g.pagado += costoTotal(p) - saldo;
     g.cantidad += 1;
     g.preordenes.push(p);
     grupos.set(clave, g);
@@ -94,4 +100,10 @@ export function etiquetaMes(clave: string, hoy: string): { nombre: string; anio:
   if (clave === 'sin_fecha') return { nombre: 'Sin fecha', anio: '' };
   const anio = clave.slice(0, 4);
   return { nombre: MESES[Number(clave.slice(5, 7)) - 1], anio: anio === hoy.slice(0, 4) ? '' : anio };
+}
+
+/** Entre 0 y 1: cuánto del mes ya está pagado. La barra se llena cuando no falta nada. */
+export function progresoMes(mes: SaldoDelMes): number {
+  if (mes.costo <= 0) return 0;
+  return Math.min(1, Math.max(0, mes.pagado / mes.costo));
 }

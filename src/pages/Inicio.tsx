@@ -69,7 +69,6 @@ export function Inicio() {
   const sinNada = datos.preordenes.length === 0;
 
   const meses = saldoPorMes(datos.preordenes, hoy);
-  const maximoMes = Math.max(1, ...meses.map((m) => m.saldo));
 
   return (
     <main className="flex flex-col gap-6 pt-5 pb-2">
@@ -102,7 +101,7 @@ export function Inicio() {
               <ul className="flex flex-col gap-1">
                 {meses.slice(0, 4).map((m, i) => (
                   <li key={m.clave}>
-                    <FilaSaldoMes mes={m} hoy={hoy} maximo={maximoMes} destacado={i === 0} />
+                    <FilaSaldoMes mes={m} hoy={hoy} destacado={i === 0} />
                   </li>
                 ))}
               </ul>

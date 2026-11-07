@@ -23,7 +23,6 @@ export function PorPagar() {
   const hoy = aISO(useAhora());
   const meses = saldoPorMes(datos.preordenes, hoy);
   const total = totales(datos.preordenes).totalPendiente;
-  const maximo = Math.max(1, ...meses.map((m) => m.saldo));
   const cantidad = meses.reduce((s, m) => s + m.cantidad, 0);
   const nombreTienda = new Map(datos.tiendas.map((x) => [x.id, x.nombre]));
   // undefined = todavía no tocó nada: se abre el primer mes (aunque los datos carguen después).
@@ -69,7 +68,7 @@ export function PorPagar() {
                       onClick={() => setAbierto(estaAbierto ? null : m.clave)}
                       className="flex min-h-[52px] w-full items-center gap-3 py-1.5 text-left"
                     >
-                      <FilaSaldoMes mes={m} hoy={hoy} maximo={maximo} destacado={i === 0} conCantidad className="flex-1" />
+                      <FilaSaldoMes mes={m} hoy={hoy} destacado={i === 0} conCantidad className="flex-1" />
                       <Icono
                         nombre="adelante"
                         tamano={18}
