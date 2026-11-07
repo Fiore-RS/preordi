@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icono } from '../components/atoms/Icono';
 import { Monto } from '../components/atoms/Monto';
+import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { Encabezado } from '../components/molecules/Encabezado';
 import { FilaPreorden } from '../components/molecules/FilaPreorden';
 import { FilaSaldoMes } from '../components/molecules/FilaSaldoMes';
@@ -37,9 +38,10 @@ export function PorPagar() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <Encabezado titulo="Por pagar cada mes" volverA="/" />
+      <Encabezado volverA="/" textoVolver="Inicio" />
 
       <div className="flex flex-col gap-5 px-5 pt-2 pb-10">
+        <TituloEtiqueta etiqueta="Por pagar" acento="cada mes" como="h1" />
         {meses.length === 0 ? (
           <p className="text-sm text-tinta-suave">Estás al día: no tenés nada por pagar.</p>
         ) : (

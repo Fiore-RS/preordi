@@ -5,8 +5,8 @@ interface Props {
   /** Palabra destacada a la par, en naranja (ej. "pronto"). */
   acento: string;
   className?: string;
-  /** Por defecto es un h2; "p" cuando acompaña a otro título (ej. categoría y estado en el detalle). */
-  como?: 'h2' | 'p';
+  /** Por defecto es un h2; "h1" cuando es el título de la pantalla; "p" cuando acompaña a otro título (ej. categoría y estado en el detalle). */
+  como?: 'h1' | 'h2' | 'p';
 }
 
 /** Título de sección de la Vitrina: una etiqueta sólida y una palabra en naranja (especificación 10.9). */
