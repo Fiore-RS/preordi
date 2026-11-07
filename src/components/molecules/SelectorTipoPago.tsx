@@ -6,13 +6,22 @@ const TIPOS_PAGO: { valor: TipoPago; titulo: string; detalle: string }[] = [
   { valor: 'al_envio', titulo: 'Pago al envío', detalle: 'Me cobran cuando la despachan' },
 ];
 
+/** Para un deseo se habla en futuro: todavía no se ha pagado nada. */
+const DETALLE_DESEO: Record<TipoPago, string> = {
+  deposito: 'Se paga una parte al apartar y el resto al llegar',
+  completo: 'Se paga todo al apartar',
+  al_envio: 'Cobran cuando la despachan',
+};
+
 interface Props {
   valor: TipoPago;
   onCambio: (valor: TipoPago) => void;
+  /** Textos para un deseo que todavía no se aparta. */
+  paraDeseo?: boolean;
 }
 
 /** Tarjetas de radio para elegir cómo se paga la preorden (especificación 5.6). */
-export function SelectorTipoPago({ valor, onCambio }: Props) {
+export function SelectorTipoPago({ valor, onCambio, paraDeseo = false }: Props) {
   return (
     <div role="radiogroup" aria-label="Tipo de pago" className="flex flex-col gap-2">
       {TIPOS_PAGO.map((t) => {
@@ -38,7 +47,7 @@ export function SelectorTipoPago({ valor, onCambio }: Props) {
             </span>
             <span className="flex flex-col gap-0.5">
               <span className="text-[15px] font-bold">{t.titulo}</span>
-              <span className="text-[13px] text-tinta-suave">{t.detalle}</span>
+              <span className="text-[13px] text-tinta-suave">{paraDeseo ? DETALLE_DESEO[t.valor] : t.detalle}</span>
             </span>
           </button>
         );

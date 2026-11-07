@@ -1,14 +1,19 @@
-import { Link } from 'react-router';
+import { useCallback, useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { Icono } from '../components/atoms/Icono';
 import { Monto } from '../components/atoms/Monto';
 import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { FilaPreorden } from '../components/molecules/FilaPreorden';
 import { TarjetaVitrina } from '../components/molecules/TarjetaVitrina';
+import { AvisoPreventas } from '../components/organisms/AvisoPreventas';
+import { HojaEstado } from '../components/organisms/HojaEstado';
 import { usePreordi } from '../context/PreordiContext';
 import { saldoPendiente, totales } from '../lib/calculos';
 import { formatearMonto } from '../lib/dinero';
-import { MESES, formatearFechaEstimada, hoy as fechaDeHoy } from '../lib/fechas';
+import { MESES, aISO, formatearFechaEstimada } from '../lib/fechas';
 import { resumenInicio, saldoPorMes } from '../lib/inicio';
+import { avisosPreventa } from '../lib/preventa';
+import { useAhora } from '../lib/useAhora';
 import type { Preorden } from '../types';
 
 interface PropsAlerta {
@@ -41,8 +46,21 @@ const nombres = (lista: Preorden[]) =>
 
 // Especificación 8.1, con la dirección Vitrina de 10.9.
 export function Inicio() {
-  const { datos } = usePreordi();
-  const hoy = fechaDeHoy();
+  const { datos, dispatch } = usePreordi();
+  const navigate = useNavigate();
+  const ahora = useAhora();
+  const hoy = aISO(ahora);
+  const [apartando, setApartando] = useState<Preorden | null>(null);
+  const cerrarHoja = useCallback(() => setApartando(null), []);
+  const avisos = avisosPreventa(datos.preordenes, ahora);
+  const linkTienda = new Map(datos.tiendas.map((x) => [x.id, x.link]));
+  const linkDe = (p: Preorden) => p.link || (p.tiendaId ? linkTienda.get(p.tiendaId) : undefined) || undefined;
+
+  function alApartar(preorden: Preorden) {
+    dispatch({ tipo: 'guardarPreorden', preorden });
+    setApartando(null);
+    navigate(`/preordenes/${preorden.id}`);
+  }
   const t = totales(datos.preordenes);
   const r = resumenInicio(datos.preordenes, hoy);
   const nombreTienda = new Map(datos.tiendas.map((x) => [x.id, x.nombre]));
@@ -107,6 +125,8 @@ export function Inicio() {
           )}
         </section>
       )}
+
+      <AvisoPreventas avisos={avisos} hoy={hoy} linkDe={linkDe} onApartar={setApartando} />
 
       {(r.vencidas.length > 0 || r.recibidasConSaldo.length > 0) && (
         <div className="flex flex-col gap-2 px-5">
@@ -205,6 +225,8 @@ export function Inicio() {
           )}
         </>
       )}
+
+      {apartando && <HojaEstado preorden={apartando} a="apartada" onGuardar={alApartar} onCerrar={cerrarHoja} />}
     </main>
   );
 }

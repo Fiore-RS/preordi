@@ -340,6 +340,21 @@ new Intl.NumberFormat('es-CR', {
 
 ---
 
+### 5.9 Fechas de preventa de los deseos (`lib/preventa.ts`)
+Algunas preventas tienen fecha límite para apartar: si se pasa, se pierde el chance. Cada deseo puede guardar:
+- `preventa.abre` (opcional): día en que abre la preventa
+- `preventa.cierra` (opcional): último día para apartar
+- `preventa.horaCierre` (opcional, `HH:MM`): hora local en que cierra; sin hora, cuenta hasta el final del día
+- `depositoEstimado` (opcional, solo con tipo de pago depósito): lo que pide la tienda para apartar. Ya viene escrito en la hoja de Apartar
+
+Fases (calculadas, no se guardan): **sin fechas** · **próximamente** (todavía no abre) · **abierta** · **cerrada** (pasó el día, o la hora si hay).
+
+Urgencia de una preventa abierta según los días que faltan para el cierre: hasta **7** días = aviso (amarillo), hasta **2** = urgente (naranja claro), el mismo día = hoy (naranja). Las que todavía no abren no avisan.
+
+**Monto para apartar:** todo el costo si es pago completo, ₡0 si es pago al envío y el depósito anotado si es depósito + saldo (sin dato si no se anotó).
+
+Al apartar, cerrar o eliminar el deseo, el aviso desaparece solo. Las fechas se pueden cambiar en cualquier momento (la tienda extendió la preventa o abrió otra ronda).
+
 ## 6. Persistencia
 
 ### 6.1 Datos de texto — `localStorage`
@@ -403,6 +418,7 @@ Registrar pago, cambiar fecha y cambiar estado se abren como **hojas modales** (
 ### 8.1 Inicio
 - **Tarjeta principal:** total pendiente (grande) y, debajo, comprometido y ya pagado.
 - **Chips de resumen:** N apartadas · N en camino · N deseos. Cada uno lleva a su lista filtrada.
+- **Aviso de preventa (5.9):** justo debajo de "Por pagar" y arriba de las alertas y "Próximas", una tarjeta que sale cuando a algún deseo le faltan 7 días o menos para que cierre la preventa. Cambia de amarillo a naranja según se acerca el cierre (color fijo en los dos modos). Con un deseo: miniatura, nombre, cuenta regresiva, monto para apartar y los botones **Apartar** e **Ir a la tienda** (link del producto o de la tienda). Con varios: "N preventas cierran pronto", cuánto se necesita para apartarlas todas y una fila por deseo con su botón Apartar. Se quita sola al apartar, eliminar o cerrar.
 - **Alerta** (si hay): "N preórdenes vencidas" y "N recibidas con saldo".
 - **Próximas llegadas:** las 5 activas con fecha más cercana (por fin de periodo), con miniatura, nombre, fecha formateada y saldo.
 - **Estado vacío:** ícono de caja con "Todavía no hay preórdenes" y botón "Agregar preorden".
@@ -418,6 +434,8 @@ Registrar pago, cambiar fecha y cambiar estado se abren como **hojas modales** (
 - Total arriba: "Si apartaras todo: ₡X"
 - Cada tarjeta tiene el botón **Apartar**, que abre la hoja para elegir tipo de pago y depósito y luego pasa a `apartada`
 - Estado vacío: "Tu lista de deseos está vacía" y botón "Agregar deseo"
+- **Preventa (5.9):** etiqueta sobre la foto con la cuenta regresiva ("Cierra en 3 días", "Abre 16 nov") en el color de su urgencia. Orden: primero las que cierran antes, luego las que todavía no abren, luego el resto (más recientes primero)
+- **Preventas cerradas:** sección plegable al final, con las tarjetas en escala de grises y los botones **Nueva fecha** y **Eliminar**. No cuentan en el total
 
 ### 8.4 Detalle de preorden
 - Imagen grande (toque para verla completa)
@@ -427,6 +445,7 @@ Registrar pago, cambiar fecha y cambiar estado se abren como **hojas modales** (
 - **Línea de tiempo de estados** con sus fechas
 - **Lista de pagos** (más reciente primero), editable o eliminable con confirmación
 - **Acciones:** botón principal según el estado ("Marcar en camino", "Marcar recibida", "Apartar") · Registrar pago · Editar · menú (cambiar estado manualmente, cancelar, eliminar)
+- **Deseos con preventa (5.9):** "Cierra" (toque para cambiar las fechas), "Para apartar" y "Llega", con un badge de cuenta regresiva. Si la preventa cerró: la imagen en escala de grises, un aviso con **Nueva fecha** y **Eliminar deseo**, y sin botón Apartar abajo
 - Notas y referencia original
 
 ### 8.5 Nueva / Editar preorden
@@ -444,6 +463,8 @@ Campos en orden:
 11. Link y notas
 
 Al editar no se muestran los pasos 7–8. Los pagos se manejan desde el detalle.
+
+Si es un deseo (al crear o al editar), se agrega la sección **Preventa**: abre, cierra y hora de cierre (todo opcional), cómo se aparta (tipo de pago) y, si es con depósito, el depósito que pide la tienda (5.9).
 
 ### 8.6 Registrar pago (hoja modal)
 - Monto, con el botón rápido **"Pagar saldo (₡X)"**

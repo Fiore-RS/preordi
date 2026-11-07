@@ -11,6 +11,7 @@ import { HojaEstado } from '../components/organisms/HojaEstado';
 import { HojaFecha } from '../components/organisms/HojaFecha';
 import { HojaInferior } from '../components/organisms/HojaInferior';
 import { HojaPago } from '../components/organisms/HojaPago';
+import { HojaPreventa } from '../components/organisms/HojaPreventa';
 import { VisorImagen } from '../components/organisms/VisorImagen';
 import { usePreordi } from '../context/PreordiContext';
 import { NOMBRE_ESTADO, NOMBRE_MOVIMIENTO, accionPrincipal, textoTransicion } from '../lib/acciones';
@@ -26,14 +27,17 @@ import {
 } from '../lib/calculos';
 import { formatearMonto } from '../lib/dinero';
 import { TRANSICIONES } from '../lib/estados';
-import { formatearFecha, formatearFechaEstimada, hoy as fechaDeHoy } from '../lib/fechas';
+import { aISO, formatearFecha, formatearFechaEstimada } from '../lib/fechas';
 import { borrarImagen } from '../lib/imagenes';
+import { formatearDiaCorto, formatearHora, infoPreventa, montoParaApartar, textoCuentaRegresiva, type InfoPreventa } from '../lib/preventa';
+import { useAhora } from '../lib/useAhora';
 import { useImagen } from '../lib/useImagen';
 import type { Estado, Pago, Preorden } from '../types';
 
 type Hoja =
   | { tipo: 'pago'; pago?: Pago }
   | { tipo: 'fecha' }
+  | { tipo: 'preventa' }
   | { tipo: 'estado'; a: Estado }
   | { tipo: 'acciones' }
   | { tipo: 'eliminar' }
@@ -45,6 +49,14 @@ const PASOS: { estado: Estado; campo: 'fechaApartada' | 'fechaEnviada' | 'fechaR
   { estado: 'en_camino', campo: 'fechaEnviada' },
   { estado: 'recibida', campo: 'fechaRecibida' },
 ];
+
+/** Tono del badge de la cuenta regresiva de la preventa. */
+function tonoPreventa(info: InfoPreventa): 'alerta' | 'naranja' | 'amarillo' | 'gris' {
+  if (info.urgencia === 'hoy') return 'alerta';
+  if (info.urgencia === 'urgente') return 'naranja';
+  if (info.urgencia === 'aviso') return 'amarillo';
+  return 'gris';
+}
 
 const NOMBRE_PASO: Record<string, string> = { apartada: 'Apartada', en_camino: 'En camino', recibida: 'Recibida' };
 
@@ -59,6 +71,7 @@ export function DetallePreorden() {
 
   const p = datos.preordenes.find((x) => x.id === id);
   const urlImagen = useImagen(p?.imagenId ?? null);
+  const ahora = useAhora();
 
   if (!p) {
     return (
@@ -76,11 +89,15 @@ export function DetallePreorden() {
   }
 
   const preorden = p;
-  const hoy = fechaDeHoy();
+  const hoy = aISO(ahora);
   const categoria = datos.categorias.find((c) => c.id === preorden.categoriaId);
   const tienda = datos.tiendas.find((t) => t.id === preorden.tiendaId);
   const esDeseo = preorden.estado === 'deseada';
-  const siguiente = accionPrincipal(preorden);
+  // Preventa del deseo (5.9). Si ya cerró, no se ofrece "Apartar": primero hay que poner otra fecha.
+  const preventa = infoPreventa(preorden, ahora);
+  const preventaCerrada = preventa.fase === 'cerrada';
+  const paraApartar = montoParaApartar(preorden);
+  const siguiente = preventaCerrada ? null : accionPrincipal(preorden);
   const esCancelada = preorden.estado === 'cancelada';
   // Lo pagado que todavía no te devolvieron (los reembolsos ya restan en totalPagado).
   const porReembolsar = esCancelada ? Math.max(0, totalPagado(preorden)) : 0;
@@ -113,7 +130,7 @@ export function DetallePreorden() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="relative h-[340px] shrink-0 overflow-hidden rounded-b-[38px] bg-marino-500">
+      <div className={`relative h-[340px] shrink-0 overflow-hidden rounded-b-[38px] bg-marino-500 ${preventaCerrada ? 'grayscale' : ''}`}>
         {urlImagen ? (
           <button
             type="button"
@@ -172,6 +189,26 @@ export function DetallePreorden() {
           {esDeseo && <span className="text-[13px] text-tinta-suave">Lo que costaría si la apartás</span>}
         </div>
 
+        {preventaCerrada && (
+          <div className="flex flex-col gap-3 rounded-[14px] bg-superficie-suave px-3.5 py-3">
+            <p className="flex items-start gap-2 text-sm">
+              <Icono nombre="reloj" tamano={18} grosor={2} className="mt-px shrink-0 text-tinta-suave" />
+              <span>
+                <strong className="font-bold">{textoCuentaRegresiva(preorden, preventa, hoy)}.</strong> Ya no se puede apartar. Si la
+                tienda extendió la preventa o abrió otra ronda, poné la nueva fecha.
+              </span>
+            </p>
+            <div className="flex gap-2">
+              <Boton tamano="chico" className="flex-1 font-bold!" onClick={() => setHoja({ tipo: 'preventa' })}>
+                Nueva fecha
+              </Boton>
+              <Boton tamano="chico" variante="principal" className="flex-1 font-bold!" onClick={() => setHoja({ tipo: 'eliminar' })}>
+                Eliminar deseo
+              </Boton>
+            </div>
+          </div>
+        )}
+
         {preorden.estado === 'cancelada' && preorden.fechaCancelada && (
           <p className="rounded-xl bg-superficie-suave px-3.5 py-3 text-sm text-tinta">
             Cancelada el {formatearFecha(preorden.fechaCancelada)}.
@@ -206,6 +243,41 @@ export function DetallePreorden() {
           ) : (
             <>
           <div className="grid grid-cols-3 gap-3">
+              {esDeseo && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setHoja({ tipo: 'preventa' })}
+                    aria-label={`Preventa: ${preorden.preventa?.cierra ? `cierra el ${formatearFecha(preorden.preventa.cierra)}` : 'sin fecha de cierre'}. Cambiar fechas de preventa`}
+                    className="-m-1.5 flex flex-col items-start rounded-xl p-1.5 text-left hover:bg-superficie-suave"
+                  >
+                    <span className="flex items-center gap-1 text-xs text-tinta-suave">
+                      Cierra <Icono nombre="editar" tamano={12} grosor={2.2} />
+                    </span>
+                    <span
+                      className={`font-display text-lg leading-tight font-extrabold ${preventa.urgencia === 'hoy' || preventa.urgencia === 'urgente' ? 'text-acento-texto' : ''}`}
+                    >
+                      {preorden.preventa?.cierra ? formatearDiaCorto(preorden.preventa.cierra, hoy) : 'Sin fecha'}
+                    </span>
+                    {preorden.preventa?.cierra && preorden.preventa.horaCierre && (
+                      <span className="text-xs text-tinta-suave">{formatearHora(preorden.preventa.horaCierre)}</span>
+                    )}
+                  </button>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-tinta-suave">Para apartar</span>
+                    {paraApartar === null ? (
+                      <Link
+                        to={`/preordenes/${preorden.id}/editar`}
+                        className="font-display text-lg font-extrabold text-tinta-tenue underline decoration-1 underline-offset-4"
+                      >
+                        Anotar
+                      </Link>
+                    ) : (
+                      <Monto monto={paraApartar} className="font-display text-lg font-extrabold" />
+                    )}
+                  </div>
+                </>
+              )}
               {!esDeseo && (
                 <>
                   <div className="flex flex-col">
@@ -241,6 +313,20 @@ export function DetallePreorden() {
                   className="h-2 rounded-full bg-naranja-500"
                   style={{ width: `${Math.round(progresoPago(preorden) * 100)}%` }}
                 />
+              </div>
+            )}
+            {esDeseo && (preventa.fase === 'abierta' || preventa.fase === 'proximamente') && (
+              <div className="flex flex-wrap gap-1.5">
+                <Badge tono={tonoPreventa(preventa)}>
+                  <Icono nombre="reloj" tamano={13} grosor={2.2} />
+                  {textoCuentaRegresiva(preorden, preventa, hoy)}
+                </Badge>
+                {preventa.fase === 'proximamente' && preorden.preventa?.cierra && (
+                  <Badge tono="gris">Cierra el {formatearDiaCorto(preorden.preventa.cierra, hoy)}</Badge>
+                )}
+                {preventa.fase === 'abierta' && preorden.preventa?.abre && preorden.preventa.abre <= hoy && (
+                  <Badge tono="gris">Abrió el {formatearDiaCorto(preorden.preventa.abre, hoy)}</Badge>
+                )}
               </div>
             )}
             {(vencidaHoy || vecesReprogramada > 0 || !esDeseo) && (
@@ -393,6 +479,7 @@ export function DetallePreorden() {
       {hoja?.tipo === 'imagen' && urlImagen && (
         <VisorImagen url={urlImagen} alt={preorden.nombre} onCerrar={cerrar} />
       )}
+      {hoja?.tipo === 'preventa' && <HojaPreventa preorden={preorden} onGuardar={guardar} onCerrar={cerrar} />}
       {hoja?.tipo === 'fecha' && <HojaFecha preorden={preorden} onGuardar={guardar} onCerrar={cerrar} />}
       {hoja?.tipo === 'estado' && <HojaEstado preorden={preorden} a={hoja.a} onGuardar={guardar} onCerrar={cerrar} />}
       {hoja?.tipo === 'acciones' && (

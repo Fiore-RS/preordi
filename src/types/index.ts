@@ -52,6 +52,16 @@ export interface CambioFecha {
   nota?: string;
 }
 
+/** Ventana de la preventa de un deseo: cuándo abre y hasta cuándo se puede apartar. */
+export interface Preventa {
+  /** Día en que abre; null si ya está abierta o no se sabe. */
+  abre: string | null;
+  /** Último día para apartar; null si no se sabe. */
+  cierra: string | null;
+  /** 'HH:MM' (24 h, hora local) en que cierra; null = hasta el final del día. */
+  horaCierre: string | null;
+}
+
 export interface Preorden {
   id: ID;
   nombre: string;
@@ -73,6 +83,11 @@ export interface Preorden {
   fechaEnviada: string | null;
   fechaRecibida: string | null;
   fechaCancelada: string | null;
+
+  /** Solo deseos: fechas de la preventa (especificación 5.9). */
+  preventa?: Preventa;
+  /** Solo deseos con tipo de pago 'deposito': lo que pide la tienda para apartar. */
+  depositoEstimado?: number;
 
   /** Llave en IndexedDB. */
   imagenId: ID | null;

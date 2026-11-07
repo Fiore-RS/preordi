@@ -5,6 +5,7 @@ import type { CostoExtra, Estado, FechaEstimada, ID, Precision, Preorden, TipoPa
 import { desdeISO, normalizarFecha } from './fechas';
 import { parsearMonto } from './dinero';
 import { pagosAlApartar } from './estados';
+import { preventaDeCampos } from './preventa';
 import { nuevoId } from './ids';
 
 export type PrecisionFormulario = Precision | 'ninguna';
@@ -25,6 +26,7 @@ export interface FormularioPreorden {
   /** Solo al crear. */
   estadoInicial: Extract<Estado, 'deseada' | 'apartada'>;
   tipoPago: TipoPago;
+  /** Al apartar: el depósito pagado. En un deseo: el depósito que pide la tienda (opcional). */
   deposito: string;
   fechaApartada: string;
 
@@ -41,6 +43,12 @@ export interface FormularioPreorden {
   costosExtra: FilaCostoExtra[];
   link: string;
   notas: string;
+
+  /** Solo deseos (5.9): 'YYYY-MM-DD' o vacío. */
+  preventaAbre: string;
+  preventaCierra: string;
+  /** 'HH:MM' o vacío. */
+  preventaHora: string;
 }
 
 export type CampoConError =
@@ -50,7 +58,8 @@ export type CampoConError =
   | 'deposito'
   | 'fechaApartada'
   | 'fechaEstimada'
-  | 'costosExtra';
+  | 'costosExtra'
+  | 'preventa';
 
 /** La parte del formulario que describe la fecha estimada (también la usa la hoja Cambiar fecha). */
 export type ValoresFecha = Pick<FormularioPreorden, 'precision' | 'fechaDia' | 'fechaSemana' | 'mes' | 'anio'>;
@@ -63,6 +72,7 @@ export const ORDEN_CAMPOS: CampoConError[] = [
   'categoriaId',
   'precio',
   'costosExtra',
+  'preventa',
   'deposito',
   'fechaApartada',
   'fechaEstimada',
@@ -92,6 +102,9 @@ export function formularioVacio(
     costosExtra: [],
     link: '',
     notas: '',
+    preventaAbre: '',
+    preventaCierra: '',
+    preventaHora: '',
   };
 }
 
@@ -122,6 +135,10 @@ export function formularioDesdePreorden(p: Preorden, hoy: string): FormularioPre
     costosExtra: p.costosExtra.map((c) => ({ id: c.id, concepto: c.concepto, monto: conGrupos(c.monto) })),
     link: p.link ?? '',
     notas: p.notas ?? '',
+    deposito: p.estado === 'deseada' && p.depositoEstimado ? conGrupos(p.depositoEstimado) : '',
+    preventaAbre: p.preventa?.abre ?? '',
+    preventaCierra: p.preventa?.cierra ?? '',
+    preventaHora: p.preventa?.horaCierre ?? '',
     ...valoresFecha(p.fechaEstimada, hoy),
   };
 }
@@ -200,7 +217,22 @@ export function procesarFormulario(f: FormularioPreorden, { hoy, ahoraISO, origi
 
   const costo = (precio ?? 0) + (costosExtra ?? []).reduce((suma, c) => suma + c.monto, 0);
   const apartarAhora = !original && f.estadoInicial === 'apartada';
+  const esDeseo = original ? original.estado === 'deseada' : f.estadoInicial === 'deseada';
   let deposito: number | undefined;
+
+  // Deseos (5.9): fechas de la preventa y depósito que pide la tienda, ambos opcionales.
+  let datosDeseo: Pick<Preorden, 'preventa' | 'depositoEstimado' | 'tipoPago'> | undefined;
+  if (esDeseo) {
+    const preventa = preventaDeCampos(f.preventaAbre, f.preventaCierra, f.preventaHora);
+    if (!preventa.ok) errores.preventa = preventa.error;
+    let depositoEstimado: number | undefined;
+    if (f.tipoPago === 'deposito' && f.deposito.trim()) {
+      depositoEstimado = parsearMonto(f.deposito) ?? undefined;
+      if (depositoEstimado === undefined) errores.deposito = 'Escribí un monto mayor que ₡0 o dejalo vacío.';
+      else if (precio !== null && depositoEstimado >= costo) errores.deposito = 'El depósito tiene que ser menor que el costo total.';
+    }
+    datosDeseo = { preventa: preventa.ok ? preventa.preventa : undefined, depositoEstimado, tipoPago: f.tipoPago };
+  }
 
   if (apartarAhora) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(f.fechaApartada)) errores.fechaApartada = 'Elegí la fecha en que la apartaste.';
@@ -225,6 +257,7 @@ export function procesarFormulario(f: FormularioPreorden, { hoy, ahoraISO, origi
     link: opcional(f.link),
     referenciaOriginal: opcional(f.referenciaOriginal),
     notas: opcional(f.notas),
+    ...datosDeseo,
     actualizadaEl: ahoraISO,
   };
 

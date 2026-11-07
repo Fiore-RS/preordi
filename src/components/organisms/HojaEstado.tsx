@@ -38,7 +38,10 @@ export function HojaEstado({ preorden, a, onGuardar, onCerrar }: Props) {
 
   const [fecha, setFecha] = useState(hoy);
   const [tipoPago, setTipoPago] = useState<TipoPago>(preorden.tipoPago);
-  const [deposito, setDeposito] = useState('');
+  // Si el deseo tiene anotado el depósito que pide la tienda, ya viene escrito (5.9).
+  const [deposito, setDeposito] = useState(() =>
+    esApartarDeseo && preorden.depositoEstimado ? new Intl.NumberFormat('es-CR').format(preorden.depositoEstimado) : '',
+  );
   const [registrarPago, setRegistrarPago] = useState(sugerido > 0);
   const [error, setError] = useState<string | null>(null);
 

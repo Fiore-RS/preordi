@@ -144,6 +144,7 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
 
   const creando = !original;
   const apartando = creando && f.estadoInicial === 'apartada';
+  const esDeseo = original ? original.estado === 'deseada' : f.estadoInicial === 'deseada';
   const costo = costoDeFormulario(f);
   const pagado = original ? totalPagado(original) : 0;
   const haySobrepago = !!original && costo > 0 && pagado > costo;
@@ -333,6 +334,87 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
                   ? `Se registra un pago de ${formatearMonto(costo)}.`
                   : `Queda todo pendiente: ${formatearMonto(costo)}.`}
               </p>
+            )}
+          </>
+        )}
+
+        {esDeseo && (
+          <>
+            <TituloEtiqueta etiqueta="Preventa" acento="fechas límite" className="-mb-2 pt-2" />
+
+            <Campo
+              id="campo-preventa"
+              etiqueta="¿Cuándo se puede apartar?"
+              error={errores.preventa}
+              ayuda="Opcional. Unos días antes del cierre te sale un aviso en Inicio. Sin hora, cuenta hasta el final del día."
+            >
+              <div className="grid grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1 text-[13px] text-tinta-suave">
+                  Abre
+                  <input
+                    type="date"
+                    value={f.preventaAbre}
+                    onChange={(e) => cambiar({ preventaAbre: e.target.value }, 'preventa')}
+                    aria-invalid={!!errores.preventa || undefined}
+                    aria-describedby={describe('preventa')}
+                    className={`${CLASE_ENTRADA} h-12`}
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-[13px] text-tinta-suave">
+                  Cierra
+                  <input
+                    type="date"
+                    value={f.preventaCierra}
+                    min={f.preventaAbre || undefined}
+                    onChange={(e) => cambiar({ preventaCierra: e.target.value }, 'preventa')}
+                    aria-invalid={!!errores.preventa || undefined}
+                    aria-describedby={describe('preventa')}
+                    className={`${CLASE_ENTRADA} h-12`}
+                  />
+                </label>
+              </div>
+              <label className="flex flex-col gap-1 text-[13px] text-tinta-suave">
+                Hora de cierre
+                <input
+                  type="time"
+                  value={f.preventaHora}
+                  onChange={(e) => cambiar({ preventaHora: e.target.value }, 'preventa')}
+                  aria-invalid={!!errores.preventa || undefined}
+                  aria-describedby={describe('preventa')}
+                  className={`${CLASE_ENTRADA} h-12`}
+                />
+              </label>
+              {(f.preventaAbre || f.preventaCierra || f.preventaHora) && (
+                <button
+                  type="button"
+                  onClick={() => cambiar({ preventaAbre: '', preventaCierra: '', preventaHora: '' }, 'preventa')}
+                  className="self-start text-[13px] font-medium text-tinta-suave underline underline-offset-2"
+                >
+                  Quitar fechas
+                </button>
+              )}
+            </Campo>
+
+            <Campo id="campo-tipoPago" etiqueta="¿Cómo se aparta?">
+              <SelectorTipoPago paraDeseo valor={f.tipoPago} onCambio={(tipoPago) => cambiar({ tipoPago }, 'deposito')} />
+            </Campo>
+
+            {f.tipoPago === 'deposito' && (
+              <Campo
+                id="campo-deposito"
+                etiqueta="Depósito para apartar"
+                para="deposito"
+                error={errores.deposito}
+                ayuda="Opcional. Sirve para saber cuánto necesitás y ya viene escrito al apartar."
+              >
+                <CampoMonto
+                  id="deposito"
+                  valor={f.deposito}
+                  onCambio={(deposito) => cambiar({ deposito }, 'deposito')}
+                  invalido={!!errores.deposito}
+                  aria-describedby={describe('deposito')}
+                />
+              </Campo>
             )}
           </>
         )}
