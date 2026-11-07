@@ -12,15 +12,14 @@ import { HojaTienda } from '../components/organisms/HojaTienda';
 import { usePreordi } from '../context/PreordiContext';
 import { contarUso } from '../lib/configuracion';
 import { useTema } from '../lib/tema';
-import { hoy } from '../lib/fechas';
+import { formatearFecha, hoy } from '../lib/fechas';
+import { ultimoRespaldo } from '../lib/recordatorioRespaldo';
 import { borrarTodasLasImagenes } from '../lib/imagenes';
 import { datosIniciales } from '../lib/persistencia';
 import {
   aplicarImagenes,
-  descargar,
-  exportarRespaldo,
+  hacerRespaldo,
   leerRespaldo,
-  nombreRespaldo,
   resumir,
   type RespaldoLeido,
   type ResumenRespaldo,
@@ -57,14 +56,23 @@ export function Configuracion() {
   const [ocupado, setOcupado] = useState<'exportar' | 'importar' | 'reiniciar' | null>(null);
   const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
 
+  const [ultimo, setUltimo] = useState(ultimoRespaldo);
   const actual = resumir(datos, datos.preordenes.filter((p) => p.imagenId).length);
 
   async function exportar() {
     setOcupado('exportar');
     setMensaje(null);
     try {
-      descargar(await exportarRespaldo(datos), nombreRespaldo(hoy()));
-      setMensaje({ tipo: 'ok', texto: 'Respaldo descargado. Guardalo en un lugar seguro (Drive, iCloud o tu compu).' });
+      const resultado = await hacerRespaldo(datos, hoy());
+      if (resultado === 'cancelado') return;
+      setUltimo(ultimoRespaldo());
+      setMensaje({
+        tipo: 'ok',
+        texto:
+          resultado === 'compartido'
+            ? 'Respaldo guardado.'
+            : 'Respaldo descargado. Guardalo en un lugar seguro (Drive, iCloud o tu compu).',
+      });
     } catch {
       setMensaje({ tipo: 'error', texto: 'No se pudo armar el respaldo. Intentá de nuevo.' });
     } finally {
@@ -196,6 +204,9 @@ export function Configuracion() {
             <TituloEtiqueta id="titulo-respaldo" etiqueta="Mi" acento="respaldo" />
             <p className="text-[13px] text-tinta-suave">
               Un .zip con tus preórdenes, deseos, categorías, tiendas e imágenes.
+            </p>
+            <p className="text-[13px] text-tinta-suave">
+              {ultimo ? `Último respaldo: ${formatearFecha(ultimo)}.` : 'Todavía no has hecho un respaldo.'}
             </p>
           </div>
           <ul className="overflow-hidden rounded-2xl bg-superficie-suave">

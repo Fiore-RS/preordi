@@ -5,6 +5,7 @@ import { strFromU8, strToU8, unzipSync, zipSync, type Zippable } from 'fflate';
 import type { DatosPreordi, ID } from '../types';
 import { guardarVarias, limpiarHuerfanas, todasLasImagenes } from './imagenes';
 import { migrar } from './persistencia';
+import { registrarRespaldo } from './recordatorioRespaldo';
 
 export interface ResumenRespaldo {
   preordenes: number;
@@ -145,6 +146,33 @@ export async function leerRespaldo(archivo: File): Promise<RespaldoLeido> {
 export async function aplicarImagenes(respaldo: RespaldoLeido): Promise<void> {
   await guardarVarias(respaldo.imagenes);
   await limpiarHuerfanas(new Set(respaldo.imagenes.keys()));
+}
+
+export type ResultadoRespaldo = 'compartido' | 'descargado' | 'cancelado';
+
+/**
+ * Arma el respaldo y lo entrega: en el teléfono abre la hoja de compartir del sistema
+ * (para guardarlo directo en iCloud Drive, Google Drive o Archivos); si no se puede, lo descarga.
+ * Registra la fecha del respaldo salvo que se cancele la hoja de compartir.
+ */
+export async function hacerRespaldo(datos: DatosPreordi, hoy: string): Promise<ResultadoRespaldo> {
+  const blob = await exportarRespaldo(datos);
+  const nombre = nombreRespaldo(hoy);
+  const archivo = new File([blob], nombre, { type: 'application/zip' });
+  const tactil = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches;
+  if (tactil && navigator.canShare?.({ files: [archivo] })) {
+    try {
+      await navigator.share({ files: [archivo], title: 'Respaldo de Preordi' });
+      registrarRespaldo(hoy);
+      return 'compartido';
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return 'cancelado';
+      // Otro error (por ejemplo, el navegador no dejó compartir): se descarga como siempre.
+    }
+  }
+  descargar(blob, nombre);
+  registrarRespaldo(hoy);
+  return 'descargado';
 }
 
 /** Descarga un archivo con un enlace temporal. */

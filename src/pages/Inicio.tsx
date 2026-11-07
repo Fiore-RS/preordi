@@ -6,6 +6,7 @@ import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { FilaPreorden } from '../components/molecules/FilaPreorden';
 import { TarjetaVitrina } from '../components/molecules/TarjetaVitrina';
 import { AvisoPreventas } from '../components/organisms/AvisoPreventas';
+import { AvisoRespaldo } from '../components/organisms/AvisoRespaldo';
 import { HojaEstado } from '../components/organisms/HojaEstado';
 import { usePreordi } from '../context/PreordiContext';
 import { saldoPendiente, totales } from '../lib/calculos';
@@ -127,6 +128,7 @@ export function Inicio() {
       )}
 
       <AvisoPreventas avisos={avisos} hoy={hoy} linkDe={linkDe} onApartar={setApartando} />
+      <AvisoRespaldo hoy={hoy} />
 
       {(r.vencidas.length > 0 || r.recibidasConSaldo.length > 0) && (
         <div className="flex flex-col gap-2 px-5">

@@ -84,8 +84,14 @@ export function PreordiProvider({ children }: { children: ReactNode }) {
     limpiarHuerfanas(enUso).catch(() => {
       // Si IndexedDB no está disponible, no hay nada que limpiar.
     });
-    // Mientras se ve la pantalla de carga, deja todas las fotos listas para que las pantallas no parpadeen.
-    precargarImagenes([...enUso]).catch(() => {});
+    // Mientras se ve la pantalla de carga, deja listas las fotos de Inicio, Preórdenes y Deseos para que no parpadeen.
+    // Las recibidas y canceladas (el historial, que crece con los años) cargan las suyas al abrirse.
+    const visibles = datos.preordenes
+      .filter((p) => p.imagenId && (p.estado === 'deseada' || p.estado === 'apartada' || p.estado === 'en_camino'))
+      .map((p) => p.imagenId!);
+    precargarImagenes(visibles).catch(() => {});
+    // Pide que el navegador no borre los datos cuando necesite espacio (6.2).
+    navigator.storage?.persist?.().catch(() => {});
     // Solo una vez, con los datos con los que arrancó la app.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

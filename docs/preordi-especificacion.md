@@ -392,6 +392,13 @@ imagenes/<id>.webp  # una por imagenId
 
 ---
 
+### 6.4 Recordatorio de respaldo y durabilidad (`lib/recordatorioRespaldo.ts`)
+- Al exportar se guarda la fecha en `localStorage` (`preordi:ultimoRespaldo`), aparte de los datos para que importar un respaldo no la cambie. Configuración muestra "Último respaldo: …".
+- En el teléfono, exportar abre la hoja de compartir del sistema para guardarlo directo en iCloud Drive, Google Drive o Archivos; si no se puede, se descarga. Cancelar la hoja no cuenta como respaldo.
+- **Aviso en Inicio** (debajo del de preventas): sale cuando pasan **30 días** sin respaldo; si nunca se ha hecho uno, se cuenta desde la preorden más antigua. Tiene el botón **Hacer respaldo** y una **X** que lo esconde **14 días**.
+- Al abrir la app se pide almacenamiento persistente (`navigator.storage.persist()`).
+- Solo se precargan las fotos de deseos, apartadas y en camino; las del historial cargan al abrirse.
+
 ## 7. Navegación y rutas
 
 **Barra inferior (4 pestañas):** Inicio · Preórdenes · Deseos · Historial
