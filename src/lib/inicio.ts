@@ -2,7 +2,7 @@
 
 import type { Preorden } from '../types';
 import { esActiva, recibidaConSaldo, saldoPendiente, vencida } from './calculos';
-import { compararFechasEstimadas, finDePeriodo } from './fechas';
+import { MESES, compararFechasEstimadas, finDePeriodo } from './fechas';
 
 export interface ResumenInicio {
   apartadas: number;
@@ -55,6 +55,8 @@ export interface SaldoDelMes {
   clave: string;
   saldo: number;
   cantidad: number;
+  /** Las preórdenes que suman en ese mes, de mayor a menor saldo. */
+  preordenes: Preorden[];
 }
 
 /**
@@ -75,12 +77,21 @@ export function saldoPorMes(preordenes: Preorden[], hoy: string): SaldoDelMes[] 
       const mes = finDePeriodo(p.fechaEstimada).slice(0, 7);
       clave = mes < mesHoy ? mesHoy : mes;
     }
-    const g = grupos.get(clave) ?? { clave, saldo: 0, cantidad: 0 };
+    const g = grupos.get(clave) ?? { clave, saldo: 0, cantidad: 0, preordenes: [] };
     g.saldo += saldo;
     g.cantidad += 1;
+    g.preordenes.push(p);
     grupos.set(clave, g);
   }
+  for (const g of grupos.values()) g.preordenes.sort((a, b) => saldoPendiente(b) - saldoPendiente(a));
   return [...grupos.values()].sort((a, b) =>
     a.clave === 'sin_fecha' ? 1 : b.clave === 'sin_fecha' ? -1 : a.clave.localeCompare(b.clave),
   );
+}
+
+/** "nov" (con el año aparte solo si no es el de hoy); "Sin fecha" para la clave sin_fecha. */
+export function etiquetaMes(clave: string, hoy: string): { nombre: string; anio: string } {
+  if (clave === 'sin_fecha') return { nombre: 'Sin fecha', anio: '' };
+  const anio = clave.slice(0, 4);
+  return { nombre: MESES[Number(clave.slice(5, 7)) - 1], anio: anio === hoy.slice(0, 4) ? '' : anio };
 }

@@ -4,6 +4,7 @@ import { Icono } from '../components/atoms/Icono';
 import { Monto } from '../components/atoms/Monto';
 import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { FilaPreorden } from '../components/molecules/FilaPreorden';
+import { FilaSaldoMes } from '../components/molecules/FilaSaldoMes';
 import { TarjetaVitrina } from '../components/molecules/TarjetaVitrina';
 import { AvisoPreventas } from '../components/organisms/AvisoPreventas';
 import { AvisoRespaldo } from '../components/organisms/AvisoRespaldo';
@@ -11,7 +12,7 @@ import { HojaEstado } from '../components/organisms/HojaEstado';
 import { usePreordi } from '../context/PreordiContext';
 import { saldoPendiente, totales } from '../lib/calculos';
 import { formatearMonto } from '../lib/dinero';
-import { MESES, aISO, formatearFechaEstimada } from '../lib/fechas';
+import { aISO, formatearFechaEstimada } from '../lib/fechas';
 import { resumenInicio, saldoPorMes } from '../lib/inicio';
 import { avisosPreventa } from '../lib/preventa';
 import { useAhora } from '../lib/useAhora';
@@ -69,12 +70,6 @@ export function Inicio() {
 
   const meses = saldoPorMes(datos.preordenes, hoy);
   const maximoMes = Math.max(1, ...meses.map((m) => m.saldo));
-  const anioHoy = hoy.slice(0, 4);
-  /** "nov" (y el año abajo solo si no es este año); "Sin fecha" para las que no tienen. */
-  const etiquetaMes = (clave: string) =>
-    clave === 'sin_fecha'
-      ? { nombre: 'Sin fecha', anio: '' }
-      : { nombre: MESES[Number(clave.slice(5, 7)) - 1], anio: clave.slice(0, 4) === anioHoy ? '' : clave.slice(0, 4) };
 
   return (
     <main className="flex flex-col gap-6 pt-5 pb-2">
@@ -90,38 +85,34 @@ export function Inicio() {
 
       {!sinNada && (
         <section aria-labelledby="titulo-por-mes" className="flex flex-col gap-3 px-5">
-          <TituloEtiqueta id="titulo-por-mes" etiqueta="Por pagar" acento="cada mes" />
+          <div className="flex items-end justify-between gap-3">
+            <TituloEtiqueta id="titulo-por-mes" etiqueta="Por pagar" acento="cada mes" />
+            {meses.length > 0 && (
+              <span className="flex flex-col items-end gap-0.5">
+                <span className="text-[11px] text-tinta-suave">Total</span>
+                <Monto monto={t.totalPendiente} className="font-display text-[22px] leading-none font-extrabold" />
+              </span>
+            )}
+          </div>
           {meses.length === 0 ? (
             <p className="text-sm text-tinta-suave">Estás al día: no tenés nada por pagar.</p>
           ) : (
             <>
-              <ol className="carrusel -mx-5 flex gap-2.5 overflow-x-auto px-5">
-                {meses.map((m, i) => {
-                  const { nombre, anio } = etiquetaMes(m.clave);
-                  return (
-                    <li
-                      key={m.clave}
-                      aria-label={`${nombre}${anio ? ` ${anio}` : ''}: ${formatearMonto(m.saldo)}, ${m.cantidad} ${m.cantidad === 1 ? 'preorden' : 'preórdenes'}`}
-                      className="flex h-[168px] min-w-[60px] flex-1 flex-col items-center justify-end gap-1.5"
-                    >
-                      <Monto monto={m.saldo} className="font-display text-[13px] font-extrabold whitespace-nowrap" />
-                      <span
-                        aria-hidden="true"
-                        className={`w-full rounded-t-[10px] rounded-b-md ${i === 0 ? 'bg-naranja-500' : 'bg-superficie-suave'}`}
-                        style={{ height: `${Math.max(6, Math.round((m.saldo / maximoMes) * 100))}px` }}
-                      />
-                      <span aria-hidden="true" className="flex flex-col items-center leading-tight">
-                        <span className={`text-xs ${i === 0 ? 'font-bold text-tinta' : 'text-tinta-suave'}`}>{nombre}</span>
-                        <span className="h-3.5 text-[10.5px] text-tinta-tenue">{anio}</span>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
-              <div className="flex items-baseline justify-between border-t border-borde-suave pt-3">
-                <span className="text-sm text-tinta-suave">Total pendiente</span>
-                <Monto monto={t.totalPendiente} className="font-display text-2xl leading-none font-extrabold" />
-              </div>
+              {/* Hasta 4 meses; el resto (y qué preórdenes suman en cada uno) en la pantalla Por pagar. */}
+              <ul className="flex flex-col gap-1">
+                {meses.slice(0, 4).map((m, i) => (
+                  <li key={m.clave}>
+                    <FilaSaldoMes mes={m} hoy={hoy} maximo={maximoMes} destacado={i === 0} />
+                  </li>
+                ))}
+              </ul>
+              <Link
+                to="/por-pagar"
+                className="flex min-h-11 items-center justify-center gap-1.5 rounded-xl bg-superficie-suave text-sm font-bold hover:bg-borde-suave"
+              >
+                Ver detalles
+                <Icono nombre="adelante" tamano={16} grosor={2.4} />
+              </Link>
             </>
           )}
         </section>

@@ -10,16 +10,20 @@ import { Monto } from '../atoms/Monto';
 interface Props {
   preorden: Preorden;
   tienda?: string;
+  /** Reemplaza la línea de tienda · fecha (ej. "Atrasada · se esperaba en oct"). */
+  detalle?: string;
+  /** La línea de detalle va en naranja. */
+  alerta?: boolean;
 }
 
 /**
  * Fila compacta de Inicio ("Más adelante" y "También por pagar") (especificación 8.1).
  * A la derecha va el saldo; si ya está pagada, el estado (en camino) o "Pagado".
  */
-export function FilaPreorden({ preorden: p, tienda }: Props) {
+export function FilaPreorden({ preorden: p, tienda, detalle: detalleDado, alerta = false }: Props) {
   const url = useImagen(p.imagenId);
   const saldo = saldoPendiente(p);
-  const detalle = [tienda, formatearFechaEstimada(p.fechaEstimada)].filter(Boolean).join(' · ');
+  const detalle = detalleDado ?? [tienda, formatearFechaEstimada(p.fechaEstimada)].filter(Boolean).join(' · ');
 
   return (
     <Link
@@ -35,7 +39,7 @@ export function FilaPreorden({ preorden: p, tienda }: Props) {
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
         <span className="truncate text-[15px] font-medium">{p.nombre}</span>
-        <span className="truncate text-[13px] text-tinta-suave">{detalle}</span>
+        <span className={`truncate text-[13px] ${alerta ? 'text-acento-texto' : 'text-tinta-suave'}`}>{detalle}</span>
       </span>
       {saldo > 0 ? (
         <span className="flex shrink-0 flex-col items-end">

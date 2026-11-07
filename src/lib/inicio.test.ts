@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Preorden } from '../types';
 import { totales } from './calculos';
-import { resumenInicio, saldoPorMes } from './inicio';
+import { etiquetaMes, resumenInicio, saldoPorMes } from './inicio';
 
 function p(nombre: string, cambios: Partial<Preorden>): Preorden {
   return {
@@ -84,5 +84,13 @@ describe('resumen de Inicio', () => {
     expect(meses[0].cantidad).toBe(5);
     expect(meses.map((m) => m.saldo)).toEqual([50000, 10000, 10000]);
     expect(meses.reduce((s, m) => s + m.saldo, 0)).toBe(totales(lista).totalPendiente);
+    expect(nombres(meses[0].preordenes)).toEqual(['Peluche', 'Llavero', 'Artbook', 'Tomo 12', 'Novela']);
+    expect(nombres(meses[2].preordenes)).toEqual(['Sin fecha']);
+  });
+
+  it('etiqueta del mes: el año solo si no es el de hoy', () => {
+    expect(etiquetaMes('2026-11', HOY)).toEqual({ nombre: 'nov', anio: '' });
+    expect(etiquetaMes('2027-03', HOY)).toEqual({ nombre: 'mar', anio: '2027' });
+    expect(etiquetaMes('sin_fecha', HOY)).toEqual({ nombre: 'Sin fecha', anio: '' });
   });
 });
