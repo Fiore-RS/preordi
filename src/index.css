@@ -80,6 +80,9 @@
   --color-tono-marino-texto: #16273D;
   --color-tono-gris: #E9EDF2;
   --color-tono-gris-texto: #4A5F7A;
+
+  /* Velo detrás de las hojas inferiores */
+  --color-velo: rgb(13 23 38 / 0.55);
 }
 
 /*
@@ -123,6 +126,9 @@
   --color-tono-marino-texto: #0D1726;
   --color-tono-gris: #203856;
   --color-tono-gris-texto: #94A8C2;
+
+  /* En oscuro el velo marino casi no se nota sobre el fondo: se usa negro más denso. */
+  --color-velo: rgb(0 0 0 / 0.7);
 
   color-scheme: dark;
 }

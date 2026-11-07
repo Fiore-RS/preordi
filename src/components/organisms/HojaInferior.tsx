@@ -39,7 +39,7 @@ export function HojaInferior({ titulo, subtitulo, onCerrar, children }: Props) {
       <div
         aria-hidden="true"
         onClick={onCerrar}
-        className="absolute inset-0 animate-[aparecer_150ms_ease-out] bg-marino-900/55"
+        className="absolute inset-0 animate-[aparecer_150ms_ease-out] bg-velo"
       />
       <div
         ref={hoja}
@@ -47,7 +47,7 @@ export function HojaInferior({ titulo, subtitulo, onCerrar, children }: Props) {
         aria-modal="true"
         aria-labelledby={idTitulo}
         tabIndex={-1}
-        className="no-scrollbar relative flex max-h-[88%] animate-[subir_220ms_ease-out] flex-col gap-4 overflow-y-auto rounded-t-[28px] bg-fondo px-5 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus:outline-none"
+        className="no-scrollbar relative flex max-h-[88%] animate-[subir_220ms_ease-out] flex-col gap-4 overflow-y-auto rounded-t-[28px] border border-b-0 border-borde bg-fondo px-5 shadow-[0_-12px_32px_-12px_rgba(0,0,0,0.45)] pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] focus:outline-none"
       >
         <span aria-hidden="true" className="mx-auto h-[5px] w-11 shrink-0 rounded-full bg-borde" />
         <div className="flex flex-col gap-0.5">

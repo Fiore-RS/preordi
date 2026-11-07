@@ -484,39 +484,40 @@ export function DetallePreorden() {
       {hoja?.tipo === 'estado' && <HojaEstado preorden={preorden} a={hoja.a} onGuardar={guardar} onCerrar={cerrar} />}
       {hoja?.tipo === 'acciones' && (
         <HojaInferior titulo="Más acciones" subtitulo={preorden.nombre} onCerrar={cerrar}>
-          <ul className="flex flex-col">
-            <li>
-              <Link
-                to={`/preordenes/${preorden.id}/editar`}
-                className="flex min-h-12 items-center gap-3 border-b border-borde-suave text-[15px] font-medium"
-              >
-                <Icono nombre="editar" />
-                Editar datos
-              </Link>
-            </li>
-            {otrasTransiciones.map((estado) => (
-              <li key={estado}>
-                <button
-                  type="button"
-                  onClick={() => setHoja({ tipo: 'estado', a: estado })}
-                  className="flex min-h-12 w-full items-center gap-3 border-b border-borde-suave text-left text-[15px] font-medium"
+          {/* Cada opción en su propia fila sobre una tarjeta (superficie + borde): sobre el fondo de la hoja se distinguen en los dos modos. */}
+          <div className="flex flex-col gap-2.5">
+            <ul className="flex flex-col divide-y divide-borde overflow-hidden rounded-2xl border border-borde bg-superficie">
+              <li>
+                <Link
+                  to={`/preordenes/${preorden.id}/editar`}
+                  className="flex min-h-13 items-center gap-3 px-4 text-[15px] font-medium hover:bg-superficie-suave"
                 >
-                  <Icono nombre={estado === 'cancelada' ? 'cerrar' : 'caja'} />
-                  {textoTransicion(preorden.estado, estado)}
-                </button>
+                  <Icono nombre="editar" className="text-tinta-suave" />
+                  Editar datos
+                </Link>
               </li>
-            ))}
-            <li>
-              <button
-                type="button"
-                onClick={() => setHoja({ tipo: 'eliminar' })}
-                className="flex min-h-12 w-full items-center gap-3 text-left text-[15px] font-bold text-acento-texto"
-              >
-                <Icono nombre="basura" />
-                {esDeseo ? 'Eliminar deseo' : 'Eliminar preorden'}
-              </button>
-            </li>
-          </ul>
+              {otrasTransiciones.map((estado) => (
+                <li key={estado}>
+                  <button
+                    type="button"
+                    onClick={() => setHoja({ tipo: 'estado', a: estado })}
+                    className="flex min-h-13 w-full items-center gap-3 px-4 text-left text-[15px] font-medium hover:bg-superficie-suave"
+                  >
+                    <Icono nombre={estado === 'cancelada' ? 'cerrar' : 'caja'} className="text-tinta-suave" />
+                    {textoTransicion(preorden.estado, estado)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button
+              type="button"
+              onClick={() => setHoja({ tipo: 'eliminar' })}
+              className="flex min-h-13 w-full items-center gap-3 rounded-2xl border border-acento-borde bg-acento-tenue px-4 text-left text-[15px] font-bold text-acento-texto"
+            >
+              <Icono nombre="basura" />
+              {esDeseo ? 'Eliminar deseo' : 'Eliminar preorden'}
+            </button>
+          </div>
         </HojaInferior>
       )}
       {hoja?.tipo === 'eliminar' && (
