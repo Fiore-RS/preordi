@@ -14,7 +14,7 @@ import {
   type FormularioPreorden as Formulario,
 } from '../../lib/formulario';
 import { nuevoId } from '../../lib/ids';
-import { borrarImagen, comprimirImagen, guardarImagen } from '../../lib/imagenes';
+import { borrarImagen, cargarUrl, comprimirImagen, guardarImagen } from '../../lib/imagenes';
 import { useImagen } from '../../lib/useImagen';
 import type { Preorden } from '../../types';
 import { Boton } from '../atoms/Boton';
@@ -119,6 +119,8 @@ export function FormularioPreorden({ original, estadoInicial = 'apartada', onGua
         if (imagen.tipo === 'nueva') {
           const imagenId = nuevoId();
           await guardarImagen(imagenId, imagen.blob);
+          // Deja la foto nueva lista antes de volver al detalle, para que no aparezca primero el marcador.
+          await cargarUrl(imagenId);
           if (original?.imagenId) await borrarImagen(original.imagenId);
           preorden = { ...preorden, imagenId };
         } else if (imagen.tipo === 'quitada' && original?.imagenId) {

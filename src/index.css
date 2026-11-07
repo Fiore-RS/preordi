@@ -209,7 +209,7 @@
 /*
   Pantallas secundarias (detalle, nueva/editar, configuración), como en Teleo: entrar
   "más adentro" llega desde la derecha; volver hacia afuera llega un poco desde la izquierda.
-  Acá sí se usa transform: dura 300 ms y no queda puesto al terminar, y lo absolute de
+  Acá sí se usa transform: dura 480 ms y no queda puesto al terminar, y lo absolute de
   estas pantallas cuelga de su propio contenedor relative.
 */
 @keyframes subpantalla-entra {
@@ -237,11 +237,11 @@
 }
 
 @utility animate-subpantalla-entra {
-  animation: subpantalla-entra 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: subpantalla-entra 480ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @utility animate-subpantalla-vuelve {
-  animation: subpantalla-vuelve 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: subpantalla-vuelve 480ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Quien prefiera menos movimiento (ajuste del sistema) no ve animaciones. */

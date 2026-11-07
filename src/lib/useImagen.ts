@@ -1,33 +1,31 @@
 import { useEffect, useState } from 'react';
 import type { ID } from '../types';
-import { obtenerImagen } from './imagenes';
+import { cargarUrl, urlEnCache } from './imagenes';
 
 /**
- * URL temporal (object URL) de la imagen guardada en IndexedDB, o null mientras carga
- * o si no hay. Se libera sola al desmontar o al cambiar de imagen.
+ * URL de la imagen guardada en IndexedDB, o null mientras carga o si no hay.
+ * Si ya se cargó antes (o se precargó al abrir la app), sale de una vez desde el primer render,
+ * así las pantallas no muestran primero el marcador y después la foto.
  */
 export function useImagen(id: ID | null): string | null {
-  const [cargada, setCargada] = useState<{ id: ID; url: string } | null>(null);
+  const [cargada, setCargada] = useState<{ id: ID; url: string } | null>(() => {
+    const url = id ? urlEnCache(id) : null;
+    return id && url ? { id, url } : null;
+  });
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || urlEnCache(id)) return;
     let vigente = true;
-    let url: string | null = null;
-    obtenerImagen(id)
-      .then((blob) => {
-        if (!vigente || !blob) return;
-        url = URL.createObjectURL(blob);
-        setCargada({ id, url });
-      })
-      .catch(() => {
-        // Sin imagen: se muestra el marcador.
-      });
+    cargarUrl(id).then((url) => {
+      if (vigente && url) setCargada({ id, url });
+    });
     return () => {
       vigente = false;
-      if (url) URL.revokeObjectURL(url);
     };
   }, [id]);
 
+  if (!id) return null;
   // Evita mostrar por un instante la imagen anterior al cambiar de id.
-  return id && cargada?.id === id ? cargada.url : null;
+  if (cargada?.id === id) return cargada.url;
+  return urlEnCache(id);
 }

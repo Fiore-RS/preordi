@@ -13,7 +13,55 @@ export const CALIDAD_JPEG = 0.85;
 let almacen: UseStore | undefined;
 const store = () => (almacen ??= createStore('preordi', 'imagenes'));
 
+/*
+  Caché de URLs ya listas para mostrar. Sin ella, cada vez que se abre una pantalla las
+  imágenes se vuelven a leer de IndexedDB y por un instante se ve el marcador antes de la foto.
+  Las URLs se guardan mientras la app esté abierta y se liberan solo cuando la imagen se borra o reemplaza.
+*/
+const urls = new Map<ID, string>();
+const pendientes = new Map<ID, Promise<string | null>>();
+
+/** URL de una imagen que ya se cargó antes, sin esperar. */
+export function urlEnCache(id: ID): string | null {
+  return urls.get(id) ?? null;
+}
+
+/** Carga la imagen, la deja decodificada (lista para pintarse sin parpadeo) y guarda su URL. */
+export function cargarUrl(id: ID): Promise<string | null> {
+  const lista = urls.get(id);
+  if (lista) return Promise.resolve(lista);
+  let promesa = pendientes.get(id);
+  if (!promesa) {
+    promesa = obtenerImagen(id)
+      .then(async (blob) => {
+        if (!blob) return null;
+        const url = URL.createObjectURL(blob);
+        const img = new Image();
+        img.src = url;
+        await img.decode().catch(() => {});
+        urls.set(id, url);
+        return url;
+      })
+      .catch(() => null)
+      .finally(() => pendientes.delete(id));
+    pendientes.set(id, promesa);
+  }
+  return promesa;
+}
+
+/** Carga varias de una vez (al abrir la app, mientras se ve la pantalla de carga). */
+export function precargarImagenes(ids: ID[]): Promise<void> {
+  return Promise.all(ids.map(cargarUrl)).then(() => {});
+}
+
+function olvidar(id: ID): void {
+  const url = urls.get(id);
+  if (url) URL.revokeObjectURL(url);
+  urls.delete(id);
+}
+
 export function guardarImagen(id: ID, blob: Blob): Promise<void> {
+  olvidar(id);
   return set(id, blob, store());
 }
 
@@ -22,6 +70,7 @@ export function obtenerImagen(id: ID): Promise<Blob | undefined> {
 }
 
 export function borrarImagen(id: ID): Promise<void> {
+  olvidar(id);
   return del(id, store());
 }
 
@@ -29,6 +78,7 @@ export function borrarImagen(id: ID): Promise<void> {
 export async function limpiarHuerfanas(idsEnUso: Set<ID>): Promise<number> {
   const todas = (await keys(store())) as ID[];
   const huerfanas = todas.filter((id) => !idsEnUso.has(id));
+  huerfanas.forEach(olvidar);
   await Promise.all(huerfanas.map((id) => del(id, store())));
   return huerfanas.length;
 }
@@ -79,10 +129,12 @@ export async function todasLasImagenes(): Promise<Map<ID, Blob>> {
 
 /** Guarda varias imágenes de una vez (al importar un respaldo). */
 export function guardarVarias(imagenes: Map<ID, Blob>): Promise<void> {
+  [...imagenes.keys()].forEach(olvidar);
   return setMany([...imagenes], store());
 }
 
 /** Vacía el almacén de imágenes (al reiniciar todo). */
 export function borrarTodasLasImagenes(): Promise<void> {
+  [...urls.keys()].forEach(olvidar);
   return clear(store());
 }

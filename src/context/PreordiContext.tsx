@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useReducer, type Dispatch, type ReactNode } from 'react';
 import type { Categoria, DatosPreordi, ID, Preorden, Tienda } from '../types';
 import { reasignarCategoria, reasignarTienda } from '../lib/configuracion';
-import { limpiarHuerfanas } from '../lib/imagenes';
+import { limpiarHuerfanas, precargarImagenes } from '../lib/imagenes';
 import { cargarDatos, guardarDatos } from '../lib/persistencia';
 
 export type Accion =
@@ -84,6 +84,8 @@ export function PreordiProvider({ children }: { children: ReactNode }) {
     limpiarHuerfanas(enUso).catch(() => {
       // Si IndexedDB no está disponible, no hay nada que limpiar.
     });
+    // Mientras se ve la pantalla de carga, deja todas las fotos listas para que las pantallas no parpadeen.
+    precargarImagenes([...enUso]).catch(() => {});
     // Solo una vez, con los datos con los que arrancó la app.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
