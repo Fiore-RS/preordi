@@ -14,6 +14,8 @@ export type Accion =
   | { tipo: 'eliminarTienda'; id: ID }
   /** Nuevo orden de las categorías (Configuración). */
   | { tipo: 'reemplazarCategorias'; categorias: Categoria[] }
+  /** Nuevo orden de las tiendas (Configuración): el orden del arreglo es el de los menús. */
+  | { tipo: 'reemplazarTiendas'; tiendas: Tienda[] }
   /** Borrar una categoría en uso: primero pasa sus preórdenes a otra (5.7). */
   | { tipo: 'moverYEliminarCategoria'; de: ID; a: ID }
   /** Borrar una tienda en uso: sus preórdenes pasan a otra tienda o a ninguna. */
@@ -51,6 +53,8 @@ function reducer(datos: DatosPreordi, accion: Accion): DatosPreordi {
       return { ...datos, tiendas: datos.tiendas.filter((t) => t.id !== accion.id) };
     case 'reemplazarCategorias':
       return { ...datos, categorias: accion.categorias };
+    case 'reemplazarTiendas':
+      return { ...datos, tiendas: accion.tiendas };
     case 'moverYEliminarCategoria':
       if (accion.de === accion.a || !datos.categorias.some((c) => c.id === accion.a)) return datos;
       return {

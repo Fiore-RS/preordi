@@ -83,6 +83,12 @@
 
   /* Velo detrás de las hojas inferiores */
   --color-velo: rgb(13 23 38 / 0.55);
+
+  /* Barra inferior: marino en los dos modos (en oscuro, el marino de las superficies); la pestaña activa en el naranja del botón + */
+  --color-barra: #203856;
+  --color-barra-borde: #203856;
+  --color-barra-activo: #E28C00;
+  --color-barra-inactivo: #94A8C2;
 }
 
 /*
@@ -129,6 +135,11 @@
 
   /* En oscuro el velo marino casi no se nota sobre el fondo: se usa negro más denso. */
   --color-velo: rgb(0 0 0 / 0.7);
+
+  --color-barra: #16273D;
+  --color-barra-borde: #2A4466;
+  --color-barra-activo: #E28C00;
+  --color-barra-inactivo: #94A8C2;
 
   color-scheme: dark;
 }

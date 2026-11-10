@@ -36,6 +36,20 @@ export function moverCategoria(categorias: Categoria[], id: ID, direccion: -1 | 
   return ordenadas.map((c, orden) => ({ ...c, orden }));
 }
 
+/** Saca el elemento de la posición `desde` y lo pone en `hacia` (arrastrar para ordenar). */
+export function moverA<T>(lista: T[], desde: number, hacia: number): T[] {
+  if (desde === hacia || desde < 0 || hacia < 0 || desde >= lista.length || hacia >= lista.length) return lista;
+  const copia = [...lista];
+  const [item] = copia.splice(desde, 1);
+  copia.splice(hacia, 0, item);
+  return copia;
+}
+
+/** Renumera `orden` de 0 en adelante según la posición en la lista. */
+export function renumerar(categorias: Categoria[]): Categoria[] {
+  return categorias.map((c, orden) => (c.orden === orden ? c : { ...c, orden }));
+}
+
 /** Pasa las preórdenes de una categoría a otra (paso previo a borrar una categoría en uso). */
 export function reasignarCategoria(preordenes: Preorden[], de: ID, a: ID, ahoraISO: string): Preorden[] {
   return preordenes.map((p) => (p.categoriaId === de ? { ...p, categoriaId: a, actualizadaEl: ahoraISO } : p));

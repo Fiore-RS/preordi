@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Categoria, Preorden } from '../types';
-import { contarUso, moverCategoria, reasignarCategoria, reasignarTienda, validarNombre } from './configuracion';
+import { contarUso, moverA, moverCategoria, renumerar, reasignarCategoria, reasignarTienda, validarNombre } from './configuracion';
 
 const categorias: Categoria[] = [
   { id: 'libro', nombre: 'Libro', orden: 0 },
@@ -53,5 +53,24 @@ describe('reasignar antes de borrar', () => {
     const ahora = '2026-11-05T00:00:00.000Z';
     expect(reasignarCategoria(preordenes, 'figura', 'libro', ahora).map((x) => x.categoriaId)).toEqual(['libro', 'libro', 'manga']);
     expect(reasignarTienda(preordenes, 'local', null, ahora).map((x) => x.tiendaId)).toEqual([null, null, null]);
+  });
+});
+
+describe('moverA y renumerar (arrastrar para ordenar)', () => {
+  it('mueve hacia abajo y hacia arriba', () => {
+    expect(moverA(['a', 'b', 'c', 'd'], 0, 2)).toEqual(['b', 'c', 'a', 'd']);
+    expect(moverA(['a', 'b', 'c', 'd'], 3, 1)).toEqual(['a', 'd', 'b', 'c']);
+  });
+  it('devuelve la misma lista si no hay cambio o el índice no existe', () => {
+    const lista = ['a', 'b'];
+    expect(moverA(lista, 1, 1)).toBe(lista);
+    expect(moverA(lista, 0, 5)).toBe(lista);
+  });
+  it('renumera el orden según la posición', () => {
+    const r = renumerar([
+      { id: 'x', nombre: 'X', orden: 4 },
+      { id: 'y', nombre: 'Y', orden: 1 },
+    ]);
+    expect(r.map((c) => c.orden)).toEqual([0, 1]);
   });
 });

@@ -4,13 +4,14 @@ import { Icono } from '../components/atoms/Icono';
 import { TituloEtiqueta } from '../components/atoms/TituloEtiqueta';
 import { BotonAgregar } from '../components/molecules/AgregarNuevo';
 import { Encabezado } from '../components/molecules/Encabezado';
+import { ListaOrdenable } from '../components/molecules/ListaOrdenable';
 import { Segmentado } from '../components/molecules/Segmentado';
 import { MensajeError } from '../components/molecules/Campo';
 import { HojaCategoria } from '../components/organisms/HojaCategoria';
 import { HojaInferior } from '../components/organisms/HojaInferior';
 import { HojaTienda } from '../components/organisms/HojaTienda';
 import { usePreordi } from '../context/PreordiContext';
-import { contarUso } from '../lib/configuracion';
+import { contarUso, renumerar } from '../lib/configuracion';
 import { useTema } from '../lib/tema';
 import { formatearFecha, hoy } from '../lib/fechas';
 import { ultimoRespaldo } from '../lib/recordatorioRespaldo';
@@ -44,9 +45,13 @@ function textoResumen(r: ResumenRespaldo): string {
   return partes.join(' · ');
 }
 
+/** Fila editable de categoría o tienda: con agarre a la izquierda, el texto se pega a él. */
+const claseFilaEditable = (cantidad: number) =>
+  `flex min-h-14 w-full items-center gap-3 py-2.5 pr-3.5 text-left ${cantidad > 1 ? 'pl-1' : 'pl-3.5'}`;
+
 const CLASE_FILA = 'flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left disabled:opacity-60';
 
-// Especificación 8.9, 6.3 (respaldo) y 10.4 (modo de color).
+// Especificación 8.9, 6.3 (respaldo) y 10.4 (modo de color). Categorías y tiendas se ordenan arrastrando.
 export function Configuracion() {
   const { datos, dispatch } = usePreordi();
   const [hoja, setHoja] = useState<Hoja>(null);
@@ -130,24 +135,26 @@ export function Configuracion() {
       <div className="flex flex-col gap-7 px-5 pt-2 pb-10">
         <section aria-labelledby="titulo-categorias" className="flex flex-col gap-2.5">
           <TituloEtiqueta id="titulo-categorias" etiqueta="Mis" acento="categorías" />
-          <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
-            {categorias.map((c) => (
-              <li key={c.id} className="border-b-2 border-fondo last:border-b-0">
-                <button
-                  type="button"
-                  onClick={() => setHoja({ tipo: 'categoria', categoria: c })}
-                  aria-label={`Editar ${c.nombre}`}
-                  className="flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left"
-                >
-                  <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate text-[15px]">{c.nombre}</span>
-                    <span className="text-[13px] text-tinta-suave">{textoUso(uso.categorias.get(c.id) ?? 0)}</span>
-                  </span>
-                  <Icono nombre="editar" tamano={18} className="shrink-0 text-tinta-suave" />
-                </button>
-              </li>
-            ))}
-          </ul>
+          <ListaOrdenable
+            items={categorias}
+            nombre={(c) => c.nombre}
+            onReordenar={(lista) => dispatch({ tipo: 'reemplazarCategorias', categorias: renumerar(lista) })}
+          >
+            {(c) => (
+              <button
+                type="button"
+                onClick={() => setHoja({ tipo: 'categoria', categoria: c })}
+                aria-label={`Editar ${c.nombre}`}
+                className={claseFilaEditable(categorias.length)}
+              >
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-[15px]">{c.nombre}</span>
+                  <span className="text-[13px] text-tinta-suave">{textoUso(uso.categorias.get(c.id) ?? 0)}</span>
+                </span>
+                <Icono nombre="editar" tamano={18} className="shrink-0 text-tinta-suave" />
+              </button>
+            )}
+          </ListaOrdenable>
           <BotonAgregar texto="Agregar categoría" onClick={() => setHoja({ tipo: 'categoria' })} />
         </section>
 
@@ -158,26 +165,28 @@ export function Configuracion() {
               Todavía no agregaste tiendas. También podés crearlas al registrar una preorden.
             </p>
           ) : (
-            <ul className="overflow-hidden rounded-2xl bg-superficie-suave">
-              {datos.tiendas.map((t) => (
-                <li key={t.id} className="border-b-2 border-fondo last:border-b-0">
-                  <button
-                    type="button"
-                    onClick={() => setHoja({ tipo: 'tienda', tienda: t })}
-                    aria-label={`Editar ${t.nombre}`}
-                    className="flex min-h-14 w-full items-center gap-3 px-3.5 py-2.5 text-left"
-                  >
-                    <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-[15px]">{t.nombre}</span>
-                      <span className="truncate text-[13px] text-tinta-suave">
-                        {t.notas || textoUso(uso.tiendas.get(t.id) ?? 0)}
-                      </span>
+            <ListaOrdenable
+              items={datos.tiendas}
+              nombre={(t) => t.nombre}
+              onReordenar={(tiendas) => dispatch({ tipo: 'reemplazarTiendas', tiendas })}
+            >
+              {(t) => (
+                <button
+                  type="button"
+                  onClick={() => setHoja({ tipo: 'tienda', tienda: t })}
+                  aria-label={`Editar ${t.nombre}`}
+                  className={claseFilaEditable(datos.tiendas.length)}
+                >
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="truncate text-[15px]">{t.nombre}</span>
+                    <span className="truncate text-[13px] text-tinta-suave">
+                      {t.notas || textoUso(uso.tiendas.get(t.id) ?? 0)}
                     </span>
-                    <Icono nombre="editar" tamano={18} className="shrink-0 text-tinta-suave" />
-                  </button>
-                </li>
-              ))}
-            </ul>
+                  </span>
+                  <Icono nombre="editar" tamano={18} className="shrink-0 text-tinta-suave" />
+                </button>
+              )}
+            </ListaOrdenable>
           )}
           <BotonAgregar texto="Agregar tienda" onClick={() => setHoja({ tipo: 'tienda' })} />
         </section>
@@ -189,9 +198,9 @@ export function Configuracion() {
             valor={tema}
             onCambio={setTema}
             opciones={[
-              { valor: 'sistema', texto: 'Sistema' },
               { valor: 'claro', texto: 'Claro' },
               { valor: 'oscuro', texto: 'Oscuro' },
+              { valor: 'sistema', texto: 'Sistema' },
             ]}
           />
           <p className="text-[13px] text-tinta-suave">
